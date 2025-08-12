@@ -69,7 +69,7 @@ export default function ChallengesPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-4 pb-20 justify-normal">
+    <div className="flex flex-col gap-6 p-4  justify-normal">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
