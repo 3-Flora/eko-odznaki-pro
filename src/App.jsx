@@ -3,6 +3,10 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Navbar } from "./components/layout/Navbar";
 import { BottomNav } from "./components/layout/BottomNav";
 import Pages from "./pages";
+import DeviceEnvironmentProvider, {
+  useDeviceEnvironment,
+} from "./contexts/DeviceEnvironmentContext";
+import Loading from "./components/loading/Loading";
 const {
   ActivityPage,
   AuthPage,
@@ -12,48 +16,51 @@ const {
   RankingPage,
 } = Pages;
 
+const renderContent = (activeTab) => {
+  switch (activeTab) {
+    case "dashboard":
+      return <DashboardPage />;
+    case "submit":
+      return <ActivityPage />;
+    case "ranking":
+      return <RankingPage />;
+    case "challenges":
+      return <ChallengesPage />;
+    case "profile":
+      return <ProfilePage />;
+    default:
+      return <DashboardPage />;
+  }
+};
+
 const AppContent = () => {
   const { currentUser, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isLogin, setIsLogin] = useState(true);
+  const { mobileDeviceType } = useDeviceEnvironment();
 
   // Show loading spinner while auth is loading
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-4 border-b-2 border-green-500 rounded-full animate-spin"></div>
-          <p className="text-gray-600">Ładowanie...</p>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
+  // Show auth page if user is not logged in
   if (!currentUser) {
     return <AuthPage isLogin={isLogin} onToggle={() => setIsLogin(!isLogin)} />;
   }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <DashboardPage />;
-      case "submit":
-        return <ActivityPage />;
-      case "ranking":
-        return <RankingPage />;
-      case "challenges":
-        return <ChallengesPage />;
-      case "profile":
-        return <ProfilePage />;
-      default:
-        return <DashboardPage />;
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div
+      className={`flex flex-col min-h-screen bg-gray-50 ${
+        mobileDeviceType === "SEorAndroid" && "pt-11"
+      } ${mobileDeviceType === "notch" && "pt-18"}`}
+    >
       <Navbar onTabChange={setActiveTab} />
-      <main className="flex-1 py-16 overflow-auto">{renderContent()}</main>
+      <Debug />
+      <main className="flex-1 py-16 overflow-auto">
+        {/* TODO: CHANGE TO REACT ROUTER */}
+        {renderContent(activeTab)}
+      </main>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
@@ -61,8 +68,10 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <DeviceEnvironmentProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </DeviceEnvironmentProvider>
   );
 }
