@@ -33,7 +33,7 @@ export const BottomNav = () => {
             key={id}
             to={id}
             className={({ isActive }) =>
-              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ` +
+              `flex flex-col flex-1 items-center py-2 px-3 rounded-lg transition-all duration-200 ` +
               (isActive
                 ? "text-green-600 bg-green-50 scale-105"
                 : "text-gray-600 hover:text-green-600")
