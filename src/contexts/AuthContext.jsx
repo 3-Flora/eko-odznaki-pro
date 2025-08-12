@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }) => {
         role: additionalData?.role || "student",
         points: 0,
         badges: [],
-        isGuest: false,
         ...(firebaseUser.photoURL && { photoURL: firebaseUser.photoURL }),
       };
 
@@ -206,27 +205,8 @@ export const AuthProvider = ({ children }) => {
     await createUserDocument(user);
   };
 
-  const loginAsGuest = async () => {
-    const guestUser = {
-      id: "guest-" + Date.now(),
-      email: "guest@example.com",
-      displayName: "Gość",
-      school: "Unverified",
-      className: "Unverified",
-      role: "guest",
-      points: 0,
-      badges: [],
-      isGuest: true,
-    };
-    setCurrentUser(guestUser);
-  };
-
   const logout = async () => {
-    if (currentUser?.isGuest) {
-      setCurrentUser(null);
-    } else {
-      await signOut(auth);
-    }
+    await signOut(auth);
   };
 
   const deleteAccount = async () => {
@@ -300,7 +280,6 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     loginWithGoogle,
-    loginAsGuest,
     logout,
     updateUserPoints,
     addBadgeToUser,

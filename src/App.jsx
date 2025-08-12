@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { Navbar } from "./components/layout/Navbar";
-import { BottomNav } from "./components/layout/BottomNav";
 import Pages from "./pages";
-import DeviceEnvironmentProvider, {
-  useDeviceEnvironment,
-} from "./contexts/DeviceEnvironmentContext";
+import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
 import Loading from "./components/loading/Loading";
+import { Navigate, BrowserRouter, Route, Routes, Outlet } from "react-router";
+import Layout from "./components/layout/Layout";
 const {
   ActivityPage,
   AuthPage,
@@ -16,55 +13,34 @@ const {
   RankingPage,
 } = Pages;
 
-const renderContent = (activeTab) => {
-  switch (activeTab) {
-    case "dashboard":
-      return <DashboardPage />;
-    case "submit":
-      return <ActivityPage />;
-    case "ranking":
-      return <RankingPage />;
-    case "challenges":
-      return <ChallengesPage />;
-    case "profile":
-      return <ProfilePage />;
-    default:
-      return <DashboardPage />;
-  }
-};
+function ProtectedRoute({ isAuth }) {
+  return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
-const AppContent = () => {
+function AppContent() {
   const { currentUser, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [isLogin, setIsLogin] = useState(true);
-  const { mobileDeviceType } = useDeviceEnvironment();
 
-  // Show loading spinner while auth is loading
   if (loading) {
     return <Loading />;
   }
 
-  // Show auth page if user is not logged in
-  if (!currentUser) {
-    return <AuthPage isLogin={isLogin} onToggle={() => setIsLogin(!isLogin)} />;
-  }
-
   return (
-    <div
-      className={`flex flex-col min-h-screen bg-gray-50 ${
-        mobileDeviceType === "SEorAndroid" && "pt-11"
-      } ${mobileDeviceType === "notch" && "pt-18"}`}
-    >
-      <Navbar onTabChange={setActiveTab} />
-      <Debug />
-      <main className="flex-1 py-16 overflow-auto">
-        {/* TODO: CHANGE TO REACT ROUTER */}
-        {renderContent(activeTab)}
-      </main>
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/" element={<ProtectedRoute isAuth={currentUser} />}>
+          <Route path="" element={<Layout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="submit" element={<ActivityPage />} />
+            <Route path="ranking" element={<RankingPage />} />
+            <Route path="challenges" element={<ChallengesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
-};
+}
 
 export default function App() {
   return (

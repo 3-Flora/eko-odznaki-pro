@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, User, School, Users, Chrome } from "lucide-react";
+import { useNavigate } from "react-router";
 
-export default function AuthPage({ isLogin, onToggle }) {
+export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -12,7 +13,11 @@ export default function AuthPage({ isLogin, onToggle }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { login, register, loginWithGoogle, loginAsGuest } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+
+  const { login, register, loginWithGoogle } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +27,7 @@ export default function AuthPage({ isLogin, onToggle }) {
     try {
       if (isLogin) {
         await login(email, password);
+        navigate("/");
       } else {
         await register(email, password, {
           displayName,
@@ -29,6 +35,7 @@ export default function AuthPage({ isLogin, onToggle }) {
           className,
           role,
         });
+        navigate("/");
       }
     } catch (err) {
       setError(err.message);
@@ -43,23 +50,10 @@ export default function AuthPage({ isLogin, onToggle }) {
 
     try {
       await loginWithGoogle();
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
-
-    setLoading(false);
-  };
-
-  const handleGuestLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      await loginAsGuest();
-    } catch (err) {
-      setError(err.message);
-    }
-
     setLoading(false);
   };
 
@@ -72,24 +66,6 @@ export default function AuthPage({ isLogin, onToggle }) {
           <p className="text-gray-600">
             {isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"}
           </p>
-        </div>
-
-        {/* Guest Login Button */}
-        <button
-          onClick={handleGuestLogin}
-          disabled={loading}
-          className="w-full py-3 mb-6 font-semibold text-gray-700 transition duration-200 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 disabled:opacity-50"
-        >
-          {loading ? "Ładowanie..." : "Przejdź jako gość"}
-        </button>
-
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 text-gray-500 bg-white">lub zaloguj się</span>
-          </div>
         </div>
 
         {error && (
@@ -223,7 +199,7 @@ export default function AuthPage({ isLogin, onToggle }) {
 
         <div className="mt-6 text-center">
           <button
-            onClick={onToggle}
+            onClick={() => setIsLogin((p) => !p)}
             className="font-medium text-green-600 hover:text-green-700"
           >
             {isLogin

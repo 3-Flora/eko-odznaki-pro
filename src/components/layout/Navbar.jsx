@@ -1,18 +1,17 @@
-import React from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
 import { User, Trophy } from "lucide-react";
 
-export const Navbar = ({ onTabChange }) => {
+export const Navbar = () => {
   const { currentUser } = useAuth();
+
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-white border-b-4 border-green-400 shadow-lg">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div
-            className="flex items-center"
-            onClick={() => onTabChange("dashboard")}
-          >
+          <div className="flex items-center">
             <div className="mr-3 text-2xl">🌱</div>
             <h1 className="text-xl font-bold text-gray-800 select-none">
               EKO-odznaki
@@ -29,7 +28,7 @@ export const Navbar = ({ onTabChange }) => {
 
             <div
               className="flex items-center space-x-2"
-              onClick={() => onTabChange("profile")}
+              onClick={() => navigate("profile")}
             >
               {currentUser?.photoURL ? (
                 <img

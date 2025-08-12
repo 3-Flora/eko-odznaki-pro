@@ -254,22 +254,19 @@ export default function ProfilePage() {
         </span>
       </motion.div>
 
-      {/* Delete Account Button - Hidden for guests */}
-      {!currentUser?.isGuest && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="flex items-center p-4 transition-colors shadow-md cursor-pointer bg-red-50 rounded-xl hover:bg-red-100"
-          onClick={() => {
-            setShowDeleteModal(true);
-          }}
-        >
-          <span className="flex items-center gap-2 text-sm font-semibold text-red-600">
-            <Trash2 size={18} /> Usuń konto
-          </span>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="flex items-center p-4 transition-colors shadow-md cursor-pointer bg-red-50 rounded-xl hover:bg-red-100"
+        onClick={() => {
+          setShowDeleteModal(true);
+        }}
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold text-red-600">
+          <Trash2 size={18} /> Usuń konto
+        </span>
+      </motion.div>
 
       <ConfirmModal
         open={showDeleteModal}

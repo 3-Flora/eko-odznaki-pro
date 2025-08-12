@@ -11,7 +11,7 @@ export const ConfirmModal = ({
   confirmClassName = "bg-red-600 hover:bg-red-700 text-white",
   children,
 }) => {
-  const modalRef = useRef < HTMLDivElement > null;
+  const modalRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
