@@ -2,9 +2,12 @@
 import { Home, Plus, Trophy, User, BookOpen, CheckSquare } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink } from "react-router";
+import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
+import clsx from "clsx";
 
 export const BottomNav = () => {
   const { currentUser } = useAuth();
+  const { isPWA } = useDeviceEnvironment();
 
   const tabs = [
     { id: "/", icon: Home, label: "Główna" },
@@ -19,7 +22,11 @@ export const BottomNav = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-10 px-4 py-2 bg-white border-t border-gray-200">
+    <div
+      className={clsx("z-10 px-4 py-2 bg-white border-t border-gray-200", {
+        "pb-6": isPWA,
+      })}
+    >
       <div className="flex justify-around">
         {tabs.map(({ id, icon: Icon, label }) => (
           <NavLink
