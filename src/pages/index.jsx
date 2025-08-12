@@ -6,12 +6,12 @@ import ProfilePage from "./profile/page";
 import RankingPage from "./ranking/page";
 
 const Pages = {
-  Activity: ActivityPage,
-  Auth: AuthPage,
-  Challenges: ChallengesPage,
-  Dashboard: DashboardPage,
-  Profile: ProfilePage,
-  Ranking: RankingPage,
+  ActivityPage,
+  AuthPage,
+  ChallengesPage,
+  DashboardPage,
+  ProfilePage,
+  RankingPage,
 };
 
 export default Pages;

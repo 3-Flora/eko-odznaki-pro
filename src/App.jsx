@@ -2,8 +2,15 @@ import { useState } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Navbar } from "./components/layout/Navbar";
 import { BottomNav } from "./components/layout/BottomNav";
-
 import Pages from "./pages";
+const {
+  ActivityPage,
+  AuthPage,
+  ChallengesPage,
+  DashboardPage,
+  ProfilePage,
+  RankingPage,
+} = Pages;
 
 const AppContent = () => {
   const { currentUser, loading } = useAuth();
@@ -23,23 +30,23 @@ const AppContent = () => {
   }
 
   if (!currentUser) {
-    return <AuthForm isLogin={isLogin} onToggle={() => setIsLogin(!isLogin)} />;
+    return <AuthPage isLogin={isLogin} onToggle={() => setIsLogin(!isLogin)} />;
   }
 
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <Pages.Dashboard />;
+        return <DashboardPage />;
       case "submit":
-        return <Pages.Activity />;
+        return <ActivityPage />;
       case "ranking":
-        return <Pages.Ranking />;
+        return <RankingPage />;
       case "challenges":
-        return <Pages.Challenges />;
+        return <ChallengesPage />;
       case "profile":
-        return <Pages.Profile />;
+        return <ProfilePage />;
       default:
-        return <Pages.Dashboard />;
+        return <DashboardPage />;
     }
   };
 
