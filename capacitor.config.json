@@ -1,0 +1,15 @@
+{
+  "appId": "pl.kunasz.eko",
+  "appName": "eko-odznaki-pro",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true,
+    "allowNavigation": [
+      "localhost",
+      "capacitor://localhost",
+      "https://*.google.com",
+      "https://*.firebaseapp.com",
+      "https://*.googleapis.com"
+    ]
+  }
+}

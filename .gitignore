@@ -23,4 +23,55 @@ dist-ssr
 *.sln
 *.sw?
 
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+www/
+
+# Capacitor Android
+android/
+capacitor/android/
+app/build/
+*.apk
+*.ap_
+*.dex
+*.class
+*.so
+*.jar
+*.keystore
+
+# Capacitor iOS
+ios/
+Pods/
+*.xcuserstate
+*.xcworkspace
+*.xcodeproj
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserdatad/
+DerivedData/
+build/
+*.ipa
+
+# Capacitor config
+# capacitor.config.json
+# capacitor.config.ts
+# capacitor.config.js
+
+# Environment files
 .env
+.env.local
+.env.*.local
+
+# Misc
+.idea/
+.vscode/
+.DS_Store
