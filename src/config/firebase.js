@@ -1,5 +1,11 @@
+import { Capacitor } from "@capacitor/core";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  indexedDBLocalPersistence,
+  initializeAuth,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -13,7 +19,21 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+/*
+  Fix do tego zeby firebase dzialal na ios
+  https://github.com/capawesome-team/capacitor-firebase/issues/221
+*/
+let auth;
+if (!auth) {
+  if (Capacitor.isNativePlatform()) {
+    auth = initializeAuth(app, { persistence: indexedDBLocalPersistence });
+  } else {
+    auth = getAuth(app);
+  }
+}
+export { auth };
+
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
