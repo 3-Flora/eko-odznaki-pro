@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Trophy, Medal, Award, Users, School, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db } from "../../services/firebase";
 
 export default function RankingPage() {
   const [activeTab, setActiveTab] = useState("individual");

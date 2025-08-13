@@ -22,7 +22,7 @@ import {
   serverTimestamp,
   deleteDoc,
 } from "firebase/firestore";
-import { auth, db, googleProvider } from "../config/firebase";
+import { auth, db, googleProvider } from "../services/firebase";
 import { availableBadges } from "../data/badges";
 
 const AuthContext = createContext(null);
@@ -274,6 +274,14 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  // Update profile function
+  const updateProfile = async (updates) => {
+    if (!currentUser) return;
+    const userRef = doc(db, "users", currentUser.id);
+    await updateDoc(userRef, updates);
+    setCurrentUser((prev) => (prev ? { ...prev, ...updates } : null));
+  };
+
   const value = {
     currentUser,
     loading,
@@ -287,6 +295,7 @@ export const AuthProvider = ({ children }) => {
     submitActivity,
     getUserActivities,
     deleteAccount,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

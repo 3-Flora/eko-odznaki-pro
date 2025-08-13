@@ -13,10 +13,13 @@ import {
 import { motion } from "framer-motion";
 import { availableBadges } from "../../data/badges";
 import { ConfirmModal } from "../../components/modal/ConfirmModal";
+import { useNavigate } from "react-router";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -92,7 +95,7 @@ export default function ProfilePage() {
             : "Uczeń"}
         </p>
 
-        <div className="flex items-center justify-center mt-4 space-x-4">
+        <div className="flex items-center justify-center mt-4 space-x-4 mb-4">
           {!currentUser?.isGuest && (
             <>
               <div className="flex items-center">
@@ -110,6 +113,12 @@ export default function ProfilePage() {
             </>
           )}
         </div>
+        <button
+          onClick={() => navigate("/profile/edit")}
+          className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
+        >
+          Edit Profile
+        </button>
       </motion.div>
 
       {/* Stats */}

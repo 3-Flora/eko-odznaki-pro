@@ -11,6 +11,7 @@ const {
   DashboardPage,
   ProfilePage,
   RankingPage,
+  EditProfilePage,
 } = Pages;
 
 function ProtectedRoute({ isAuth }) {
@@ -35,6 +36,7 @@ function AppContent() {
             <Route path="ranking" element={<RankingPage />} />
             <Route path="challenges" element={<ChallengesPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="profile/edit" element={<EditProfilePage />} />
           </Route>
         </Route>
       </Routes>
