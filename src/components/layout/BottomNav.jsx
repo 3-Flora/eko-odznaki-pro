@@ -23,9 +23,12 @@ export const BottomNav = () => {
 
   return (
     <div
-      className={clsx("z-10 border-t border-gray-200 bg-white px-4 py-2", {
-        "pb-6": isPWA,
-      })}
+      className={clsx(
+        "z-10 border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-900",
+        {
+          "pb-6": isPWA,
+        },
+      )}
     >
       <div className="flex justify-around">
         {tabs.map(({ id, icon: Icon, label }) => (
@@ -35,8 +38,8 @@ export const BottomNav = () => {
             className={({ isActive }) =>
               `flex flex-1 flex-col items-center rounded-lg px-3 py-2 transition-all duration-200 ` +
               (isActive
-                ? "scale-105 bg-green-50 text-green-600"
-                : "text-gray-600 hover:text-green-600")
+                ? "scale-105 bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-300"
+                : "text-gray-600 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400")
             }
             end={id === "/"}
           >

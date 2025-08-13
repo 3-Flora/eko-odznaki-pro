@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { User, Trophy } from "lucide-react";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
+import ToggleThemeBtn from "../ToggleThemeBtn";
 
 export const Navbar = () => {
   const { currentUser } = useAuth();
@@ -12,24 +13,29 @@ export const Navbar = () => {
 
   return (
     <nav
-      className={clsx("z-10 border-b-4 border-green-400 bg-white shadow-lg", {
-        "pt-11": mobileDeviceType === "SEorAndroid",
-        "pt-16": mobileDeviceType === "notch",
-      })}
+      className={clsx(
+        "z-10 border-b-4 border-green-400 bg-white shadow-lg dark:border-green-700 dark:bg-gray-900",
+        {
+          "pt-11": mobileDeviceType === "SEorAndroid",
+          "pt-16": mobileDeviceType === "notch",
+        },
+      )}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <div className="mr-3 text-2xl">🌱</div>
-            <h1 className="text-xl font-bold text-gray-800 select-none">
+            <h1 className="text-xl font-bold text-gray-800 select-none dark:text-white">
               Eko odznaki
             </h1>
           </div>
 
+          <ToggleThemeBtn />
+
           <div className="flex items-center space-x-4">
-            <div className="flex items-center rounded-full bg-green-100 px-3 py-1">
-              <Trophy className="mr-1 h-4 w-4 text-green-600" />
-              <span className="text-sm font-semibold text-green-800">
+            <div className="flex items-center rounded-full bg-green-100 px-3 py-1 dark:bg-green-900">
+              <Trophy className="mr-1 h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-semibold text-green-800 dark:text-green-300">
                 {currentUser?.points || 0} pkt
               </span>
             </div>
@@ -45,7 +51,7 @@ export const Navbar = () => {
                   className="h-8 w-8 rounded-full"
                 />
               ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 dark:bg-green-700">
                   <User className="h-4 w-4 text-white" />
                 </div>
               )}

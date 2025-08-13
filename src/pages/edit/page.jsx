@@ -39,44 +39,44 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="mx-auto mt-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
+    <div className="mx-auto mt-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-2 font-semibold text-green-600 hover:text-green-800"
+        className="mb-6 flex items-center gap-2 font-semibold text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
       >
         <ArrowLeft className="h-5 w-5" /> Powrót
       </button>
 
-      <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
+      <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
         Edytuj profil
       </h2>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+          <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             placeholder="Nazwa wyświetlana"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             required
           />
         </div>
 
         <div className="relative">
-          <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+          <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <select
             value={school}
             onChange={(e) => setSchool(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             required
           >
             <option value="">Wybierz szkołę</option>
@@ -87,11 +87,11 @@ export default function EditProfilePage() {
         </div>
 
         <div className="relative">
-          <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+          <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <select
             value={className}
             onChange={(e) => setClassName(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             required
           >
             <option value="">Wybierz klasę</option>
@@ -105,7 +105,7 @@ export default function EditProfilePage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 dark:from-green-700 dark:to-emerald-800 dark:hover:from-green-800 dark:hover:to-emerald-900"
         >
           {loading ? "Zapisywanie..." : "Zapisz zmiany"}
         </button>

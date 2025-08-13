@@ -94,3 +94,68 @@ export const activityCategories = [
     color: "bg-indigo-500",
   },
 ];
+
+export const currentChallenge = {
+  id: 1,
+  title: "Tydzień bez plastiku",
+  description:
+    "Unikaj jednorazowych przedmiotów plastikowych przez cały tydzień",
+  icon: "🚫🥤",
+  bonusPoints: 50,
+  startDate: new Date("2024-01-15"),
+  endDate: new Date("2024-01-21"),
+  participants: 234,
+  daysLeft: 3,
+  progress: 60,
+};
+
+export const upcomingChallenges = [
+  {
+    id: 2,
+    title: "Eko-transport",
+    description: "Przez tydzień używaj tylko transportu ekologicznego",
+    icon: "🚴‍♀️",
+    bonusPoints: 40,
+    startDate: new Date("2024-01-22"),
+    endDate: new Date("2024-01-28"),
+  },
+  {
+    id: 3,
+    title: "Oszczędzanie energii",
+    description: "Zmniejsz zużycie energii w domu o 20%",
+    icon: "💡",
+    bonusPoints: 35,
+    startDate: new Date("2024-01-29"),
+    endDate: new Date("2024-02-04"),
+  },
+  {
+    id: 4,
+    title: "Zero waste lunch",
+    description: "Przynoś do szkoły lunch bez opakowań jednorazowych",
+    icon: "🥪",
+    bonusPoints: 30,
+    startDate: new Date("2024-02-05"),
+    endDate: new Date("2024-02-11"),
+  },
+];
+
+export const completedChallenges = [
+  {
+    id: 5,
+    title: "Segregacja mistrzów",
+    description: "Prawidłowo segreguj śmieci przez 2 tygodnie",
+    icon: "♻️",
+    bonusPoints: 45,
+    completed: true,
+    earnedPoints: 45,
+  },
+  {
+    id: 6,
+    title: "Wodne oszczędności",
+    description: "Zmniejsz zużycie wody w domu",
+    icon: "💧",
+    bonusPoints: 25,
+    completed: true,
+    earnedPoints: 25,
+  },
+];

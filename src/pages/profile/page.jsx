@@ -60,12 +60,12 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="flex flex-col justify-normal gap-6 p-4">
+    <div className="flex min-h-screen flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-center text-white"
+        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-center text-white dark:bg-gradient-to-r dark:from-green-700 dark:to-emerald-900"
       >
         <div className="relative mb-4 inline-block">
           {currentUser?.photoURL ? (
@@ -88,29 +88,19 @@ export default function ProfilePage() {
 
         <h1 className="mb-1 text-2xl font-bold">{currentUser?.displayName}</h1>
         <p className="mb-2 text-green-100">
-          {currentUser?.isGuest
-            ? "Użytkownik gość"
-            : currentUser?.role === "teacher"
-              ? "Nauczyciel"
-              : "Uczeń"}
+          {currentUser?.role === "teacher" ? "Nauczyciel" : "Uczeń"}
         </p>
 
         <div className="mt-4 mb-4 flex items-center justify-center space-x-4">
-          {!currentUser?.isGuest && (
-            <>
-              <div className="flex items-center">
-                <School className="mr-1 h-4 w-4" />
-                <span className="text-sm">{currentUser?.school}</span>
-              </div>
-              {currentUser?.className && (
-                <div className="flex items-center">
-                  <Users className="mr-1 h-4 w-4" />
-                  <span className="text-sm">
-                    Klasa {currentUser?.className}
-                  </span>
-                </div>
-              )}
-            </>
+          <div className="flex items-center">
+            <School className="mr-1 h-4 w-4" />
+            <span className="text-sm">{currentUser?.school}</span>
+          </div>
+          {currentUser?.className && (
+            <div className="flex items-center">
+              <Users className="mr-1 h-4 w-4" />
+              <span className="text-sm">Klasa {currentUser?.className}</span>
+            </div>
           )}
         </div>
         <button
@@ -129,11 +119,15 @@ export default function ProfilePage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 + index * 0.1 }}
-            className="rounded-2xl bg-white p-4 text-center shadow-lg"
+            className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
           >
             <stat.icon className={`mx-auto mb-2 h-8 w-8 ${stat.color}`} />
-            <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-            <p className="text-sm text-gray-600">{stat.label}</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
+              {stat.value}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {stat.label}
+            </p>
           </motion.div>
         ))}
       </div>
@@ -143,23 +137,19 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-2xl bg-white p-6 shadow-lg"
+        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
       >
-        <h2 className="mb-4 text-xl font-bold text-gray-800">Twoje odznaki</h2>
+        <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
+          Twoje odznaki
+        </h2>
 
-        {currentUser?.isGuest ? (
-          <div className="py-8 text-center">
-            <div className="mb-4 text-4xl">👤</div>
-            <p className="text-gray-600">Tryb gościa</p>
-            <p className="mt-2 text-sm text-gray-400">
-              Zaloguj się, aby zdobywać punkty i odznaki
-            </p>
-          </div>
-        ) : earnedBadges.length === 0 ? (
+        {earnedBadges.length === 0 ? (
           <div className="py-8 text-center">
             <div className="mb-4 text-4xl">🏆</div>
-            <p className="text-gray-600">Zdobądź pierwszą odznakę!</p>
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="text-gray-600 dark:text-gray-300">
+              Zdobądź pierwszą odznakę!
+            </p>
+            <p className="mt-2 text-sm text-gray-400 dark:text-gray-400">
               Zgłaszaj działania eco, aby zdobywać punkty i odznaki
             </p>
           </div>
@@ -171,7 +161,7 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
-                className={`${badge.color} rounded-xl p-4 text-center text-white`}
+                className={`${badge.color} rounded-xl p-4 text-center text-white dark:bg-green-700`}
               >
                 <div className="mb-2 text-3xl">{badge.icon}</div>
                 <h3 className="mb-1 text-sm font-bold">{badge.name}</h3>
@@ -182,82 +172,15 @@ export default function ProfilePage() {
         )}
       </motion.div>
 
-      {/* Available Badges - Hidden for guests */}
-      {!currentUser?.isGuest && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="rounded-2xl bg-white p-6 shadow-lg"
-        >
-          <h2 className="mb-4 text-xl font-bold text-gray-800">
-            Odznaki do zdobycia
-          </h2>
-
-          <div className="space-y-3">
-            {availableBadges
-              .filter(
-                (badge) => (currentUser?.points || 0) < badge.pointsRequired,
-              )
-              .map((badge, index) => (
-                <motion.div
-                  key={badge.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + index * 0.05 }}
-                  className="flex items-center rounded-xl bg-gray-50 p-4"
-                >
-                  <div className="mr-4 text-2xl opacity-50">{badge.icon}</div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800">
-                      {badge.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">{badge.description}</p>
-                    <div className="mt-2">
-                      <div className="mb-1 flex justify-between text-xs text-gray-500">
-                        <span>
-                          {currentUser?.points || 0} / {badge.pointsRequired}{" "}
-                          pkt
-                        </span>
-                        <span>
-                          {Math.round(
-                            ((currentUser?.points || 0) /
-                              badge.pointsRequired) *
-                              100,
-                          )}
-                          %
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-gray-200">
-                        <div
-                          className="h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
-                          style={{
-                            width: `${Math.min(
-                              ((currentUser?.points || 0) /
-                                badge.pointsRequired) *
-                                100,
-                              100,
-                            )}%`,
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-          </div>
-        </motion.div>
-      )}
-
       {/* Logtout Button */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 shadow-md transition-colors hover:bg-gray-100"
+        className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 shadow-md transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
         onClick={handleLogout}
       >
-        <span className="flex items-center gap-2 text-sm font-semibold">
+        <span className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-300">
           <LogOut size={18} />
           Wyloguj
         </span>
@@ -267,12 +190,12 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="flex cursor-pointer items-center rounded-xl bg-red-50 p-4 shadow-md transition-colors hover:bg-red-100"
+        className="flex cursor-pointer items-center rounded-xl bg-red-50 p-4 shadow-md transition-colors hover:bg-red-100 dark:bg-red-900 dark:hover:bg-red-800"
         onClick={() => {
           setShowDeleteModal(true);
         }}
       >
-        <span className="flex items-center gap-2 text-sm font-semibold text-red-600">
+        <span className="flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-300">
           <Trash2 size={18} /> Usuń konto
         </span>
       </motion.div>

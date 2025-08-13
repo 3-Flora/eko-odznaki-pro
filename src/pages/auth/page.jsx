@@ -76,47 +76,49 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex h-svh w-full max-w-md flex-col justify-center bg-white p-8">
+    <div className="mx-auto flex h-svh w-full max-w-md flex-col justify-center bg-white p-8 dark:bg-gray-800">
       <div className="mb-8 text-center">
         <div className="mb-4 text-6xl">🌱</div>
-        <h1 className="mb-2 text-3xl font-bold text-gray-800">EKO-odznaki</h1>
-        <p className="text-gray-600">
+        <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">
+          EKO-odznaki
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300">
           {isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"}
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <Mail className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+          <Mail className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <input
             type="email"
             placeholder="Adres e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             required
           />
         </div>
 
         <div className="relative">
-          <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+          <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Hasło"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             required
           />
           <button
             type="button"
-            className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700"
+            className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
             onClick={() => setShowPassword((prev) => !prev)}
             tabIndex={-1}
           >
@@ -127,18 +129,18 @@ export default function AuthPage() {
         {!isLogin && (
           <>
             <div className="relative">
-              <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+              <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Powtórz hasło"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-12 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+                className="w-full rounded-xl border border-gray-300 py-3 pr-12 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 required
               />
               <button
                 type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700"
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -147,31 +149,23 @@ export default function AuthPage() {
             </div>
 
             <div className="relative">
-              <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+              <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 placeholder="Nazwa wyświetlana"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 required
               />
             </div>
 
             <div className="relative">
-              <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
-              {/* <input
-                type="text"
-                placeholder="Nazwa szkoły"
-                value={school}
-                onChange={(e) => setSchool(e.target.value)}
-                className="w-full py-3 pl-10 pr-4 border border-gray-300 transition rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              /> */}
+              <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
               <select
                 value={school}
                 onChange={(e) => setSchool(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 required
               >
                 <option value="">Wybierz szkołę</option>
@@ -182,19 +176,11 @@ export default function AuthPage() {
             </div>
 
             <div className="relative">
-              <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
-              {/* <input
-                type="text"
-                placeholder="Klasa (np. 5A)"
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                className="w-full py-3 pl-10 pr-4 border border-gray-300 transition rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              /> */}
+              <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
               <select
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
+                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 required
               >
                 <option value="">Wybierz klasę</option>
@@ -211,7 +197,7 @@ export default function AuthPage() {
                 className={`text flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 font-semibold transition ${
                   role === "student"
                     ? "border-green-500 bg-green-500 text-white shadow-lg"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
                 }`}
                 onClick={() => setRole("student")}
               >
@@ -222,7 +208,7 @@ export default function AuthPage() {
                 className={`text flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 font-semibold transition ${
                   role === "teacher"
                     ? "border-emerald-600 bg-emerald-600 text-white shadow-lg"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
                 }`}
                 onClick={() => setRole("teacher")}
               >
@@ -235,7 +221,7 @@ export default function AuthPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 dark:from-green-700 dark:to-emerald-800 dark:hover:from-green-800 dark:hover:to-emerald-900"
         >
           {loading
             ? "Ładowanie..."
@@ -248,17 +234,17 @@ export default function AuthPage() {
       {/* <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 text-gray-500 bg-white">lub</span>
+            <span className="px-2 text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-300">lub</span>
           </div>
         </div>
 
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="flex items-center justify-center w-full py-3 mt-4 font-semibold text-gray-700 bg-white border border-gray-300 gap-2 transition duration-200 rounded-xl hover:bg-gray-50"
+          className="flex items-center justify-center w-full py-3 mt-4 font-semibold text-gray-700 bg-white border border-gray-300 gap-2 transition duration-200 rounded-xl hover:bg-gray-50 dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:hover:bg-gray-800"
         >
           <Chrome className="w-5 h-5" />
           Zaloguj się przez Google
@@ -268,7 +254,7 @@ export default function AuthPage() {
       <div className="mt-6 text-center">
         <button
           onClick={() => setIsLogin((p) => !p)}
-          className="font-medium text-green-600 hover:text-green-700"
+          className="font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
         >
           {isLogin
             ? "Nie masz konta? Zarejestruj się"

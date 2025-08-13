@@ -3,7 +3,6 @@ import { Camera, Upload, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { activityCategories } from "../../data/badges";
 import { useAuth } from "../../contexts/AuthContext";
-import ProtectedRoute from "../../components/routing/ProtectedRoute";
 
 export default function ActivityPage() {
   const { submitActivity, currentUser } = useAuth();
@@ -71,43 +70,22 @@ export default function ActivityPage() {
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4 pb-20">
+      <div className="flex items-center justify-center p-4 pb-20 dark:bg-gray-900">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="text-center"
         >
           <div className="mb-4 text-6xl">🎉</div>
-          <h2 className="mb-2 text-2xl font-bold text-gray-800">Wysłano!</h2>
-          <p className="mb-4 text-gray-600">
+          <h2 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
+            Wysłano!
+          </h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-300">
             Twoje działanie zostało przesłane do weryfikacji przez nauczyciela
           </p>
-          <div className="inline-block rounded-full bg-green-100 px-4 py-2 text-green-800">
+          <div className="inline-block rounded-full bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-300">
             <CheckCircle className="mr-1 inline h-4 w-4" />
             Oczekuje na zatwierdzenie
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // Show guest message if user is a guest
-  if (currentUser?.isGuest) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-4 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md text-center"
-        >
-          <div className="mb-4 text-6xl">👤</div>
-          <h2 className="mb-2 text-2xl font-bold text-gray-800">Tryb gościa</h2>
-          <p className="mb-4 text-gray-600">
-            Aby zgłaszać działania i zdobywać punkty, musisz się zalogować do
-            swojego konta.
-          </p>
-          <div className="inline-block rounded-full bg-blue-100 px-4 py-2 text-blue-800">
-            Zaloguj się, aby kontynuować
           </div>
         </motion.div>
       </div>
@@ -119,24 +97,26 @@ export default function ActivityPage() {
   );
 
   return (
-    <div className="flex flex-col justify-normal gap-6 p-4">
+    <div className="flex flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
         <div className="mb-4 text-4xl">🌍</div>
-        <h1 className="mb-2 text-2xl font-bold text-gray-800">
+        <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
           Dodaj działanie
         </h1>
-        <p className="text-gray-600">Podziel się swoimi eko-działaniami!</p>
+        <p className="text-gray-600 dark:text-gray-300">
+          Podziel się swoimi eko-działaniami!
+        </p>
       </motion.div>
 
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+          className="rounded-xl border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300"
         >
           {error}
         </motion.div>
@@ -148,9 +128,9 @@ export default function ActivityPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl bg-white p-6 shadow-lg"
+          className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
         >
-          <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
             Wybierz kategorię
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -161,15 +141,17 @@ export default function ActivityPage() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`rounded-xl border-2 p-4 transition-all duration-200 ${
                   selectedCategory === category.id
-                    ? "scale-105 border-green-500 bg-green-50"
-                    : "border-gray-200 hover:border-green-300"
+                    ? "scale-105 border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900"
+                    : "border-gray-200 hover:border-green-300 dark:border-gray-700 dark:hover:border-green-600"
                 }`}
               >
                 <div className="mb-2 text-2xl">{category.icon}</div>
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-medium text-gray-800 dark:text-white">
                   {category.name}
                 </p>
-                <p className="text-xs text-gray-600">+{category.points} pkt</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">
+                  +{category.points} pkt
+                </p>
               </button>
             ))}
           </div>
@@ -182,17 +164,17 @@ export default function ActivityPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-2xl bg-white p-6 shadow-lg"
+              className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
             >
               <div className="mb-4 flex items-center">
                 <div className="mr-3 text-2xl">
                   {selectedCategoryData?.icon}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                     {selectedCategoryData?.name}
                   </h3>
-                  <p className="text-sm text-green-600">
+                  <p className="text-sm text-green-600 dark:text-green-300">
                     +{selectedCategoryData?.points} punktów
                   </p>
                 </div>
@@ -200,7 +182,7 @@ export default function ActivityPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Tytuł działania
                   </label>
                   <input
@@ -208,13 +190,13 @@ export default function ActivityPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="np. Przejazd rowerem do szkoły"
-                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Opis działania
                   </label>
                   <textarea
@@ -222,7 +204,7 @@ export default function ActivityPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Opisz szczegóły swojego eko-działania..."
                     rows={4}
-                    className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500"
+                    className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     required
                   />
                 </div>
@@ -234,20 +216,22 @@ export default function ActivityPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="rounded-2xl bg-white p-6 shadow-lg"
+              className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
             >
-              <h3 className="mb-4 text-lg font-semibold text-gray-800">
+              <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
                 Dodaj zdjęcie (opcjonalne)
               </h3>
 
               {!photoPreview ? (
                 <label className="block cursor-pointer">
-                  <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-400">
-                    <Camera className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                    <p className="mb-2 text-gray-600">
+                  <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-400 dark:border-gray-700 dark:hover:border-green-600">
+                    <Camera className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-300" />
+                    <p className="mb-2 text-gray-600 dark:text-gray-300">
                       Kliknij, aby dodać zdjęcie
                     </p>
-                    <p className="text-sm text-gray-400">PNG, JPG do 5MB</p>
+                    <p className="text-sm text-gray-400 dark:text-gray-400">
+                      PNG, JPG do 5MB
+                    </p>
                   </div>
                   <input
                     type="file"
@@ -284,7 +268,7 @@ export default function ActivityPage() {
               transition={{ delay: 0.4 }}
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 text-lg font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 text-lg font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 dark:from-green-700 dark:to-emerald-800 dark:hover:from-green-800 dark:hover:to-emerald-900"
             >
               {loading ? (
                 <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-white"></div>

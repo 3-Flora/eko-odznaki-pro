@@ -89,7 +89,9 @@ export default function RankingPage() {
         className="text-center"
       >
         <div className="mb-4 text-4xl">🏆</div>
-        <h1 className="mb-2 text-2xl font-bold text-gray-800">Ranking</h1>
+        <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
+          Ranking
+        </h1>
         <p className="text-gray-600">Zobacz najlepszych eko-wojowników!</p>
       </motion.div>
 
@@ -98,7 +100,7 @@ export default function RankingPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="rounded-2xl bg-white p-2 shadow-lg"
+        className="rounded-2xl bg-white p-2 shadow-lg dark:bg-gray-900"
       >
         <div className="flex">
           {tabs.map(({ id, label, icon: Icon }) => (
@@ -107,8 +109,8 @@ export default function RankingPage() {
               onClick={() => setActiveTab(id)}
               className={`flex flex-1 items-center justify-center rounded-xl px-4 py-3 transition-all duration-200 ${
                 activeTab === id
-                  ? "bg-green-500 text-white shadow-lg"
-                  : "text-gray-600 hover:text-green-600"
+                  ? "bg-green-500 text-white shadow-lg dark:bg-green-700"
+                  : "text-gray-600 hover:text-green-600 dark:text-green-400 dark:hover:text-green-400"
               }`}
             >
               <Icon className="mr-2 h-4 w-4" />
@@ -127,7 +129,7 @@ export default function RankingPage() {
       >
         {loading ? (
           <div className="py-8 text-center">
-            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-green-500"></div>
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-green-500 dark:border-green-700"></div>
             <p className="mt-4 text-gray-600">Ładowanie rankingu...</p>
           </div>
         ) : activeTab === "individual" ? (
@@ -143,8 +145,8 @@ export default function RankingPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + index * 0.05 }}
-                className={`${getRankBg(user.rank)} rounded-2xl p-4 shadow-lg ${
-                  user.rank <= 3 ? "text-white" : "bg-white"
+                className={`${getRankBg(user.rank).replace("bg-white", "bg-white dark:bg-gray-900")} rounded-2xl p-4 shadow-lg ${
+                  user.rank <= 3 ? "text-white" : "bg-white dark:bg-gray-900"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -153,7 +155,9 @@ export default function RankingPage() {
                     <div className="flex items-center">
                       <div
                         className={`mr-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl ${
-                          user.rank <= 3 ? "bg-white/20" : "bg-green-100"
+                          user.rank <= 3
+                            ? "bg-white/20"
+                            : "bg-green-100 dark:bg-green-900"
                         }`}
                       >
                         {user.photoURL ? (
@@ -165,7 +169,9 @@ export default function RankingPage() {
                         ) : (
                           <span
                             className={`text-lg font-bold ${
-                              user.rank <= 3 ? "text-white" : "text-green-600"
+                              user.rank <= 3
+                                ? "text-white"
+                                : "text-green-600 dark:text-green-400"
                             }`}
                           >
                             {user.displayName?.charAt(0) || "U"}
@@ -175,7 +181,9 @@ export default function RankingPage() {
                       <div>
                         <h3
                           className={`font-bold ${
-                            user.rank <= 3 ? "text-white" : "text-gray-800"
+                            user.rank <= 3
+                              ? "text-white"
+                              : "text-gray-800 dark:text-white"
                           }`}
                         >
                           {user.displayName}
@@ -193,7 +201,9 @@ export default function RankingPage() {
                   <div className="text-right">
                     <p
                       className={`text-lg font-bold ${
-                        user.rank <= 3 ? "text-white" : "text-green-600"
+                        user.rank <= 3
+                          ? "text-white"
+                          : "text-green-600 dark:text-green-400"
                       }`}
                     >
                       {user.points} pkt

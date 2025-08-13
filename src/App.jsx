@@ -4,6 +4,7 @@ import Loading from "./components/loading/Loading";
 import Layout from "./components/layout/Layout";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
+import { ThemeContext } from "./contexts/ThemeContext";
 import {
   ActivityPage,
   AuthPage,
@@ -13,6 +14,8 @@ import {
   RankingPage,
   EditProfilePage,
 } from "./pages";
+import { useContext } from "react";
+import clsx from "clsx";
 
 function AppContent() {
   const { currentUser, loading } = useAuth();
@@ -41,11 +44,23 @@ function AppContent() {
 }
 
 export default function App() {
+  const { theme } = useContext(ThemeContext);
+
+  console.log("Current theme:", theme);
+
   return (
-    <DeviceEnvironmentProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </DeviceEnvironmentProvider>
+    <div
+      className={clsx(
+        theme === "dark" && "dark",
+        "select-none",
+        "h-screen bg-gray-50 dark:bg-gray-800",
+      )}
+    >
+      <DeviceEnvironmentProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </DeviceEnvironmentProvider>
+    </div>
   );
 }
