@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { User, School, Users, ArrowLeft } from "lucide-react";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
@@ -39,44 +39,44 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg mt-8">
+    <div className="mx-auto mt-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 mb-6 text-green-600 hover:text-green-800 font-semibold"
+        className="mb-6 flex items-center gap-2 font-semibold text-green-600 hover:text-green-800"
       >
-        <ArrowLeft className="w-5 h-5" /> Powrót
+        <ArrowLeft className="h-5 w-5" /> Powrót
       </button>
 
-      <h2 className="mb-6 text-2xl font-bold text-gray-800 text-center">
+      <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
         Edytuj profil
       </h2>
 
       {error && (
-        <div className="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded-lg">
+        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <User className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
+          <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
           <input
             type="text"
             placeholder="Nazwa wyświetlana"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full py-3 pl-10 pr-4 transition border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
             required
           />
         </div>
 
         <div className="relative">
-          <School className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
+          <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
           <select
             value={school}
             onChange={(e) => setSchool(e.target.value)}
-            className="w-full py-3 pl-10 pr-4 transition border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
             required
           >
             <option value="">Wybierz szkołę</option>
@@ -87,11 +87,11 @@ export default function EditProfilePage() {
         </div>
 
         <div className="relative">
-          <Users className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
+          <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
           <select
             value={className}
             onChange={(e) => setClassName(e.target.value)}
-            className="w-full py-3 pl-10 pr-4 transition border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500"
             required
           >
             <option value="">Wybierz klasę</option>
@@ -105,7 +105,7 @@ export default function EditProfilePage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 font-semibold text-white transition duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
         >
           {loading ? "Zapisywanie..." : "Zapisz zmiany"}
         </button>

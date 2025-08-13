@@ -1,10 +1,10 @@
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import Pages from "./pages";
-import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
+import { BrowserRouter, Route, Routes } from "react-router";
+import ProtectedRoute from "./components/routing/ProtectedRoute";
 import Loading from "./components/loading/Loading";
-import { Navigate, BrowserRouter, Route, Routes, Outlet } from "react-router";
 import Layout from "./components/layout/Layout";
-const {
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
+import {
   ActivityPage,
   AuthPage,
   ChallengesPage,
@@ -12,11 +12,7 @@ const {
   ProfilePage,
   RankingPage,
   EditProfilePage,
-} = Pages;
-
-function ProtectedRoute({ isAuth }) {
-  return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
-}
+} from "./pages";
 
 function AppContent() {
   const { currentUser, loading } = useAuth();

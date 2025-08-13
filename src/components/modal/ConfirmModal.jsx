@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export const ConfirmModal = ({
   open,
@@ -31,7 +31,7 @@ export const ConfirmModal = ({
     >
       <div
         ref={modalRef}
-        className="w-full max-w-xs p-6 bg-white shadow-lg rounded-xl"
+        className="w-full max-w-xs rounded-xl bg-white p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-2 text-lg font-bold text-gray-800">{title}</h2>
@@ -39,15 +39,15 @@ export const ConfirmModal = ({
           <p className="mb-4 text-sm text-gray-600">{description}</p>
         )}
         {children}
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="mt-4 flex justify-end gap-2">
           <button
-            className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200"
+            className="rounded-lg bg-gray-100 px-4 py-2 text-sm hover:bg-gray-200"
             onClick={onClose}
           >
             {cancelLabel}
           </button>
           <button
-            className={`px-4 py-2 text-sm rounded-lg ${confirmClassName}`}
+            className={`rounded-lg px-4 py-2 text-sm ${confirmClassName}`}
             onClick={onConfirm}
           >
             {confirmLabel}

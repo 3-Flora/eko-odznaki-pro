@@ -23,7 +23,7 @@ export const BottomNav = () => {
 
   return (
     <div
-      className={clsx("z-10 px-4 py-2 bg-white border-t border-gray-200", {
+      className={clsx("z-10 border-t border-gray-200 bg-white px-4 py-2", {
         "pb-6": isPWA,
       })}
     >
@@ -33,14 +33,14 @@ export const BottomNav = () => {
             key={id}
             to={id}
             className={({ isActive }) =>
-              `flex flex-col flex-1 items-center py-2 px-3 rounded-lg transition-all duration-200 ` +
+              `flex flex-1 flex-col items-center rounded-lg px-3 py-2 transition-all duration-200 ` +
               (isActive
-                ? "text-green-600 bg-green-50 scale-105"
+                ? "scale-105 bg-green-50 text-green-600"
                 : "text-gray-600 hover:text-green-600")
             }
             end={id === "/"}
           >
-            <Icon className="w-6 h-6 mb-1" />
+            <Icon className="mb-1 h-6 w-6" />
             <span className="text-xs font-medium">{label}</span>
           </NavLink>
         ))}

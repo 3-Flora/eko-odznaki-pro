@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Users } from "lucide-react";
 import { motion } from "framer-motion";
@@ -36,16 +35,16 @@ export default function DashboardPage() {
   const currentStreak = 5; // TODO: Calculate from user data
   const weeklyProgress = Math.min(
     ((currentUser?.points || 0) / 100) * 100,
-    100
+    100,
   ); // Weekly goal of 100 points
 
   return (
-    <div className="flex flex-col gap-6 p-4 justify-normal">
+    <div className="flex flex-col justify-normal gap-6 p-4">
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 text-white bg-gradient-to-r from-green-400 to-emerald-500 rounded-3xl"
+        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white"
       >
         <h2 className="mb-2 text-2xl font-bold">
           Cześć, {currentUser?.displayName?.split(" ")[0]}! 👋
@@ -55,7 +54,7 @@ export default function DashboardPage() {
           punktów eco!
         </p>
         <div className="flex items-center">
-          <div className="px-3 py-1 mr-2 rounded-full bg-white/20">
+          <div className="mr-2 rounded-full bg-white/20 px-3 py-1">
             <span className="text-sm font-semibold">
               Streak: {currentStreak} dni 🔥
             </span>
@@ -68,16 +67,16 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="p-6 bg-white shadow-lg rounded-2xl"
+        className="rounded-2xl bg-white p-6 shadow-lg"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800">
             Kolejna odznaka
           </h3>
           <div className="text-2xl">🏆</div>
         </div>
         <div className="mb-2">
-          <div className="flex justify-between mb-1 text-sm text-gray-600">
+          <div className="mb-1 flex justify-between text-sm text-gray-600">
             <span>
               {currentUser?.points || 0} / {nextBadgePoints} punktów
             </span>
@@ -86,13 +85,13 @@ export default function DashboardPage() {
               %
             </span>
           </div>
-          <div className="w-full h-3 bg-gray-200 rounded-full">
+          <div className="h-3 w-full rounded-full bg-gray-200">
             <div
-              className="h-3 transition-all duration-500 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
+              className="h-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
               style={{
                 width: `${Math.min(
                   ((currentUser?.points || 0) / nextBadgePoints) * 100,
-                  100
+                  100,
                 )}%`,
               }}
             ></div>
@@ -110,7 +109,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="p-4 text-center bg-white shadow-lg rounded-2xl"
+          className="rounded-2xl bg-white p-4 text-center shadow-lg"
         >
           <div className="mb-2 text-3xl">🎯</div>
           <p className="text-2xl font-bold text-gray-800">{weeklyProgress}%</p>
@@ -121,7 +120,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="p-4 text-center bg-white shadow-lg rounded-2xl"
+          className="rounded-2xl bg-white p-4 text-center shadow-lg"
         >
           <div className="mb-2 text-3xl">🌱</div>
           <p className="text-2xl font-bold text-gray-800">
@@ -136,13 +135,13 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="p-6 bg-white shadow-lg rounded-2xl"
+        className="rounded-2xl bg-white p-6 shadow-lg"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800">
             Aktywność klasy
           </h3>
-          <Users className="w-5 h-5 text-gray-400" />
+          <Users className="h-5 w-5 text-gray-400" />
         </div>
         <div className="space-y-3">
           {recentActivities.length === 0 ? (
@@ -160,10 +159,10 @@ export default function DashboardPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
-                className="flex items-center justify-between p-3 bg-green-50 rounded-xl"
+                className="flex items-center justify-between rounded-xl bg-green-50 p-3"
               >
                 <div className="flex items-center">
-                  <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-500 rounded-full">
+                  <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
                     <span className="text-sm font-semibold text-white">
                       {activity.userName?.charAt(0) || "U"}
                     </span>
@@ -182,10 +181,10 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-400">
                     {activity.reviewedAt
                       ? new Date(activity.reviewedAt).toLocaleDateString(
-                          "pl-PL"
+                          "pl-PL",
                         )
                       : new Date(activity.submittedAt).toLocaleDateString(
-                          "pl-PL"
+                          "pl-PL",
                         )}
                   </p>
                 </div>
@@ -200,9 +199,9 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="p-6 text-white bg-gradient-to-r from-blue-400 to-cyan-500 rounded-2xl"
+        className="rounded-2xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">Wyzwanie tygodnia</h3>
           <div className="text-2xl">⚡</div>
         </div>
@@ -212,7 +211,7 @@ export default function DashboardPage() {
         </p>
         <div className="flex items-center justify-between">
           <span className="text-sm">Bonus: +50 punktów</span>
-          <span className="px-3 py-1 text-sm rounded-full bg-white/20">
+          <span className="rounded-full bg-white/20 px-3 py-1 text-sm">
             Pozostało 3 dni
           </span>
         </div>

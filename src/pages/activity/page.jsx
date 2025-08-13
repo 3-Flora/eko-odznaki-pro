@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Camera, Upload, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { activityCategories } from "../../data/badges";
 import { useAuth } from "../../contexts/AuthContext";
+import ProtectedRoute from "../../components/routing/ProtectedRoute";
 
 export default function ActivityPage() {
   const { submitActivity, currentUser } = useAuth();
@@ -70,7 +71,7 @@ export default function ActivityPage() {
 
   if (submitted) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4 pb-20">
+      <div className="flex min-h-screen items-center justify-center p-4 pb-20">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -81,8 +82,8 @@ export default function ActivityPage() {
           <p className="mb-4 text-gray-600">
             Twoje działanie zostało przesłane do weryfikacji przez nauczyciela
           </p>
-          <div className="inline-block px-4 py-2 text-green-800 bg-green-100 rounded-full">
-            <CheckCircle className="inline w-4 h-4 mr-1" />
+          <div className="inline-block rounded-full bg-green-100 px-4 py-2 text-green-800">
+            <CheckCircle className="mr-1 inline h-4 w-4" />
             Oczekuje na zatwierdzenie
           </div>
         </motion.div>
@@ -93,11 +94,11 @@ export default function ActivityPage() {
   // Show guest message if user is a guest
   if (currentUser?.isGuest) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4 pb-20">
+      <div className="flex min-h-screen items-center justify-center p-4 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md"
+          className="max-w-md text-center"
         >
           <div className="mb-4 text-6xl">👤</div>
           <h2 className="mb-2 text-2xl font-bold text-gray-800">Tryb gościa</h2>
@@ -105,7 +106,7 @@ export default function ActivityPage() {
             Aby zgłaszać działania i zdobywać punkty, musisz się zalogować do
             swojego konta.
           </p>
-          <div className="inline-block px-4 py-2 text-blue-800 bg-blue-100 rounded-full">
+          <div className="inline-block rounded-full bg-blue-100 px-4 py-2 text-blue-800">
             Zaloguj się, aby kontynuować
           </div>
         </motion.div>
@@ -114,11 +115,11 @@ export default function ActivityPage() {
   }
 
   const selectedCategoryData = activityCategories.find(
-    (cat) => cat.id === selectedCategory
+    (cat) => cat.id === selectedCategory,
   );
 
   return (
-    <div className="flex flex-col gap-6 p-4 justify-normal">
+    <div className="flex flex-col justify-normal gap-6 p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -135,7 +136,7 @@ export default function ActivityPage() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded-xl"
+          className="rounded-xl border border-red-400 bg-red-100 px-4 py-3 text-red-700"
         >
           {error}
         </motion.div>
@@ -147,7 +148,7 @@ export default function ActivityPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="p-6 bg-white shadow-lg rounded-2xl"
+          className="rounded-2xl bg-white p-6 shadow-lg"
         >
           <h3 className="mb-4 text-lg font-semibold text-gray-800">
             Wybierz kategorię
@@ -158,9 +159,9 @@ export default function ActivityPage() {
                 key={category.id}
                 type="button"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`rounded-xl border-2 p-4 transition-all duration-200 ${
                   selectedCategory === category.id
-                    ? "border-green-500 bg-green-50 scale-105"
+                    ? "scale-105 border-green-500 bg-green-50"
                     : "border-gray-200 hover:border-green-300"
                 }`}
               >
@@ -181,9 +182,9 @@ export default function ActivityPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="p-6 bg-white shadow-lg rounded-2xl"
+              className="rounded-2xl bg-white p-6 shadow-lg"
             >
-              <div className="flex items-center mb-4">
+              <div className="mb-4 flex items-center">
                 <div className="mr-3 text-2xl">
                   {selectedCategoryData?.icon}
                 </div>
@@ -199,7 +200,7 @@ export default function ActivityPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Tytuł działania
                   </label>
                   <input
@@ -207,13 +208,13 @@ export default function ActivityPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="np. Przejazd rowerem do szkoły"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Opis działania
                   </label>
                   <textarea
@@ -221,7 +222,7 @@ export default function ActivityPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Opisz szczegóły swojego eko-działania..."
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 resize-none rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-green-500"
                     required
                   />
                 </div>
@@ -233,7 +234,7 @@ export default function ActivityPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="p-6 bg-white shadow-lg rounded-2xl"
+              className="rounded-2xl bg-white p-6 shadow-lg"
             >
               <h3 className="mb-4 text-lg font-semibold text-gray-800">
                 Dodaj zdjęcie (opcjonalne)
@@ -241,8 +242,8 @@ export default function ActivityPage() {
 
               {!photoPreview ? (
                 <label className="block cursor-pointer">
-                  <div className="p-8 text-center transition border-2 border-gray-300 border-dashed rounded-xl hover:border-green-400">
-                    <Camera className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition hover:border-green-400">
+                    <Camera className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                     <p className="mb-2 text-gray-600">
                       Kliknij, aby dodać zdjęcie
                     </p>
@@ -260,7 +261,7 @@ export default function ActivityPage() {
                   <img
                     src={photoPreview}
                     alt="Preview"
-                    className="object-cover w-full h-48 rounded-xl"
+                    className="h-48 w-full rounded-xl object-cover"
                   />
                   <button
                     type="button"
@@ -268,7 +269,7 @@ export default function ActivityPage() {
                       setPhoto(null);
                       setPhotoPreview(null);
                     }}
-                    className="absolute p-2 text-white transition bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                    className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
                   >
                     ✕
                   </button>
@@ -283,13 +284,13 @@ export default function ActivityPage() {
               transition={{ delay: 0.4 }}
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center w-full gap-2 py-4 text-lg font-semibold text-white transition duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 text-lg font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-6 h-6 border-b-2 border-white rounded-full animate-spin"></div>
+                <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-white"></div>
               ) : (
                 <>
-                  <Upload className="w-5 h-5" />
+                  <Upload className="h-5 w-5" />
                   Wyślij działanie
                 </>
               )}

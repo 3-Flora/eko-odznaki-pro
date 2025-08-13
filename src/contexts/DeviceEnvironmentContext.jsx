@@ -3,7 +3,6 @@ import { Capacitor } from "@capacitor/core";
 
 const DeviceEnvironmentContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useDeviceEnvironment = () => useContext(DeviceEnvironmentContext);
 
 export default function DeviceEnvironmentProvider({ children }) {
@@ -23,7 +22,7 @@ export default function DeviceEnvironmentProvider({ children }) {
 
   function isIPhoneSE23() {
     return window.matchMedia(
-      "only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+      "only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
     ).matches;
   }
 

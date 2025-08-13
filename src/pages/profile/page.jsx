@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
 import {
@@ -35,7 +35,7 @@ export default function ProfilePage() {
   };
 
   const earnedBadges = availableBadges.filter(
-    (badge) => (currentUser?.points || 0) >= badge.pointsRequired
+    (badge) => (currentUser?.points || 0) >= badge.pointsRequired,
   );
 
   const stats = [
@@ -60,29 +60,29 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-4 justify-normal">
+    <div className="flex flex-col justify-normal gap-6 p-4">
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 text-center text-white bg-gradient-to-r from-green-400 to-emerald-500 rounded-3xl"
+        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-center text-white"
       >
-        <div className="relative inline-block mb-4">
+        <div className="relative mb-4 inline-block">
           {currentUser?.photoURL ? (
             <img
               src={currentUser.photoURL}
               alt={currentUser.displayName}
-              className="w-24 h-24 border-4 border-white rounded-full"
+              className="h-24 w-24 rounded-full border-4 border-white"
             />
           ) : (
-            <div className="flex items-center justify-center w-24 h-24 border-4 border-white rounded-full bg-white/20">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-white/20">
               <span className="text-3xl font-bold">
                 {currentUser?.displayName?.charAt(0) || "U"}
               </span>
             </div>
           )}
-          <div className="absolute p-2 bg-yellow-400 rounded-full -bottom-2 -right-2">
-            <Trophy className="w-6 h-6 text-yellow-800" />
+          <div className="absolute -right-2 -bottom-2 rounded-full bg-yellow-400 p-2">
+            <Trophy className="h-6 w-6 text-yellow-800" />
           </div>
         </div>
 
@@ -91,20 +91,20 @@ export default function ProfilePage() {
           {currentUser?.isGuest
             ? "Użytkownik gość"
             : currentUser?.role === "teacher"
-            ? "Nauczyciel"
-            : "Uczeń"}
+              ? "Nauczyciel"
+              : "Uczeń"}
         </p>
 
-        <div className="flex items-center justify-center mt-4 space-x-4 mb-4">
+        <div className="mt-4 mb-4 flex items-center justify-center space-x-4">
           {!currentUser?.isGuest && (
             <>
               <div className="flex items-center">
-                <School className="w-4 h-4 mr-1" />
+                <School className="mr-1 h-4 w-4" />
                 <span className="text-sm">{currentUser?.school}</span>
               </div>
               {currentUser?.className && (
                 <div className="flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
+                  <Users className="mr-1 h-4 w-4" />
                   <span className="text-sm">
                     Klasa {currentUser?.className}
                   </span>
@@ -115,7 +115,7 @@ export default function ProfilePage() {
         </div>
         <button
           onClick={() => navigate("/profile/edit")}
-          className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
+          className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
         >
           Edit Profile
         </button>
@@ -129,9 +129,9 @@ export default function ProfilePage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 + index * 0.1 }}
-            className="p-4 text-center bg-white shadow-lg rounded-2xl"
+            className="rounded-2xl bg-white p-4 text-center shadow-lg"
           >
-            <stat.icon className={`w-8 h-8 mx-auto mb-2 ${stat.color}`} />
+            <stat.icon className={`mx-auto mb-2 h-8 w-8 ${stat.color}`} />
             <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
             <p className="text-sm text-gray-600">{stat.label}</p>
           </motion.div>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="p-6 bg-white shadow-lg rounded-2xl"
+        className="rounded-2xl bg-white p-6 shadow-lg"
       >
         <h2 className="mb-4 text-xl font-bold text-gray-800">Twoje odznaki</h2>
 
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
-                className={`${badge.color} rounded-xl p-4 text-white text-center`}
+                className={`${badge.color} rounded-xl p-4 text-center text-white`}
               >
                 <div className="mb-2 text-3xl">{badge.icon}</div>
                 <h3 className="mb-1 text-sm font-bold">{badge.name}</h3>
@@ -188,7 +188,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="p-6 bg-white shadow-lg rounded-2xl"
+          className="rounded-2xl bg-white p-6 shadow-lg"
         >
           <h2 className="mb-4 text-xl font-bold text-gray-800">
             Odznaki do zdobycia
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           <div className="space-y-3">
             {availableBadges
               .filter(
-                (badge) => (currentUser?.points || 0) < badge.pointsRequired
+                (badge) => (currentUser?.points || 0) < badge.pointsRequired,
               )
               .map((badge, index) => (
                 <motion.div
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7 + index * 0.05 }}
-                  className="flex items-center p-4 bg-gray-50 rounded-xl"
+                  className="flex items-center rounded-xl bg-gray-50 p-4"
                 >
                   <div className="mr-4 text-2xl opacity-50">{badge.icon}</div>
                   <div className="flex-1">
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                     </h3>
                     <p className="text-sm text-gray-600">{badge.description}</p>
                     <div className="mt-2">
-                      <div className="flex justify-between mb-1 text-xs text-gray-500">
+                      <div className="mb-1 flex justify-between text-xs text-gray-500">
                         <span>
                           {currentUser?.points || 0} / {badge.pointsRequired}{" "}
                           pkt
@@ -223,20 +223,20 @@ export default function ProfilePage() {
                           {Math.round(
                             ((currentUser?.points || 0) /
                               badge.pointsRequired) *
-                              100
+                              100,
                           )}
                           %
                         </span>
                       </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                      <div className="h-2 w-full rounded-full bg-gray-200">
                         <div
-                          className="h-2 transition-all duration-500 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
+                          className="h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
                           style={{
                             width: `${Math.min(
                               ((currentUser?.points || 0) /
                                 badge.pointsRequired) *
                                 100,
-                              100
+                              100,
                             )}%`,
                           }}
                         ></div>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="flex items-center p-4 transition-colors shadow-md cursor-pointer bg-gray-50 rounded-xl hover:bg-gray-100"
+        className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 shadow-md transition-colors hover:bg-gray-100"
         onClick={handleLogout}
       >
         <span className="flex items-center gap-2 text-sm font-semibold">
@@ -267,7 +267,7 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="flex items-center p-4 transition-colors shadow-md cursor-pointer bg-red-50 rounded-xl hover:bg-red-100"
+        className="flex cursor-pointer items-center rounded-xl bg-red-50 p-4 shadow-md transition-colors hover:bg-red-100"
         onClick={() => {
           setShowDeleteModal(true);
         }}

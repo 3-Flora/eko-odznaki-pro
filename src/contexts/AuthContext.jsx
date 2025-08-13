@@ -27,7 +27,6 @@ import { availableBadges } from "../data/badges";
 
 const AuthContext = createContext(null);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -156,7 +155,7 @@ export const AuthProvider = ({ children }) => {
     const activitiesQuery = query(
       collection(db, "activities"),
       where("userId", "==", currentUser.id),
-      orderBy("submittedAt", "desc")
+      orderBy("submittedAt", "desc"),
     );
 
     const querySnapshot = await getDocs(activitiesQuery);
@@ -195,7 +194,7 @@ export const AuthProvider = ({ children }) => {
     const { user } = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     await createUserDocument(user, userData);
   };
@@ -254,7 +253,7 @@ export const AuthProvider = ({ children }) => {
             },
             (error) => {
               console.error("Error listening to user data:", error);
-            }
+            },
           );
         } else {
           setCurrentUser(null);

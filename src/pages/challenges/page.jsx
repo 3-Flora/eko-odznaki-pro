@@ -1,4 +1,3 @@
-import React from "react";
 import { Calendar, Users, Gift } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -69,7 +68,7 @@ export default function ChallengesPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-4  justify-normal">
+    <div className="flex flex-col justify-normal gap-6 p-4">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -88,9 +87,9 @@ export default function ChallengesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="p-6 text-white bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl"
+        className="rounded-3xl bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="mr-3 text-3xl">{currentChallenge.icon}</div>
             <div>
@@ -99,7 +98,7 @@ export default function ChallengesPage() {
             </div>
           </div>
           <div className="text-center">
-            <div className="px-3 py-2 bg-white/20 rounded-xl">
+            <div className="rounded-xl bg-white/20 px-3 py-2">
               <p className="text-sm font-medium">Bonus</p>
               <p className="text-lg font-bold">
                 +{currentChallenge.bonusPoints}
@@ -111,13 +110,13 @@ export default function ChallengesPage() {
         <p className="mb-4 text-blue-100">{currentChallenge.description}</p>
 
         <div className="mb-4">
-          <div className="flex justify-between mb-2 text-sm">
+          <div className="mb-2 flex justify-between text-sm">
             <span>Postęp: {currentChallenge.progress}%</span>
             <span>Pozostało {currentChallenge.daysLeft} dni</span>
           </div>
-          <div className="w-full h-3 rounded-full bg-white/20">
+          <div className="h-3 w-full rounded-full bg-white/20">
             <div
-              className="h-3 transition-all duration-500 bg-white rounded-full"
+              className="h-3 rounded-full bg-white transition-all duration-500"
               style={{ width: `${currentChallenge.progress}%` }}
             ></div>
           </div>
@@ -125,10 +124,10 @@ export default function ChallengesPage() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center text-sm">
-            <Users className="w-4 h-4 mr-1" />
+            <Users className="mr-1 h-4 w-4" />
             <span>{currentChallenge.participants} uczestników</span>
           </div>
-          <button className="px-4 py-2 text-sm font-semibold text-purple-600 transition bg-white rounded-xl hover:bg-blue-50">
+          <button className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-purple-600 transition hover:bg-blue-50">
             Weź udział
           </button>
         </div>
@@ -139,7 +138,7 @@ export default function ChallengesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6 bg-white shadow-lg rounded-2xl"
+        className="rounded-2xl bg-white p-6 shadow-lg"
       >
         <h3 className="mb-4 text-lg font-bold text-gray-800">
           Nadchodzące wyzwania
@@ -151,7 +150,7 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + index * 0.05 }}
-              className="flex items-center p-4 transition-colors cursor-pointer bg-gray-50 rounded-xl hover:bg-green-50"
+              className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 transition-colors hover:bg-green-50"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
               <div className="flex-1">
@@ -162,7 +161,7 @@ export default function ChallengesPage() {
                   {challenge.description}
                 </p>
                 <div className="flex items-center text-xs text-gray-500">
-                  <Calendar className="w-3 h-3 mr-1" />
+                  <Calendar className="mr-1 h-3 w-3" />
                   <span>
                     {challenge.startDate.toLocaleDateString("pl-PL")} -{" "}
                     {challenge.endDate.toLocaleDateString("pl-PL")}
@@ -170,8 +169,8 @@ export default function ChallengesPage() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="px-2 py-1 text-green-800 bg-green-100 rounded-lg">
-                  <Gift className="w-4 h-4 mx-auto mb-1" />
+                <div className="rounded-lg bg-green-100 px-2 py-1 text-green-800">
+                  <Gift className="mx-auto mb-1 h-4 w-4" />
                   <p className="text-xs font-bold">+{challenge.bonusPoints}</p>
                 </div>
               </div>
@@ -185,7 +184,7 @@ export default function ChallengesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="p-6 bg-white shadow-lg rounded-2xl"
+        className="rounded-2xl bg-white p-6 shadow-lg"
       >
         <h3 className="mb-4 text-lg font-bold text-gray-800">
           Ukończone wyzwania
@@ -197,7 +196,7 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 + index * 0.05 }}
-              className="flex items-center p-4 border border-green-200 bg-green-50 rounded-xl"
+              className="flex items-center rounded-xl border border-green-200 bg-green-50 p-4"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
               <div className="flex-1">
@@ -207,7 +206,7 @@ export default function ChallengesPage() {
                 <p className="text-sm text-gray-600">{challenge.description}</p>
               </div>
               <div className="text-center">
-                <div className="px-3 py-2 text-white bg-green-500 rounded-lg">
+                <div className="rounded-lg bg-green-500 px-3 py-2 text-white">
                   <p className="text-xs">Zdobyto</p>
                   <p className="text-sm font-bold">+{challenge.earnedPoints}</p>
                 </div>
@@ -222,7 +221,7 @@ export default function ChallengesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="p-6 text-white bg-gradient-to-r from-emerald-400 to-green-500 rounded-2xl"
+        className="rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 p-6 text-white"
       >
         <h3 className="mb-2 text-lg font-bold">💡 Wskazówka</h3>
         <p className="text-green-100">
