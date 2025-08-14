@@ -46,21 +46,11 @@ function AppContent() {
 export default function App() {
   const { theme } = useContext(ThemeContext);
 
-  console.log("Current theme:", theme);
-
   return (
-    <div
-      className={clsx(
-        theme === "dark" && "dark",
-        "select-none",
-        "h-screen bg-gray-50 dark:bg-gray-800",
-      )}
-    >
-      <DeviceEnvironmentProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </DeviceEnvironmentProvider>
-    </div>
+    <DeviceEnvironmentProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </DeviceEnvironmentProvider>
   );
 }

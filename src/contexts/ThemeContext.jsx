@@ -29,15 +29,20 @@ export const ThemeProvider = ({ children }) => {
           setTheme(value);
         }
       } catch (error) {
-        // Ignore error, theme already set from localStorage
+        console.log("Error loading theme from Preferences:", error);
       }
     };
+
     loadTheme();
   }, []);
 
   useEffect(() => {
     Preferences.set({ key: THEME_KEY, value: theme });
     localStorage.setItem(THEME_KEY, theme);
+
+    // Add theme class to body
+    document.body.classList.remove("light", "dark");
+    document.body.classList.add(theme);
   }, [theme]);
 
   const toggleTheme = () => {

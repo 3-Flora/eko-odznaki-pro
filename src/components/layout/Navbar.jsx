@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { User, Trophy } from "lucide-react";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
-import ToggleThemeBtn from "../ToggleThemeBtn";
+import ToggleTheme from "../ui/ToggleTheme";
 
 export const Navbar = () => {
   const { currentUser } = useAuth();
@@ -30,7 +30,7 @@ export const Navbar = () => {
             </h1>
           </div>
 
-          <ToggleThemeBtn />
+          <ToggleTheme />
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center rounded-full bg-green-100 px-3 py-1 dark:bg-green-900">
