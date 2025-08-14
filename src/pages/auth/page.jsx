@@ -1,16 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  Mail,
-  Lock,
-  User,
-  School,
-  Users,
-  Chrome,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Lock, User, School, Users } from "lucide-react";
 import { useNavigate } from "react-router";
+import ErrorMessage from "../../components/ui/ErrorMessage";
+import Select from "../../components/ui/Select";
+import UserTypeSelect from "../../components/ui/UserTypeSelect";
+import Input from "../../components/ui/Input";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +17,6 @@ export default function AuthPage() {
   const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // Show/hide password state for confirm password
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -76,145 +70,87 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex h-svh w-full max-w-md flex-col justify-center bg-white p-8 dark:bg-gray-800">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center p-8">
       <div className="mb-8 text-center">
         <div className="mb-4 text-6xl">🌱</div>
         <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">
-          EKO-odznaki
+          EKO Odznaki
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
           {isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"}
         </p>
       </div>
 
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-          {error}
-        </div>
-      )}
+      <ErrorMessage error={error} className="mb-4" />
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
+        {/* <div className="relative">
           <Mail className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
           <input
             type="email"
             placeholder="Adres e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             required
           />
-        </div>
+        </div> */}
+        <Input
+          icon={Mail}
+          type="email"
+          placeholder="Adres e-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <div className="relative">
-          <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Hasło"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+        {!isLogin && (
+          <Input
+            icon={User}
+            placeholder="Nazwa wyświetlana"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
             required
           />
-          <button
-            type="button"
-            className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-            onClick={() => setShowPassword((prev) => !prev)}
-            tabIndex={-1}
-          >
-            {showPassword ? <EyeOff /> : <Eye />}
-          </button>
-        </div>
+        )}
+
+        <Input
+          icon={Lock}
+          placeholder="Hasło"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
         {!isLogin && (
           <>
-            <div className="relative">
-              <Lock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Powtórz hasło"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-12 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                required
-              />
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 transform px-2 py-1 text-xs text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? <EyeOff /> : <Eye />}
-              </button>
-            </div>
+            <Input
+              icon={Lock}
+              placeholder="Powtórz hasło"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
 
-            <div className="relative">
-              <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-              <input
-                type="text"
-                placeholder="Nazwa wyświetlana"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                required
-              />
-            </div>
+            <Select icon={School} value={school} onChange={setSchool}>
+              <option value="">Wybierz szkołę</option>
+              <option value="szkola1">Szkoła 1</option>
+              <option value="szkola2">Szkoła 2</option>
+              <option value="szkola3">Szkoła 3</option>
+            </Select>
 
-            <div className="relative">
-              <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-              <select
-                value={school}
-                onChange={(e) => setSchool(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                required
-              >
-                <option value="">Wybierz szkołę</option>
-                <option value="szkola1">Szkoła 1</option>
-                <option value="szkola2">Szkoła 2</option>
-                <option value="szkola3">Szkoła 3</option>
-              </select>
-            </div>
+            <Select icon={Users} value={className} onChange={setClassName}>
+              <option value="">Wybierz klasę</option>
+              <option value="klasa1">Klasa 1</option>
+              <option value="klasa2">Klasa 2</option>
+              <option value="klasa3">Klasa 3</option>
+              <option value="klasa4">Klasa 4</option>
+            </Select>
 
-            <div className="relative">
-              <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-              <select
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                required
-              >
-                <option value="">Wybierz klasę</option>
-                <option value="klasa1">Klasa 1</option>
-                <option value="klasa2">Klasa 2</option>
-                <option value="klasa3">Klasa 3</option>
-                <option value="klasa3">Klasa 4</option>
-              </select>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                className={`text flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 font-semibold transition ${
-                  role === "student"
-                    ? "border-green-500 bg-green-500 text-white shadow-lg"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
-                }`}
-                onClick={() => setRole("student")}
-              >
-                <span>🧑‍🎓 Uczeń</span>
-              </button>
-              <button
-                type="button"
-                className={`text flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 font-semibold transition ${
-                  role === "teacher"
-                    ? "border-emerald-600 bg-emerald-600 text-white shadow-lg"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
-                }`}
-                onClick={() => setRole("teacher")}
-              >
-                <span>👨‍🏫 Nauczyciel</span>
-              </button>
-            </div>
+            {/* Do usunięcia po skończeniu apki */}
+            <UserTypeSelect onRoleChange={setRole} role={role} />
           </>
         )}
 
