@@ -13,8 +13,6 @@ function ScrollToTop({ scrollContainerRef }) {
     if (scrollContainerRef?.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
-
-    console.log(`Scroll to top on path change: ${pathname}`);
   }, [pathname, scrollContainerRef]);
 
   return null;
