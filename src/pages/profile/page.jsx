@@ -60,7 +60,8 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
+    <>
+      {" "}
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -110,7 +111,6 @@ export default function ProfilePage() {
           Edit Profile
         </button>
       </motion.div>
-
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {stats.map((stat, index) => (
@@ -131,7 +131,6 @@ export default function ProfilePage() {
           </motion.div>
         ))}
       </div>
-
       {/* Badges Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -171,7 +170,6 @@ export default function ProfilePage() {
           </div>
         )}
       </motion.div>
-
       {/* Logtout Button */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -185,7 +183,6 @@ export default function ProfilePage() {
           Wyloguj
         </span>
       </motion.div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -199,7 +196,6 @@ export default function ProfilePage() {
           <Trash2 size={18} /> Usuń konto
         </span>
       </motion.div>
-
       <ConfirmModal
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -209,6 +205,6 @@ export default function ProfilePage() {
         confirmLabel="Usuń konto"
         confirmClassName="bg-red-600 hover:bg-red-700 text-white"
       />
-    </div>
+    </>
   );
 }

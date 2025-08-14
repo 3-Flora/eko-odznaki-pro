@@ -8,7 +8,7 @@ import {
 
 export default function ChallengesPage() {
   return (
-    <div className="flex min-h-screen flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
+    <>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -174,6 +174,6 @@ export default function ChallengesPage() {
           punkty.
         </p>
       </motion.div>
-    </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Camera, Upload, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { activityCategories } from "../../data/badges";
 import { useAuth } from "../../contexts/AuthContext";
+import ErrorMessage from "../../components/ui/ErrorMessage";
 
 export default function ActivityPage() {
   const { submitActivity, currentUser } = useAuth();
@@ -70,7 +71,7 @@ export default function ActivityPage() {
 
   if (submitted) {
     return (
-      <div className="flex items-center justify-center p-4 pb-20 dark:bg-gray-900">
+      <div className="flex items-center justify-center p-4">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -97,7 +98,7 @@ export default function ActivityPage() {
   );
 
   return (
-    <div className="flex flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
+    <>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -112,15 +113,7 @@ export default function ActivityPage() {
         </p>
       </motion.div>
 
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300"
-        >
-          {error}
-        </motion.div>
-      )}
+      <ErrorMessage error={error} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category Selection */}
@@ -282,6 +275,6 @@ export default function ActivityPage() {
           </>
         )}
       </form>
-    </div>
+    </>
   );
 }

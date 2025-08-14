@@ -39,7 +39,7 @@ export default function DashboardPage() {
   ); // Weekly goal of 100 points
 
   return (
-    <div className="flex min-h-screen flex-col justify-normal gap-6 p-4 dark:bg-gray-900">
+    <>
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -230,6 +230,6 @@ export default function DashboardPage() {
           </span>
         </div>
       </motion.div>
-    </div>
+    </>
   );
 }

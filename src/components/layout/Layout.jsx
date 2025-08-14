@@ -7,7 +7,9 @@ export default function Layout() {
     <div className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900">
       <Navbar />
       <main className="h-full flex-1 overflow-auto">
-        <Outlet />
+        <div className="flex flex-col justify-normal gap-6 p-4">
+          <Outlet />
+        </div>
       </main>
       <BottomNav />
     </div>

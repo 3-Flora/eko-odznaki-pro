@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { User, School, Users, ArrowLeft } from "lucide-react";
+import { User, School, Users, ArrowLeft, Mail } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import Input from "../../components/ui/Input";
+import Label from "../../components/ui/Label";
+import Button from "../../components/ui/Button";
+import Select from "../../components/ui/Select";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
 
-  // Example state, replace with context values if needed
   const [displayName, setDisplayName] = useState("");
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { currentUser, updateProfile } = useAuth();
-
-  console.log(currentUser);
 
   useEffect(() => {
     // Fetch user data and populate form fields
@@ -24,6 +26,7 @@ export default function EditProfilePage() {
       setDisplayName(userData.displayName);
       setSchool(userData.school);
       setClassName(userData.className);
+      setEmail(userData.email);
     };
 
     fetchUserData();
@@ -33,83 +36,72 @@ export default function EditProfilePage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    await updateProfile({ displayName, school, className });
+    await updateProfile({ displayName, school, className, email });
     setLoading(false);
+    // TODO: Zamiast cofania, informacja o pomyślnej zmianie
     navigate(-1);
   };
 
   return (
-    <div className="mx-auto mt-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-2 font-semibold text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-      >
-        <ArrowLeft className="h-5 w-5" /> Powrót
-      </button>
+    <>
+      <div className="mx-auto w-full max-w-md rounded-2xl p-4 shadow-lg dark:bg-gray-800">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center gap-2 font-semibold text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+        >
+          <ArrowLeft className="h-5 w-5" /> Powrót
+        </button>
 
-      <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
-        Edytuj profil
-      </h2>
+        <h2 className="mb-6 text-center text-2xl font-bold text-gray-800 dark:text-white">
+          Edytuj profil
+        </h2>
 
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-          <input
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Label>Nazwa wyświetlana</Label>
+          <Input
             type="text"
             placeholder="Nazwa wyświetlana"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            required
+            icon={User}
           />
-        </div>
 
-        <div className="relative">
-          <School className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-          <select
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            required
-          >
+          <Label>Email</Label>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            icon={Mail}
+          />
+
+          <Label>Szkoła</Label>
+          <Select value={school} onChange={setSchool}>
             <option value="">Wybierz szkołę</option>
             <option value="szkola1">Szkoła 1</option>
             <option value="szkola2">Szkoła 2</option>
             <option value="szkola3">Szkoła 3</option>
-          </select>
-        </div>
+          </Select>
 
-        <div className="relative">
-          <Users className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-          <select
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            required
-          >
+          <Label>Klasa</Label>
+          <Select value={className} onChange={setClassName}>
             <option value="">Wybierz klasę</option>
             <option value="klasa1">Klasa 1</option>
             <option value="klasa2">Klasa 2</option>
             <option value="klasa3">Klasa 3</option>
             <option value="klasa4">Klasa 4</option>
-          </select>
-        </div>
+          </Select>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 py-3 font-semibold text-white transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 dark:from-green-700 dark:to-emerald-800 dark:hover:from-green-800 dark:hover:to-emerald-900"
-        >
-          {loading ? "Zapisywanie..." : "Zapisz zmiany"}
-        </button>
-      </form>
-    </div>
+          <Button loading={loading} />
+        </form>
+      </div>
+    </>
   );
 }

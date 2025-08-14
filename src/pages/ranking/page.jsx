@@ -81,7 +81,7 @@ export default function RankingPage() {
   ];
 
   return (
-    <div className="flex flex-col justify-normal gap-6 p-4">
+    <>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -220,6 +220,6 @@ export default function RankingPage() {
           </div>
         )}
       </motion.div>
-    </div>
+    </>
   );
 }
