@@ -1,235 +1,477 @@
 import { useAuth } from "../../contexts/AuthContext";
-import { Users } from "lucide-react";
+import { CalendarClockIcon, Pickaxe, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import { availableBadges } from "../../data/badges";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../../services/firebase";
+import { useNavigate } from "react-router";
+
+// Static fallback progress data (used when currentUser doesn't provide badge/rank yet)
+const staticProgressData = {
+  user: { displayName: "Jan Kowalski", avatarUrl: "" },
+  rank: { position: 5, totalInClass: 25, label: "Miejsce w klasie" },
+  featuredBadge: {
+    name: "Eko-Aktywista",
+    level: 1,
+    imageUrl: "",
+    progress: { current: 23, target: 25, label: "do poziomu 2" },
+  },
+  callToAction: { text: "Zobacz pełny profil", action: "NAVIGATE_TO_PROFILE" },
+};
+
+// --- Skeleton components ---
+function LargeChallengeCardSkeleton() {
+  return (
+    <div className="animate-pulse rounded-3xl bg-gray-100 p-6 dark:bg-gray-800">
+      <div className="mb-3 h-6 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="mb-6 h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" />
+    </div>
+  );
+}
+
+function ActionsCarouselSkeleton() {
+  return (
+    <div className="animate-pulse rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
+      <div className="mb-3 h-6 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="flex space-x-3">
+        <div className="h-24 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-24 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-24 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+      </div>
+    </div>
+  );
+}
+
+function ProgressCardSkeleton() {
+  return (
+    <div className="animate-pulse rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+      <div className="mb-4 h-8 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="flex items-center space-x-4">
+        <div className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
+        <div className="flex-1">
+          <div className="mb-2 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+          <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActivityFeedSkeleton() {
+  return (
+    <div className="animate-pulse rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+      <div className="mb-4 h-6 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="space-y-3">
+        <div className="flex items-start space-x-3">
+          <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div className="flex-1">
+            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+          </div>
+        </div>
+        <div className="flex items-start space-x-3">
+          <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div className="flex-1">
+            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LargeChallengeCard({ data }) {
+  const end = new Date(data.endDate.seconds * 1000);
+  const now = new Date();
+  const msLeft = Math.max(0, end - now);
+  const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
+  const progressPct = Math.round(
+    (data.classProgress.current / data.classProgress.total) * 100,
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-3xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900 dark:text-white"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <h4 className="text-2xl font-bold">{data.challengeName}</h4>
+          <p className="mt-2 text-sm text-blue-100 dark:text-blue-200">
+            {data.challengeDescription}
+          </p>
+        </div>
+        <div className="flex items-center justify-items-center gap-2 text-right">
+          {/* <div className="text-sm"></div> */}
+          <CalendarClockIcon className="h-5 w-5 text-white" />
+          <div className="font-semibold">{end.toLocaleDateString("pl-PL")}</div>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between">
+        <div className="w-2/3">
+          <div className="mb-1 flex items-center justify-between text-sm text-blue-100 dark:text-blue-200">
+            <span>
+              {data.classProgress.current} / {data.classProgress.total} uczniów
+            </span>
+            <span>{progressPct}%</span>
+          </div>
+          <div className="h-3 w-full rounded-full bg-white/30 dark:bg-white/10">
+            <div
+              className="h-3 rounded-full bg-white transition-all duration-500 dark:bg-emerald-400"
+              style={{ width: `${Math.min(progressPct, 100)}%` }}
+            />
+          </div>
+        </div>
+        <div className="ml-4 text-sm dark:text-blue-100">
+          <div className="mb-1">Pozostało</div>
+          <div className="rounded-full bg-white/20 px-3 py-1 font-semibold dark:bg-white/10">
+            {daysLeft} dni
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => console.log("DO IT")}
+          className="rounded-full bg-white/20 px-4 py-2 font-semibold hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
+        >
+          Wykonaj działanie
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function ActionsCarousel({ data }) {
+  const navigate = useNavigate();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
+          Szybkie Działania
+        </h3>
+        <button
+          onClick={() => navigate("/submit")}
+          className="text-sm text-gray-500 dark:text-gray-300"
+        >
+          Zobacz wszystkie
+        </button>
+      </div>
+
+      <div className="flex space-x-3 overflow-x-auto pb-2">
+        {data.actions.map((action) => (
+          <div
+            key={action.id}
+            className="min-w-[160px] flex-none rounded-xl border bg-white p-3 text-left dark:border-gray-700 dark:bg-gray-800"
+          >
+            <div className="mb-2 flex justify-center">
+              <div className="flex flex-col">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-500 text-white dark:bg-green-600">
+                  {/* icon */}
+                  <span className="text-4xl">{action.icon}</span>
+                </div>
+                <div className="text-xl font-medium text-gray-800 dark:text-white">
+                  {action.name}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2">
+              <button
+                // tutaj przekierowywujne na /submit z wybranym EkoDziałaniem
+                onClick={() => console.log("quick action", action)}
+                className="w-full rounded-md bg-green-500 px-3 py-1 text-sm font-semibold text-white hover:bg-green-600"
+              >
+                Wykonaj
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function ProgressCard({ data }) {
+  const badgePct = Math.round(
+    (data.featuredBadge.progress.current / data.featuredBadge.progress.target) *
+      100,
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
+          Mój Postęp
+        </h3>
+        <Pickaxe className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+      </div>
+
+      <div className="flex items-center space-x-4">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-xl font-semibold dark:bg-gray-700 dark:text-white">
+          {data.user.displayName[0]}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold text-gray-800 dark:text-white">
+                {data.user.displayName}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {data.rank.label}: {data.rank.position}/{data.rank.totalInClass}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Odznaka
+              </div>
+              <div className="font-semibold dark:text-white">
+                {data.featuredBadge.name} (Lv {data.featuredBadge.level})
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <div className="mb-1 flex items-center justify-between text-sm text-gray-500 dark:text-gray-300">
+              <span>
+                {data.featuredBadge.progress.current} /{" "}
+                {data.featuredBadge.progress.target}{" "}
+                {data.featuredBadge.progress.label}
+              </span>
+              <span>{badgePct}%</span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+              <div
+                className="h-2 rounded-full bg-emerald-500 dark:bg-emerald-400"
+                style={{ width: `${Math.min(badgePct, 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => console.log(data.callToAction)}
+          className="rounded-full bg-emerald-500 px-4 py-2 font-semibold text-white hover:bg-emerald-600 dark:bg-emerald-500"
+        >
+          {data.callToAction.text}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function ActivityFeed({ data }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
+          Co słychać w klasie?
+        </h3>
+        <Users className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+      </div>
+
+      <p className="mb-2 text-gray-600 dark:text-gray-400">
+        Tutaj znajdziesz ostatnie aktywności i działania w klasie.
+      </p>
+
+      <div className="space-y-3">
+        {data.feedItems.map((item, i) => (
+          <div key={item.id} className="flex items-start space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500 font-semibold text-white dark:bg-green-600">
+              {i + 1}
+            </div>
+            <div className="flex-1">
+              <div className="text-sm text-gray-800 dark:text-white">
+                {item.text}
+              </div>
+              <div className="mt-1 text-xs text-gray-400 dark:text-gray-400">
+                {new Date(item.timestamp).toLocaleString("pl-PL")}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function DashboardPage() {
   const { currentUser } = useAuth();
 
-  // Mock recent activities for now
-  const recentActivities = [
-    {
-      id: "1",
-      userName: "Anna K.",
-      title: "Przejazd rowerem do szkoły",
-      points: 10,
-      submittPagedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      reviewedAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
-    },
-    {
-      id: "2",
-      userName: "Piotr M.",
-      title: "Segregacja śmieci",
-      points: 15,
-      submittedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-      reviewedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-    },
-  ];
+  // prefer real user from context when available, otherwise use static sample
+  const user = currentUser || { displayName: "Jan Kowalski" };
 
-  // Find next badge
-  const nextBadge = availableBadges
-    .filter((badge) => (currentUser?.points || 0) < badge.pointsRequired)
-    .sort((a, b) => a.pointsRequired - b.pointsRequired)[0];
+  // Live data states
+  const [assignedChallenge, setAssignedChallenge] = useState(null);
+  const [ecoActions, setEcoActions] = useState(null);
+  const [feedItems, setFeedItems] = useState(null);
+  const [loadingAssigned, setLoadingAssigned] = useState(true);
+  const [loadingEcoActions, setLoadingEcoActions] = useState(true);
+  const [loadingFeed, setLoadingFeed] = useState(true);
 
-  const nextBadgePoints = nextBadge?.pointsRequired || 50;
-  const currentStreak = 5; // TODO: Calculate from user data
-  const weeklyProgress = Math.min(
-    ((currentUser?.points || 0) / 100) * 100,
-    100,
-  ); // Weekly goal of 100 points
+  // Fetch assigned challenge for the user's class (current active one)
+  useEffect(() => {
+    if (!currentUser?.classId) return;
+
+    let mounted = true;
+    setLoadingAssigned(true);
+    (async () => {
+      try {
+        const now = new Date();
+        const q = query(
+          collection(db, "assignedChallenges"),
+          where("classId", "==", currentUser.classId),
+          orderBy("endDate", "desc"),
+          limit(5),
+        );
+        const snap = await getDocs(q);
+        // find active one (startDate <= now <= endDate)
+        const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const active = items.find((it) => {
+          const start = it.startDate
+            ? it.startDate.toDate?.() || new Date(it.startDate)
+            : new Date(0);
+          const end = it.endDate
+            ? it.endDate.toDate?.() || new Date(it.endDate)
+            : new Date(0);
+          return start <= now && now <= end;
+        });
+        if (mounted && active) setAssignedChallenge(active);
+      } catch (e) {
+        console.warn("failed to fetch assignedChallenges", e);
+      }
+      if (mounted) setLoadingAssigned(false);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [currentUser?.classId]);
+
+  // Fetch ecoActions (small list for quick actions)
+  useEffect(() => {
+    let mounted = true;
+    setLoadingEcoActions(true);
+    (async () => {
+      try {
+        const q = query(
+          collection(db, "ecoActions"),
+          orderBy("name"),
+          limit(10),
+        );
+        const snap = await getDocs(q);
+        const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (mounted) setEcoActions(items.slice(0, 3));
+      } catch (e) {
+        console.warn("failed to fetch ecoActions", e);
+      }
+      if (mounted) setLoadingEcoActions(false);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Subscribe to activity feed for the class
+  useEffect(() => {
+    if (!currentUser?.classId) return;
+    const feedCol = collection(
+      db,
+      "activityFeeds",
+      currentUser.classId,
+      "items",
+    );
+    const q = query(feedCol, orderBy("timestamp", "desc"), limit(10));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setFeedItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setLoadingFeed(false);
+      },
+      (err) => console.warn("feed listener error", err),
+    );
+    return () => unsub();
+  }, [currentUser?.classId]);
 
   return (
     <>
-      {/* Welcome Section */}
+      {/* Top welcome */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:bg-gradient-to-r dark:from-green-700 dark:to-emerald-900 dark:text-white"
+        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:from-green-700 dark:to-emerald-900"
       >
         <h2 className="mb-2 text-2xl font-bold">
-          Cześć, {currentUser?.displayName?.split(" ")[0]}! 👋
+          Cześć, {user.displayName.split(" ")[0]}! 👋
         </h2>
-        <p className="mb-4 text-gray-600 dark:text-gray-300">
-          Masz już <span className="font-bold">{currentUser?.points || 0}</span>{" "}
-          punktów eco!
-        </p>
-        <div className="flex items-center">
-          <div className="mr-2 rounded-full bg-white/20 px-3 py-1 dark:bg-white/10">
-            <span className="text-sm font-semibold">
-              Streak: {currentStreak} dni 🔥
-            </span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Progress to Next Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Kolejna odznaka
-          </h3>
-          <div className="text-2xl">🏆</div>
-        </div>
-        <div className="mb-2">
-          <div className="mb-1 flex justify-between text-sm text-gray-600 dark:text-gray-300">
-            <span>
-              {currentUser?.points || 0} / {nextBadgePoints} punktów
-            </span>
-            <span>
-              {Math.round(((currentUser?.points || 0) / nextBadgePoints) * 100)}
-              %
-            </span>
-          </div>
-          <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-            <div
-              className="h-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 dark:from-green-600 dark:to-emerald-700"
-              style={{
-                width: `${Math.min(
-                  ((currentUser?.points || 0) / nextBadgePoints) * 100,
-                  100,
-                )}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          Jeszcze {Math.max(0, nextBadgePoints - (currentUser?.points || 0))}{" "}
-          punktów do odznaki "{nextBadge?.name || "następnej odznaki"}"!
+        <p className="text-sm text-white/90">
+          Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie
+          działania i swój postęp.
         </p>
       </motion.div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
-        >
-          <div className="mb-2 text-3xl">🎯</div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">
-            {weeklyProgress}%
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Tygodniowy cel
-          </p>
-        </motion.div>
+      {/* Render sections explicitly (prefer live DB data, fallback to static samples) */}
+      {loadingAssigned ? (
+        <LargeChallengeCardSkeleton />
+      ) : (
+        <LargeChallengeCard data={assignedChallenge || heroData} />
+      )}
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
-        >
-          <div className="mb-2 text-3xl">🌱</div>
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">
-            {currentUser?.badges?.length || 0}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Zdobyte odznaki
-          </p>
-        </motion.div>
-      </div>
+      {loadingEcoActions ? (
+        <ActionsCarouselSkeleton />
+      ) : (
+        <ActionsCarousel
+          data={{
+            actions: ecoActions.map((a) => ({
+              id: a.id,
+              name: a.name,
+              icon: a.icon || "🍃",
+              action: "SUBMIT_ACTION_QUICKLY",
+              actionId: a.id,
+            })),
+          }}
+        />
+      )}
 
-      {/* Recent Class Activities */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Aktywność klasy
-          </h3>
-          <Users className="h-5 w-5 text-gray-400 dark:text-gray-300" />
-        </div>
-        <div className="space-y-3">
-          {recentActivities.length === 0 ? (
-            <div className="py-8 text-center">
-              <div className="mb-4 text-4xl">🌱</div>
-              <p className="text-gray-600 dark:text-gray-300">
-                Brak aktywności w klasie
-              </p>
-              <p className="mt-2 text-sm text-gray-400 dark:text-gray-400">
-                Zachęć uczniów do zgłaszania działań eco!
-              </p>
-            </div>
-          ) : (
-            recentActivities.map((activity, index) => (
-              <motion.div
-                key={activity.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="flex items-center justify-between rounded-xl bg-green-50 p-3 dark:bg-green-900"
-              >
-                <div className="flex items-center">
-                  <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
-                    <span className="text-sm font-semibold text-white">
-                      {activity.userName?.charAt(0) || "U"}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-white">
-                      {activity.userName}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">
-                      {activity.title}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-green-600 dark:text-green-300">
-                    +{activity.points} pkt
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-400">
-                    {activity.reviewedAt
-                      ? new Date(activity.reviewedAt).toLocaleDateString(
-                          "pl-PL",
-                        )
-                      : new Date(activity.submittedAt).toLocaleDateString(
-                          "pl-PL",
-                        )}
-                  </p>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
-      </motion.div>
+      {/* Progress card doesn't rely on async DB in this implementation, but show skeleton briefly if desired */}
+      <ProgressCard
+        data={
+          staticProgressData.user
+            ? staticProgressData
+            : { ...progressData, user }
+        }
+      />
 
-      {/* Current Weekly Challenge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="rounded-2xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold dark:text-white">
-            Wyzwanie tygodnia
-          </h3>
-          <div className="text-2xl">⚡</div>
-        </div>
-        <h4 className="mb-2 text-xl font-bold dark:text-white">
-          Tydzień bez plastiku
-        </h4>
-        <p className="mb-4 text-blue-100 dark:text-blue-200">
-          Unikaj jednorazowych przedmiotów plastikowych przez cały tydzień
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Bonus: +50 punktów</span>
-          <span className="rounded-full bg-white/20 px-3 py-1 text-sm dark:bg-white/10">
-            Pozostało 3 dni
-          </span>
-        </div>
-      </motion.div>
+      {loadingFeed ? (
+        <ActivityFeedSkeleton />
+      ) : (
+        <ActivityFeed data={{ feedItems: feedItems || feedData.feedItems }} />
+      )}
     </>
   );
 }
