@@ -14,7 +14,7 @@ import {
 import { useAuth } from "./contexts/AuthContext";
 
 export default function App() {
-  const { currentUser, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <Loading />;
@@ -24,7 +24,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
-        <Route path="/" element={<ProtectedRoute isAuth={currentUser} />}>
+        <Route path="/" element={<ProtectedRoute />}>
           <Route path="" element={<Layout />}>
             <Route index element={<DashboardPage />} />
             <Route path="submit" element={<ActivityPage />} />

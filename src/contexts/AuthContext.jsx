@@ -20,10 +20,8 @@ import {
   orderBy,
   getDocs,
   serverTimestamp,
-  deleteDoc,
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../services/firebase";
-import { availableBadges } from "../data/badges";
 
 const AuthContext = createContext(null);
 
@@ -45,149 +43,86 @@ export const AuthProvider = ({ children }) => {
 
     if (!userSnap.exists()) {
       const userData = {
-        id: firebaseUser.uid,
         email: firebaseUser.email,
         displayName:
-          firebaseUser.displayName || additionalData?.displayName || "",
-        school: additionalData?.school || "",
-        className: additionalData?.className || "",
+          firebaseUser.displayName || additionalData?.displayName || "Uczeń",
         role: additionalData?.role || "student",
-        points: 0,
-        badges: [],
+        schoolId: additionalData?.schoolId || "",
+        classId: additionalData?.classId || "",
+        isVerified: false,
+        counters: {
+          totalActions: 0,
+          totalChallenges: 0,
+          recyclingActions: 0,
+          educationActions: 0,
+        },
+        earnedBadges: {},
         ...(firebaseUser.photoURL && { photoURL: firebaseUser.photoURL }),
       };
 
       await setDoc(userRef, userData);
-      return userData;
+      return { id: firebaseUser.uid, ...userData };
     }
 
-    return userSnap.data();
+    return { id: userSnap.id, ...userSnap.data() };
   };
 
-  const updateUserPoints = async (additionalPoints) => {
-    if (!currentUser) return;
-
-    const userRef = doc(db, "users", currentUser.id);
-    const newPoints = currentUser.points + additionalPoints;
-
-    await updateDoc(userRef, {
-      points: newPoints,
-    });
-
-    setCurrentUser((prev) => (prev ? { ...prev, points: newPoints } : null));
-
-    await checkAndAwardBadges(newPoints);
-  };
-
-  const checkAndAwardBadges = async (userPoints) => {
-    if (!currentUser) return;
-
-    const earnedBadgeIds = currentUser.badges.map((badge) => badge.id);
-    const newBadges = [];
-
-    availableBadges.forEach((badge) => {
-      if (
-        badge.pointsRequired > 0 &&
-        userPoints >= badge.pointsRequired &&
-        !earnedBadgeIds.includes(badge.id)
-      ) {
-        newBadges.push({ ...badge, earnedAt: new Date() });
-      }
-    });
-
-    for (const badge of newBadges) {
-      await addBadgeToUser(badge);
+  const submitEcoAction = async (ecoAction, optionalData = {}) => {
+    if (!currentUser || !currentUser.isVerified) {
+      throw new Error(
+        "Użytkownik musi być zweryfikowany, aby zgłaszać działania.",
+      );
     }
-  };
 
-  const addBadgeToUser = async (badge) => {
-    if (!currentUser) return;
-
-    const userRef = doc(db, "users", currentUser.id);
-    const newBadges = [
-      ...currentUser.badges,
-      { ...badge, earnedAt: new Date() },
-    ];
-
-    await updateDoc(userRef, {
-      badges: newBadges,
-    });
-
-    setCurrentUser((prev) => (prev ? { ...prev, badges: newBadges } : null));
-  };
-
-  const refreshUserData = async () => {
-    if (!currentUser) return;
-
-    const userRef = doc(db, "users", currentUser.id);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      setCurrentUser(userSnap.data());
-    }
-  };
-
-  const submitActivity = async (activityData) => {
-    if (!currentUser) return;
-
-    const activity = {
-      userId: currentUser.id,
-      userName: currentUser.displayName,
-      userPhoto: currentUser.photoURL,
-      category: activityData.category,
-      title: activityData.title,
-      description: activityData.description,
-      photoURL: activityData.photoURL,
-      points: getCategoryPoints(activityData.category),
-      status: "pending",
-      submittedAt: new Date(),
+    const submissionData = {
+      studentId: currentUser.id,
+      studentName: currentUser.displayName,
+      classId: currentUser.classId,
+      ecoActionId: ecoAction.id,
+      category: ecoAction.category, // Ważne dla Cloud Function liczącej punkty
+      createdAt: serverTimestamp(),
+      status: "approved",
+      photoUrl: optionalData.photoUrl || "",
+      comment: optionalData.comment || "",
     };
 
-    await addDoc(collection(db, "activities"), {
-      ...activity,
-      submittedAt: serverTimestamp(),
-    });
+    await addDoc(collection(db, "submissions"), submissionData);
   };
 
-  const getUserActivities = async () => {
+  const submitChallengeSubmission = async (
+    assignedChallenge,
+    optionalData = {},
+  ) => {
+    if (!currentUser || !currentUser.isVerified) {
+      throw new Error(
+        "Użytkownik musi być zweryfikowany, aby zgłaszać wyzwania.",
+      );
+    }
+
+    const submissionData = {
+      studentId: currentUser.id,
+      assignedChallengeId: assignedChallenge.id,
+      classId: currentUser.classId,
+      createdAt: serverTimestamp(),
+      status: "approved",
+      photoUrl: optionalData.photoUrl || "",
+      comment: optionalData.comment || "",
+    };
+
+    await addDoc(collection(db, "challengeSubmissions"), submissionData);
+  };
+
+  const getUserEcoActionSubmissions = async () => {
     if (!currentUser) return [];
 
-    const activitiesQuery = query(
-      collection(db, "activities"),
-      where("userId", "==", currentUser.id),
-      orderBy("submittedAt", "desc"),
+    const submissionsQuery = query(
+      collection(db, "submissions"),
+      where("studentId", "==", currentUser.id),
+      orderBy("createdAt", "desc"),
     );
 
-    const querySnapshot = await getDocs(activitiesQuery);
-    const activities = [];
-
-    querySnapshot.forEach((doc) => {
-      activities.push({
-        id: doc.id,
-        ...doc.data(),
-        submittedAt: doc.data().submittedAt?.toDate() || new Date(),
-        reviewedAt: doc.data().reviewedAt?.toDate(),
-      });
-    });
-
-    return activities;
-  };
-
-  const getCategoryPoints = (category) => {
-    const categoryMap = {
-      transport: 10,
-      recycling: 15,
-      energy: 12,
-      water: 8,
-      cleanup: 20,
-      nature: 18,
-      education: 25,
-    };
-    return categoryMap[category] || 10;
-  };
-
-  const login = async (email, password) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    const querySnapshot = await getDocs(submissionsQuery);
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
   const register = async (email, password, userData) => {
@@ -199,6 +134,10 @@ export const AuthProvider = ({ children }) => {
     await createUserDocument(user, userData);
   };
 
+  const login = async (email, password) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
   const loginWithGoogle = async () => {
     const { user } = await signInWithPopup(auth, googleProvider);
     await createUserDocument(user);
@@ -208,78 +147,29 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
   };
 
-  const deleteAccount = async () => {
-    if (!currentUser) return;
-    try {
-      if (auth.currentUser) {
-        await deleteUser(auth.currentUser);
-      }
-      const userRef = doc(db, "users", currentUser.id);
-      await deleteDoc(userRef);
-
-      await logout();
-      console.log("Pomyślnie usunięto konto");
-    } catch (error) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        error.code === "auth/requires-recent-login"
-      ) {
-        console.error("Aby usunąć konto, zaloguj się ponownie.");
-      } else {
-        console.error("Wystąpił błąd podczas usuwania konta");
-      }
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    let userUnsubscribe;
-
-    const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (firebaseUser) {
-          const userData = await createUserDocument(firebaseUser);
-          setCurrentUser(userData);
-
-          const userRef = doc(db, "users", firebaseUser.uid);
-          userUnsubscribe = onSnapshot(
-            userRef,
-            (doc) => {
-              if (doc.exists()) {
-                setCurrentUser(doc.data());
-              }
-            },
-            (error) => {
-              console.error("Error listening to user data:", error);
-            },
-          );
-        } else {
-          setCurrentUser(null);
-        }
-      } catch (error) {
-        console.error("Error in auth state change:", error);
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    return () => {
-      authUnsubscribe();
-      if (userUnsubscribe) {
-        userUnsubscribe();
-      }
-    };
-  }, []);
-
-  // Update profile function
   const updateProfile = async (updates) => {
     if (!currentUser) return;
     const userRef = doc(db, "users", currentUser.id);
     await updateDoc(userRef, updates);
-    setCurrentUser((prev) => (prev ? { ...prev, ...updates } : null));
   };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+        onSnapshot(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            setCurrentUser({ id: snapshot.id, ...snapshot.data() });
+          }
+          setLoading(false);
+        });
+      } else {
+        setCurrentUser(null);
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const value = {
     currentUser,
@@ -288,13 +178,10 @@ export const AuthProvider = ({ children }) => {
     register,
     loginWithGoogle,
     logout,
-    updateUserPoints,
-    addBadgeToUser,
-    refreshUserData,
-    submitActivity,
-    getUserActivities,
-    deleteAccount,
     updateProfile,
+    submitEcoAction,
+    submitChallengeSubmission,
+    getUserEcoActionSubmissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

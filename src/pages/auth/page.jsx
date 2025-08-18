@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react"; // Dodajemy useEffect
 import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, User, School, Users } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router"; // Poprawiony import
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Select from "../../components/ui/Select";
 import UserTypeSelect from "../../components/ui/UserTypeSelect";
@@ -17,14 +17,18 @@ export default function AuthPage() {
   const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
   const [isLogin, setIsLogin] = useState(true);
 
-  const { login, register, loginWithGoogle } = useAuth();
+  const { login, register, loginWithGoogle, currentUser } = useAuth();
 
   const navigate = useNavigate();
+
+  // Automatyczna nawigacja po zalogowaniu
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +38,6 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await login(email, password);
-        navigate("/");
       } else {
         if (password !== confirmPassword) {
           setError("Hasła nie pasują do siebie");
@@ -47,28 +50,29 @@ export default function AuthPage() {
           className,
           role,
         });
-        navigate("/");
       }
+      // Usuwamy navigate("/") - useEffect się tym zajmie
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
-
     try {
       await loginWithGoogle();
-      navigate("/");
+      // Usuwamy navigate("/") - useEffect się tym zajmie
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  // Reszta komponentu bez zmian
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center p-8">
       <div className="mb-8 text-center">
@@ -84,17 +88,6 @@ export default function AuthPage() {
       <ErrorMessage error={error} className="mb-4" />
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* <div className="relative">
-          <Mail className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
-          <input
-            type="email"
-            placeholder="Adres e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            required
-          />
-        </div> */}
         <Input
           icon={Mail}
           type="email"
@@ -166,26 +159,6 @@ export default function AuthPage() {
               : "Zarejestruj się"}
         </button>
       </form>
-
-      {/* <div className="mt-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-300">lub</span>
-          </div>
-        </div>
-
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          className="flex items-center justify-center w-full py-3 mt-4 font-semibold text-gray-700 bg-white border border-gray-300 gap-2 transition duration-200 rounded-xl hover:bg-gray-50 dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:hover:bg-gray-800"
-        >
-          <Chrome className="w-5 h-5" />
-          Zaloguj się przez Google
-        </button>
-      </div> */}
 
       <div className="mt-6 text-center">
         <button
