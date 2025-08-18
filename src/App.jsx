@@ -1,10 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import ProtectedRoute from "./components/routing/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import Layout from "./components/layout/Layout";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
-import { ThemeContext } from "./contexts/ThemeContext";
+import ProtectedRoute from "./components/routing/ProtectedRoute";
 import {
   ActivityPage,
   AuthPage,
@@ -14,10 +11,9 @@ import {
   RankingPage,
   EditProfilePage,
 } from "./pages";
-import { useContext } from "react";
-import clsx from "clsx";
+import { useAuth } from "./contexts/AuthContext";
 
-function AppContent() {
+export default function App() {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
@@ -40,17 +36,5 @@ function AppContent() {
         </Route>
       </Routes>
     </BrowserRouter>
-  );
-}
-
-export default function App() {
-  const { theme } = useContext(ThemeContext);
-
-  return (
-    <DeviceEnvironmentProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </DeviceEnvironmentProvider>
   );
 }
