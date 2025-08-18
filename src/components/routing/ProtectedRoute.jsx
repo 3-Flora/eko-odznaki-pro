@@ -10,6 +10,10 @@ export default function ProtectedRoute() {
   }
 
   // Komponent sam sprawdza, czy użytkownik jest zalogowany.
-  // Użycie !! jawnie konwertuje obiekt (gdy zalogowany) lub null (gdy wylogowany) na true/false.
+  // If user is logged in but hasn't selected a class yet, force them to select school/class
+  if (!!currentUser && !currentUser.classId) {
+    return <Navigate to="/selectSchool" replace />;
+  }
+
   return !!currentUser ? <Outlet /> : <Navigate to="/login" replace />;
 }

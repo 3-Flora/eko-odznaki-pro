@@ -47,8 +47,11 @@ export const AuthProvider = ({ children }) => {
         displayName:
           firebaseUser.displayName || additionalData?.displayName || "Uczeń",
         role: additionalData?.role || "student",
-        schoolId: additionalData?.schoolId || "",
-        classId: additionalData?.classId || "",
+        // Upewnij się, że nowo utworzone konta NIE mają domyślnie przypisanej klasy.
+        // Dzięki temu `classId` będzie puste, więc aplikacja może zmusić użytkownika do wybrania
+        // swojej szkoły/klasy na stronie `selectSchool` po rejestracji.
+        schoolId: additionalData?.schoolId || additionalData?.school || "",
+        classId: "",
         isVerified: false,
         counters: {
           totalActions: 0,

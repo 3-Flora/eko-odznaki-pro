@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
 import {
@@ -9,15 +9,21 @@ import {
   Users,
   Trash2,
   LogOut,
+  CheckCircle,
+  HelpCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { availableBadges } from "../../data/badges";
 import { ConfirmModal } from "../../components/modal/ConfirmModal";
 import { useNavigate } from "react-router";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../services/firebase";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [schoolName, setSchoolName] = useState("");
+  const [classNameState, setClassNameState] = useState("");
 
   const navigate = useNavigate();
 
@@ -37,6 +43,44 @@ export default function ProfilePage() {
   const earnedBadges = availableBadges.filter(
     (badge) => (currentUser?.points || 0) >= badge.pointsRequired,
   );
+
+  // Ładuje czytelne nazwy szkoły/klasy, gdy w dokumencie użytkownika są tylko identyfikatory
+  useEffect(() => {
+    let mounted = true;
+    const loadNames = async () => {
+      if (!currentUser) return;
+
+      setSchoolName(currentUser.school || "");
+      setClassNameState(currentUser.className || "");
+
+      try {
+        if (currentUser.schoolId) {
+          const sRef = doc(db, "schools", currentUser.schoolId);
+          const sSnap = await getDoc(sRef);
+          if (mounted && sSnap.exists()) {
+            const data = sSnap.data();
+            setSchoolName(data.name || data.title || "");
+          }
+        }
+
+        if (currentUser.classId) {
+          const cRef = doc(db, "classes", currentUser.classId);
+          const cSnap = await getDoc(cRef);
+          if (mounted && cSnap.exists()) {
+            const data = cSnap.data();
+            setClassNameState(data.name || data.title || "");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load school/class names:", err);
+      }
+    };
+
+    loadNames();
+    return () => {
+      mounted = false;
+    };
+  }, [currentUser]);
 
   const stats = [
     {
@@ -61,7 +105,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      {" "}
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -92,24 +135,33 @@ export default function ProfilePage() {
           {currentUser?.role === "teacher" ? "Nauczyciel" : "Uczeń"}
         </p>
 
-        <div className="mt-4 mb-4 flex items-center justify-center space-x-4">
-          <div className="flex items-center">
-            <School className="mr-1 h-4 w-4" />
-            <span className="text-sm">{currentUser?.school}</span>
-          </div>
-          {currentUser?.className && (
-            <div className="flex items-center">
-              <Users className="mr-1 h-4 w-4" />
-              <span className="text-sm">Klasa {currentUser?.className}</span>
+        {/* Verification status */}
+        <div className="mb-4 flex items-center justify-center">
+          {currentUser?.isVerified ? (
+            <div className="flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+              <CheckCircle className="h-4 w-4" />
+              <span>Zweryfikowany przez nauczyciela</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
+              <HelpCircle className="h-4 w-4" />
+              <span>Oczekuje weryfikacji</span>
             </div>
           )}
         </div>
-        <button
-          onClick={() => navigate("/profile/edit")}
-          className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-        >
-          Edit Profile
-        </button>
+
+        <div className="mt-4 mb-4 flex items-center justify-between text-left">
+          <div className="flex items-center gap-2">
+            <School className="mr-1 h-6 w-6" />
+            <span className="text-sm">
+              {schoolName || "Nie wybrano szkoły"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users className="mr-1 h-6 w-6" />
+            <span className="text-sm">{classNameState}</span>
+          </div>
+        </div>
       </motion.div>
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">

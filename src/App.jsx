@@ -10,6 +10,7 @@ import {
   ProfilePage,
   RankingPage,
   EditProfilePage,
+  SelectSchoolPage,
 } from "./pages";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -24,6 +25,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/selectSchool" element={<SelectSchoolPage />} />
         <Route path="/" element={<ProtectedRoute />}>
           <Route path="" element={<Layout />}>
             <Route index element={<DashboardPage />} />

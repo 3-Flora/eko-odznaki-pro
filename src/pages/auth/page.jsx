@@ -3,8 +3,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, User, School, Users } from "lucide-react";
 import { useNavigate } from "react-router"; // Poprawiony import
 import ErrorMessage from "../../components/ui/ErrorMessage";
-import Select from "../../components/ui/Select";
-import UserTypeSelect from "../../components/ui/UserTypeSelect";
 import Input from "../../components/ui/Input";
 
 export default function AuthPage() {
@@ -51,7 +49,6 @@ export default function AuthPage() {
           role,
         });
       }
-      // Usuwamy navigate("/") - useEffect się tym zajmie
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,7 +61,6 @@ export default function AuthPage() {
     setError("");
     try {
       await loginWithGoogle();
-      // Usuwamy navigate("/") - useEffect się tym zajmie
     } catch (err) {
       setError(err.message);
     } finally {
@@ -126,24 +122,6 @@ export default function AuthPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-
-            <Select icon={School} value={school} onChange={setSchool}>
-              <option value="">Wybierz szkołę</option>
-              <option value="szkola1">Szkoła 1</option>
-              <option value="szkola2">Szkoła 2</option>
-              <option value="szkola3">Szkoła 3</option>
-            </Select>
-
-            <Select icon={Users} value={className} onChange={setClassName}>
-              <option value="">Wybierz klasę</option>
-              <option value="klasa1">Klasa 1</option>
-              <option value="klasa2">Klasa 2</option>
-              <option value="klasa3">Klasa 3</option>
-              <option value="klasa4">Klasa 4</option>
-            </Select>
-
-            {/* Do usunięcia po skończeniu apki */}
-            <UserTypeSelect onRoleChange={setRole} role={role} />
           </>
         )}
 
