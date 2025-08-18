@@ -21,7 +21,6 @@ export default function Select({ icon: Icon, value, onChange, children }) {
   const selectedLabel = getLabel(children) || "Wybierz";
 
   const renderOptions = (childrenList, level = 0) => {
-    console.log(childrenList);
     return Children.map(childrenList, (child) => {
       if (!child) return null;
 

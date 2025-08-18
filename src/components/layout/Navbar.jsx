@@ -30,31 +30,25 @@ export const Navbar = () => {
             </h1>
           </div>
 
-          <ToggleTheme />
-
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center rounded-full bg-green-100 px-3 py-1 dark:bg-green-900">
-              <Trophy className="mr-1 h-4 w-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-800 dark:text-green-300">
-                {currentUser?.points || 0} pkt
-              </span>
-            </div>
-
-            <div
-              className="flex items-center space-x-2"
-              onClick={() => navigate("profile")}
-            >
-              {currentUser?.photoURL ? (
-                <img
-                  src={currentUser.photoURL}
-                  alt={currentUser.displayName}
-                  className="h-8 w-8 rounded-full"
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 dark:bg-green-700">
-                  <User className="h-4 w-4 text-white" />
-                </div>
-              )}
+          <div className="flex flex-row gap-4">
+            <ToggleTheme />
+            <div className="flex items-center space-x-4">
+              <div
+                className="flex items-center space-x-2"
+                onClick={() => navigate("profile")}
+              >
+                {currentUser?.photoURL ? (
+                  <img
+                    src={currentUser.photoURL}
+                    alt={currentUser.displayName}
+                    className="h-8 w-8 rounded-full"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 dark:bg-green-700">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
