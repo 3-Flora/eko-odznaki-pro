@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Funkcja pomocnicza do sprawdzania roli użytkownika
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    // Funkcja sprawdzająca, czy nauczyciel zarządza daną klasą
+    function isTeacherOfClass(classId) {
+      let teacherId = get(/databases/$(database)/documents/classes/$(classId)).data.teacherId;
+      return request.auth.uid == teacherId;
+    }
+    
+    // Funkcja sprawdzająca, czy zalogowany użytkownik ma rolę 'ekoskop'.
+    function isRequestUserEkoskop() {
+      // request.auth.uid to bezpieczna zmienna przechowująca ID
+      // użytkownika, który wysyła żądanie do bazy danych.
+      return getUserRole(request.auth.uid) == 'ekoskop';
+    }
+
+    // Każdy zalogowany użytkownik może odczytać dane o sobie, ale tylko on może je modyfikować
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+
+    // Dane szkół i klas są publiczne do odczytu dla zalogowanych użytkowników
+    match /schools/{schoolId} {
+      allow read: if request.auth != null;
+      allow write: if isRequestUserEkoskop(); // Tylko EKOSKOP może dodawać/edytować szkoły
+    }
+
+    match /classes/{classId} {
+      allow read: if request.auth != null;
+      // Nauczyciel może edytować swoją klasę (np. weryfikować uczniów - to by wymagało innej logiki)
+      // EKOSKOP może tworzyć klasy
+      allow write: if isTeacherOfClass(classId) || isRequestUserEkoskop();
+    }
+
+    // Szablony EkoDziałań są publiczne do odczytu
+    match /ecoActions/{ecoActionId} {
+        allow read: if request.auth != null;
+        allow write: if isRequestUserEkoskop(); // Tylko admini dodają globalne działania
+    }
+
+    // Zgłoszenia zadań
+    match /submissions/{submissionId} {
+        // Uczeń może stworzyć zgłoszenie tylko dla siebie i jeśli jest zweryfikowany
+        allow create: if request.resource.data.studentId == request.auth.uid &&
+                         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isVerified == true;
+
+        // Uczeń może czytać swoje zgłoszenia. Nauczyciel może czytać zgłoszenia swojej klasy.
+        allow read: if request.auth.uid == resource.data.studentId || isTeacherOfClass(resource.data.classId);
+
+        // Nauczyciel może zaktualizować status zgłoszenia w swojej klasie (np. odrzucić)
+        allow update: if isTeacherOfClass(request.resource.data.classId) &&
+                         request.resource.data.status == 'rejected';
+    }
+    
+    // Szablony wyzwań (challengeTemplates)
+    match /challengeTemplates/{templateId} {
+      // Każdy zalogowany użytkownik (uczeń, nauczyciel) może czytać szablony
+      allow read: if request.auth != null;
+      // Tylko administrator (EKOSKOP) może tworzyć, edytować i usuwać szablony
+      allow write: if isRequestUserEkoskop();
+    }
+
+    // Wyzwania przypisane do klas (assignedChallenges)
+    match /assignedChallenges/{assignmentId} {
+      // Uczeń może odczytać tylko wyzwania przypisane do jego klasy
+      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId == resource.data.classId;
+
+      // Nauczyciel może TWORZYĆ nowe przypisania tylko dla SWOJEJ klasy
+      allow create: if isTeacherOfClass(request.resource.data.classId);
+
+      // Nauczyciel może edytować/usuwać tylko te przypisania, które sam stworzył
+      allow update, delete: if request.auth.uid == resource.data.teacherId;
+    }
+
+    // Zgłoszenia EkoWyzwań (challengeSubmissions)
+    match /challengeSubmissions/{submissionId} {
+      // Uczeń może stworzyć zgłoszenie dla siebie i jeśli jest zweryfikowany
+      allow create: if request.resource.data.studentId == request.auth.uid &&
+                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isVerified == true;
+
+      // Uczeń może czytać swoje zgłoszenia. Nauczyciel może czytać zgłoszenia swojej klasy.
+      allow read: if request.auth.uid == resource.data.studentId || isTeacherOfClass(resource.data.classId);
+
+      // Nauczyciel może zaktualizować status (odrzucić) zgłoszenie w swojej klasie.
+      allow update: if isTeacherOfClass(request.resource.data.classId);
+    }
+  }
+}
