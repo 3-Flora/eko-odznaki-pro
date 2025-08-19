@@ -11,7 +11,7 @@ import {
   RankingPage,
   EditProfilePage,
   SelectSchoolPage,
-} from "./pages";
+} from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
 export default function App() {

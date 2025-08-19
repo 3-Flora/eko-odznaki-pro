@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Camera, Upload, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { activityCategories } from "../../data/badges";
-import { useAuth } from "../../contexts/AuthContext";
-import ErrorMessage from "../../components/ui/ErrorMessage";
+import { activityCategories } from "../data/badges";
+import { useAuth } from "../contexts/AuthContext";
+import ErrorMessage from "../components/ui/ErrorMessage";
 
 export default function ActivityPage() {
-  const { submitActivity, currentUser } = useAuth();
+  const { submitActivity } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

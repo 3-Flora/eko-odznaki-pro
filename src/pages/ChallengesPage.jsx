@@ -4,7 +4,7 @@ import {
   currentChallenge,
   upcomingChallenges,
   completedChallenges,
-} from "../../data/badges";
+} from "../data/badges";
 
 export default function ChallengesPage() {
   return (

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { User, School, Users, ArrowLeft, Mail } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
-import Input from "../../components/ui/Input";
-import Label from "../../components/ui/Label";
-import Button from "../../components/ui/Button";
-import Select from "../../components/ui/Select";
+import { useAuth } from "../contexts/AuthContext";
+import Input from "../components/ui/Input";
+import Label from "../components/ui/Label";
+import Button from "../components/ui/Button";
+import Select from "../components/ui/Select";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();

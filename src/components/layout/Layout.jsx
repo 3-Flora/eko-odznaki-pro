@@ -22,7 +22,7 @@ export default function Layout() {
   const scrollRef = useRef(null);
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-svh flex-col bg-gray-50 dark:bg-gray-900">
       <ScrollToTop scrollContainerRef={scrollRef} />
       <Navbar />
       <main className="h-full flex-1 overflow-auto" ref={scrollRef}>

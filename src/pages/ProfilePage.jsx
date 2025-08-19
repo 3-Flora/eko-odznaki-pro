@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 import {
   Trophy,
@@ -13,11 +13,11 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { availableBadges } from "../../data/badges";
-import { ConfirmModal } from "../../components/modal/ConfirmModal";
+import { availableBadges } from "../data/badges";
+import { ConfirmModal } from "../components/modal/ConfirmModal";
 import { useNavigate } from "react-router";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../services/firebase";
+import { db } from "../services/firebase";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();

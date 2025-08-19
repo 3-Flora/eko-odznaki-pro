@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
-import ErrorMessage from "../../components/ui/ErrorMessage";
-import Select from "../../components/ui/Select";
+import ErrorMessage from "../components/ui/ErrorMessage";
+import Select from "../components/ui/Select";
 import { School, Users } from "lucide-react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../services/firebase";
+import { db } from "../services/firebase";
 
 export default function SelectSchoolPage() {
   const { currentUser, updateProfile, loading } = useAuth();

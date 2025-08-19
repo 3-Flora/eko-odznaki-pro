@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"; // Dodajemy useEffect
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Mail, Lock, User, School, Users } from "lucide-react";
 import { useNavigate } from "react-router"; // Poprawiony import
-import ErrorMessage from "../../components/ui/ErrorMessage";
-import Input from "../../components/ui/Input";
+import ErrorMessage from "../components/ui/ErrorMessage";
+import Input from "../components/ui/Input";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
