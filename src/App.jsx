@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import Loading from "./components/loading/Loading";
+import Loading from "./components/routing/Loading";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import {
