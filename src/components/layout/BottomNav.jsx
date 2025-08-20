@@ -7,7 +7,7 @@ import clsx from "clsx";
 
 export const BottomNav = () => {
   const { currentUser } = useAuth();
-  const { isPWA } = useDeviceEnvironment();
+  const { mobileDeviceType } = useDeviceEnvironment();
 
   const tabs = [
     { id: "/", icon: Home, label: "Główna" },
@@ -26,7 +26,8 @@ export const BottomNav = () => {
       className={clsx(
         "z-10 border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-900",
         {
-          "pb-6": isPWA,
+          "pb-6": mobileDeviceType === "Android",
+          "pb-safe": mobileDeviceType === "iPhone",
         },
       )}
     >

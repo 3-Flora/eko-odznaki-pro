@@ -20,18 +20,9 @@ export default function DeviceEnvironmentProvider({ children }) {
     } else setIsPWA(false);
   }, []);
 
-  function isIPhoneSE23() {
-    return window.matchMedia(
-      "only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
-    ).matches;
-  }
-
   const mobileDeviceType = useMemo(() => {
     if (isPWA) {
-      // iPhone SE 2023 has a different top padding
-      return isIPhoneSE23() || Capacitor.getPlatform() === "android"
-        ? "SEorAndroid"
-        : "notch";
+      return Capacitor.getPlatform() === "android" ? "Android" : "iPhone";
     }
   }, [isPWA]);
 

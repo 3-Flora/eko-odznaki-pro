@@ -1,3 +1,10 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}

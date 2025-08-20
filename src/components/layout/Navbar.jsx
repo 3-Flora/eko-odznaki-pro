@@ -16,13 +16,13 @@ export const Navbar = () => {
       className={clsx(
         "z-10 border-b-4 border-green-400 bg-white shadow-lg dark:border-green-700 dark:bg-gray-900",
         {
-          "pt-11": mobileDeviceType === "SEorAndroid",
-          "pt-16": mobileDeviceType === "notch",
+          "pt-5": mobileDeviceType === "Android",
+          "pt-safe": mobileDeviceType === "iPhone",
         },
       )}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-12 items-center justify-between">
           <div className="flex items-center">
             <div className="mr-3 text-2xl">🌱</div>
             <h1 className="text-xl font-bold text-gray-800 select-none dark:text-white">
