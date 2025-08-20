@@ -11,19 +11,28 @@ import {
   LogOut,
   CheckCircle,
   HelpCircle,
+  ArrowRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { availableBadges } from "../data/badges";
-import { ConfirmModal } from "../components/modal/ConfirmModal";
 import { useNavigate } from "react-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
+import {
+  getBadgeTemplates,
+  calculateBadgeProgress,
+  getRecentBadgesForProfile,
+} from "../services/badgeService";
+import { ConfirmModal } from "../components/ui/ConfirmModal";
+import Badge from "../components/ui/Badge";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [schoolName, setSchoolName] = useState("");
   const [classNameState, setClassNameState] = useState("");
+  const [badgeProgress, setBadgeProgress] = useState([]);
+  const [recentBadges, setRecentBadges] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -40,9 +49,46 @@ export default function ProfilePage() {
     deleteAccount();
   };
 
-  const earnedBadges = availableBadges.filter(
-    (badge) => (currentUser?.points || 0) >= badge.pointsRequired,
+  // Pobierz postęp odznak z bazy danych
+  const loadBadgeProgress = async () => {
+    if (!currentUser) return;
+
+    try {
+      setLoading(true);
+      const badgeTemplates = await getBadgeTemplates();
+      const progress = calculateBadgeProgress(
+        currentUser.counters || {},
+        currentUser.earnedBadges || {},
+        badgeTemplates,
+      );
+      setBadgeProgress(progress);
+
+      // Pobierz ostatnie 3 odznaki do wyświetlenia na profilu
+      const recent = getRecentBadgesForProfile(
+        progress,
+        currentUser.earnedBadges || {},
+      );
+      setRecentBadges(recent);
+    } catch (error) {
+      console.error("Error loading badge progress:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBadgeProgress();
+  }, [currentUser]);
+
+  // Filtruj odznaki: pokazuj zdobyte + te w trakcie zdobywania (mają jakiś postęp)
+  const displayBadges = badgeProgress.filter(
+    (badge) => badge.isEarned || badge.currentCount > 0,
   );
+
+  // Statystyki zdobytych odznak
+  const earnedBadgesCount = badgeProgress.filter(
+    (badge) => badge.isEarned,
+  ).length;
 
   // Ładuje czytelne nazwy szkoły/klasy, gdy w dokumencie użytkownika są tylko identyfikatory
   useEffect(() => {
@@ -50,8 +96,9 @@ export default function ProfilePage() {
     const loadNames = async () => {
       if (!currentUser) return;
 
-      setSchoolName(currentUser.school || "");
-      setClassNameState(currentUser.className || "");
+      // Start with empty human-readable names; we'll fetch them below if ids exist.
+      setSchoolName("");
+      setClassNameState("");
 
       try {
         if (currentUser.schoolId) {
@@ -84,20 +131,16 @@ export default function ProfilePage() {
 
   const stats = [
     {
-      label: "Punkty",
-      value: currentUser?.points || 0,
-      icon: Trophy,
-      color: "text-yellow-600",
-    },
-    {
       label: "Odznaki",
-      value: earnedBadges.length,
+      value: earnedBadgesCount,
       icon: Star,
       color: "text-purple-600",
     },
     {
       label: "Dni aktywności",
-      value: 15,
+      // Use counters from the user document when available. `totalActions` is a
+      // reasonable proxy for activity days (adjust if you have a dedicated field).
+      value: currentUser?.counters?.totalActions || 0,
       icon: Calendar,
       color: "text-blue-600",
     },
@@ -163,6 +206,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </motion.div>
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {stats.map((stat, index) => (
@@ -190,43 +234,65 @@ export default function ProfilePage() {
         transition={{ delay: 0.4 }}
         className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
       >
-        <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
-          Twoje odznaki
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+            Ostatnie odznaki {loading && "(Ładowanie...)"}
+          </h2>
+          <button
+            onClick={() => navigate("/profile/badges")}
+            className="flex items-center gap-2 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600"
+          >
+            Zobacz wszystkie
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
 
-        {earnedBadges.length === 0 ? (
+        {!loading && recentBadges.length === 0 && (
           <div className="py-8 text-center">
-            <div className="mb-4 text-4xl">🏆</div>
-            <p className="text-gray-600 dark:text-gray-300">
-              Zdobądź pierwszą odznakę!
+            <p className="text-gray-500 dark:text-gray-400">
+              Jeszcze nie zdobyłeś żadnych odznak. Zacznij wykonywać
+              EkoDziałania!
             </p>
-            <p className="mt-2 text-sm text-gray-400 dark:text-gray-400">
-              Zgłaszaj działania eco, aby zdobywać punkty i odznaki
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {earnedBadges.map((badge, index) => (
-              <motion.div
-                key={badge.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className={`${badge.color} rounded-xl p-4 text-center text-white dark:bg-green-700`}
-              >
-                <div className="mb-2 text-3xl">{badge.icon}</div>
-                <h3 className="mb-1 text-sm font-bold">{badge.name}</h3>
-                <p className="text-xs opacity-90">{badge.description}</p>
-              </motion.div>
-            ))}
           </div>
         )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {recentBadges.map((badge, index) => {
+            // Dla zdobytych odznak, użyj ikony z aktualnego poziomu
+            const currentLevelIcon = badge.currentLevelData?.icon || "🏅";
+            // Dla niezdobytych, użyj ikony pierwszego poziomu
+            const nextLevelIcon = badge.nextLevelData?.icon || "🏅";
+            const displayIcon = badge.isEarned
+              ? currentLevelIcon
+              : nextLevelIcon;
+
+            return (
+              <Badge
+                key={badge.id}
+                icon={displayIcon}
+                name={badge.name}
+                description={
+                  badge.isEarned
+                    ? badge.currentLevelData?.description
+                    : badge.nextLevelData?.description
+                }
+                color="bg-green-500"
+                lvl={badge.currentLevel}
+                progress={badge.progress}
+                progressText={badge.progressText}
+                nextLevelData={badge.nextLevelData}
+                isEarned={badge.isEarned}
+              />
+            );
+          })}
+        </div>
       </motion.div>
+
       {/* Logtout Button */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 1.1 }}
         className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 shadow-md transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
         onClick={handleLogout}
       >
@@ -238,7 +304,7 @@ export default function ProfilePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
+        transition={{ delay: 1.2 }}
         className="flex cursor-pointer items-center rounded-xl bg-red-50 p-4 shadow-md transition-colors hover:bg-red-100 dark:bg-red-900 dark:hover:bg-red-800"
         onClick={() => {
           setShowDeleteModal(true);
@@ -260,3 +326,15 @@ export default function ProfilePage() {
     </>
   );
 }
+
+// <motion.div
+//   key={badge.id}
+//   initial={{ opacity: 0, scale: 0.8 }}
+//   animate={{ opacity: 1, scale: 1 }}
+//   transition={{ delay: 0.5 + index * 0.1 }}
+//   className={`${badge.color} rounded-xl p-4 text-center text-white dark:bg-green-700`}
+// >
+//   <div className="mb-2 text-3xl">{badge.icon}</div>
+//   <h3 className="mb-1 text-sm font-bold">{badge.name}</h3>
+//   <p className="text-xs opacity-90">{badge.description}</p>
+// </motion.div>

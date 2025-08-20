@@ -1,8 +1,10 @@
 export { default as ActivityPage } from "./ActivityPage";
 export { default as AuthPage } from "./AuthPage";
+export { default as BadgesPage } from "./BadgesPage";
 export { default as ChallengesPage } from "./ChallengesPage";
 export { default as DashboardPage } from "./DashboardPage";
 export { default as ProfilePage } from "./ProfilePage";
 export { default as RankingPage } from "./RankingPage";
 export { default as EditProfilePage } from "./EditProfilePage";
 export { default as SelectSchoolPage } from "./SelectSchoolPage";
+export { default as DebugPage } from "./DebugPage";

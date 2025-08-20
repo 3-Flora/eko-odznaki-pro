@@ -1,16 +1,18 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import Loading from "./components/routing/Loading";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import {
   ActivityPage,
   AuthPage,
+  BadgesPage,
   ChallengesPage,
   DashboardPage,
   ProfilePage,
   RankingPage,
   EditProfilePage,
   SelectSchoolPage,
+  DebugPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -33,7 +35,10 @@ export default function App() {
             <Route path="ranking" element={<RankingPage />} />
             <Route path="challenges" element={<ChallengesPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="profile/badges" element={<BadgesPage />} />
             <Route path="profile/edit" element={<EditProfilePage />} />
+            <Route path="profile/debug" element={<DebugPage />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Route>
         </Route>
       </Routes>

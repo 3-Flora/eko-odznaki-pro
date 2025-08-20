@@ -20,6 +20,7 @@ import {
   orderBy,
   getDocs,
   serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../services/firebase";
 
@@ -58,6 +59,7 @@ export const AuthProvider = ({ children }) => {
           totalChallenges: 0,
           recyclingActions: 0,
           educationActions: 0,
+          savingActions: 0,
         },
         earnedBadges: {},
         ...(firebaseUser.photoURL && { photoURL: firebaseUser.photoURL }),
@@ -156,6 +158,23 @@ export const AuthProvider = ({ children }) => {
     await updateDoc(userRef, updates);
   };
 
+  const deleteAccount = async () => {
+    if (!currentUser) return;
+    try {
+      // Delete Firestore user document
+      const userRef = doc(db, "users", currentUser.id);
+      await deleteDoc(userRef);
+
+      // Delete Firebase Auth user (may require recent login / reauth)
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
+      }
+    } catch (err) {
+      console.error("Failed to delete account:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -181,6 +200,7 @@ export const AuthProvider = ({ children }) => {
     register,
     loginWithGoogle,
     logout,
+    deleteAccount,
     updateProfile,
     submitEcoAction,
     submitChallengeSubmission,
