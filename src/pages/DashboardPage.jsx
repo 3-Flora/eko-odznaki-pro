@@ -140,17 +140,7 @@ export default function DashboardPage() {
       {loadingEcoActions ? (
         <ActionsCarousel.Skeleton />
       ) : (
-        <ActionsCarousel
-          data={{
-            actions: ecoActions.map((a) => ({
-              id: a.id,
-              name: a.name,
-              icon: a.icon || "🍃",
-              action: "SUBMIT_ACTION_QUICKLY",
-              actionId: a.id,
-            })),
-          }}
-        />
+        <ActionsCarousel data={[...ecoActions]} />
       )}
 
       {loadingFeed ? (

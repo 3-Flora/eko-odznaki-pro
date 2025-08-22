@@ -25,13 +25,18 @@ const app = initializeApp(firebaseConfig);
   https://github.com/capawesome-team/capacitor-firebase/issues/221
 */
 let auth;
-if (!auth) {
+try {
   if (Capacitor.isNativePlatform()) {
     auth = initializeAuth(app, { persistence: indexedDBLocalPersistence });
   } else {
     auth = getAuth(app);
   }
+} catch (error) {
+  console.error("Błąd inicjalizacji Firebase Auth:", error);
+  // Fallback do getAuth jeśli initializeAuth nie działa
+  auth = getAuth(app);
 }
+
 export { auth };
 
 export const db = getFirestore(app);

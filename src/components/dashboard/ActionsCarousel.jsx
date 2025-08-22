@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
+import clsx from "clsx";
 
 function ActionsCarousel({ data }) {
   const navigate = useNavigate();
+
+  console.log(data);
 
   return (
     <motion.div
@@ -23,16 +26,26 @@ function ActionsCarousel({ data }) {
       </div>
 
       <div className="flex space-x-3 overflow-x-auto pb-2">
-        {data.actions.map((action) => (
+        {data.map((action) => (
           <div
             key={action.id}
             className="min-w-[160px] flex-none rounded-xl border bg-white p-3 text-left dark:border-gray-700 dark:bg-gray-800"
           >
             <div className="mb-2 flex justify-center">
               <div className="flex flex-col">
-                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-500 text-white dark:bg-green-600">
+                <div
+                  className={clsx(
+                    "mx-auto flex h-24 w-24 items-center justify-center rounded-full text-white",
+                    action.style.color !== undefined &&
+                      `bg-${action.style.color}-500 dark:bg-${action.style.color}-600`,
+
+                    action.style.shape === "circle" && "rounded-full",
+                    action.style.shape === "square" && "rounded-md",
+                    action.style.shape === "triangle" && "clip-triangle",
+                  )}
+                >
                   {/* icon */}
-                  <span className="text-4xl">{action.icon}</span>
+                  <span className="text-4xl">{action.style.icon}</span>
                 </div>
                 <div className="text-xl font-medium text-gray-800 dark:text-white">
                   {action.name}

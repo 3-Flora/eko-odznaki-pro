@@ -4,15 +4,13 @@ import { Mail, Lock, User, School, Users } from "lucide-react";
 import { useNavigate } from "react-router"; // Poprawiony import
 import ErrorMessage from "../components/ui/ErrorMessage";
 import Input from "../components/ui/Input";
+import PageHeader from "../components/ui/PageHeader";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [school, setSchool] = useState("");
-  const [className, setClassName] = useState("");
-  const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -44,9 +42,6 @@ export default function AuthPage() {
         }
         await register(email, password, {
           displayName,
-          school,
-          className,
-          role,
         });
       }
     } catch (err) {
@@ -71,17 +66,16 @@ export default function AuthPage() {
   // Reszta komponentu bez zmian
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center p-8">
-      <div className="mb-8 text-center">
-        <div className="mb-4 text-6xl">🌱</div>
-        <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">
-          EKO Odznaki
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          {isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"}
-        </p>
-      </div>
+      <PageHeader
+        emoji="🌱"
+        title="EKO Odznaki"
+        subtitle={
+          isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"
+        }
+        disableBackButton
+      />
 
-      <ErrorMessage error={error} className="mb-4" />
+      <ErrorMessage error={error} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -96,7 +90,7 @@ export default function AuthPage() {
         {!isLogin && (
           <Input
             icon={User}
-            placeholder="Nazwa wyświetlana"
+            placeholder="Nazwa użytkownika"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             required

@@ -17,6 +17,7 @@ export const ecoActionsData = {
     style: {
       color: "yellow",
       shape: "circle",
+      icon: "💡",
     },
   },
   "segregacja-odpadow": {
@@ -27,6 +28,7 @@ export const ecoActionsData = {
     style: {
       color: "green",
       shape: "square",
+      icon: "♻️",
     },
   },
   "oszczedzanie-wody": {
@@ -37,6 +39,7 @@ export const ecoActionsData = {
     style: {
       color: "blue",
       shape: "circle",
+      icon: "💧",
     },
   },
   "nauka-o-srodowisku": {
@@ -47,6 +50,7 @@ export const ecoActionsData = {
     style: {
       color: "purple",
       shape: "triangle",
+      icon: "📚",
     },
   },
   "uzycie-transportu-publicznego": {
@@ -57,6 +61,7 @@ export const ecoActionsData = {
     style: {
       color: "orange",
       shape: "circle",
+      icon: "🚌",
     },
   },
   "sadzenie-roslin": {
@@ -67,6 +72,7 @@ export const ecoActionsData = {
     style: {
       color: "green",
       shape: "square",
+      icon: "🌱",
     },
   },
   "zbieranie-makulatury": {
@@ -77,6 +83,7 @@ export const ecoActionsData = {
     style: {
       color: "brown",
       shape: "square",
+      icon: "📦",
     },
   },
   "eco-warsztaty": {
@@ -87,6 +94,7 @@ export const ecoActionsData = {
     style: {
       color: "teal",
       shape: "circle",
+      icon: "🌱",
     },
   },
 };

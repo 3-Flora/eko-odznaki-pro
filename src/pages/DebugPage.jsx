@@ -4,8 +4,15 @@ import DatabaseManager from "../components/debug/DatabaseManager";
 import DatabaseViewer from "../components/debug/DatabaseViewer";
 
 import { motion } from "framer-motion";
+import {
+  calculateBadgeProgress,
+  getBadgeTemplates,
+} from "../services/badgeService";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function DebugPage() {
+  const { currentUser } = useAuth();
+
   // Funkcja do odświeżania odznak po zmianie counters
   const handleCountersUpdate = async (newCounters) => {
     // Odśwież postęp odznak z nowymi counters

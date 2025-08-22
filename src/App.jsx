@@ -13,6 +13,8 @@ import {
   EditProfilePage,
   SelectSchoolPage,
   DebugPage,
+  MySubmissionsPage,
+  EditPasswordPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -36,7 +38,12 @@ export default function App() {
             <Route path="challenges" element={<ChallengesPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/badges" element={<BadgesPage />} />
+            <Route path="profile/submissions" element={<MySubmissionsPage />} />
             <Route path="profile/edit" element={<EditProfilePage />} />
+            <Route
+              path="profile/edit/password"
+              element={<EditPasswordPage />}
+            />
             <Route path="profile/debug" element={<DebugPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>

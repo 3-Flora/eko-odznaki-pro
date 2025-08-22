@@ -88,7 +88,7 @@ export default function SelectSchoolPage() {
         </p>
       </div>
 
-      <ErrorMessage error={error} className="mb-4" />
+      <ErrorMessage error={error} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Select

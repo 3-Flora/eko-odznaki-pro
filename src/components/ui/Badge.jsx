@@ -15,14 +15,7 @@ export default function Badge({
     if (!isEarned) {
       return "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 dark:from-gray-700 dark:to-gray-800 dark:text-gray-400";
     }
-    return "bg-gradient-to-br from-green-400 to-emerald-600 text-white shadow-lg shadow-green-500/25";
-  };
-
-  const getProgressColor = () => {
-    if (progress >= 100) return "bg-gradient-to-r from-green-400 to-green-600";
-    if (progress >= 75) return "bg-gradient-to-r from-yellow-400 to-yellow-600";
-    if (progress >= 50) return "bg-gradient-to-r from-orange-400 to-orange-600";
-    return "bg-gradient-to-r from-red-400 to-red-600";
+    return "bg-gradient-to-br from-green-700 to-emerald-800 text-white shadow-lg shadow-green-500/25";
   };
 
   return (
@@ -70,33 +63,32 @@ export default function Badge({
           {nextLevelData && isEarned && (
             <div>
               <div className="mb-2 flex items-center justify-between text-xs font-medium">
-                <span className="flex items-center gap-1">
+                {/* <span className="flex items-center gap-1">
                   <span className="text-yellow-300">🎯</span>
-                  <span>Do LV {nextLevelData.level}</span>
-                </span>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur-sm">
-                  {progressText}
-                </span>
+                  <span>Do LVL {nextLevelData.level}</span>
+                </span> */}
                 <span>
                   <span
                     className={clsx(
-                      "rounded-full px-3 py-1 text-sm font-bold",
+                      "rounded-full px-2 py-0.5 font-bold",
                       isEarned
                         ? "bg-white/25 backdrop-blur-sm"
                         : "bg-gray-400 text-gray-700 dark:bg-gray-600 dark:text-gray-300",
                     )}
                   >
-                    <span className="text-xs opacity-75">LV</span>
+                    <span className="text-xs opacity-75">LVL</span>
                     <span className="ml-1">{lvl || 0}</span>
                   </span>
+                </span>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur-sm">
+                  {progressText}
                 </span>
               </div>
 
               <div className="relative h-2 overflow-hidden rounded-full bg-white/20 backdrop-blur-sm">
                 <div
                   className={clsx(
-                    "h-full rounded-full transition-all duration-700 ease-out",
-                    getProgressColor(),
+                    "h-full rounded-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-700 ease-out",
                   )}
                   style={{ width: `${Math.min(progress, 100)}%` }}
                 >

@@ -6,6 +6,11 @@ import {
   signInWithPopup,
   signOut,
   deleteUser,
+  updateEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  verifyBeforeUpdateEmail,
 } from "firebase/auth";
 import {
   doc,
@@ -60,6 +65,9 @@ export const AuthProvider = ({ children }) => {
           recyclingActions: 0,
           educationActions: 0,
           savingActions: 0,
+          transportActions: 0,
+          energyActions: 0,
+          foodActions: 0,
         },
         earnedBadges: {},
         ...(firebaseUser.photoURL && { photoURL: firebaseUser.photoURL }),
@@ -158,6 +166,38 @@ export const AuthProvider = ({ children }) => {
     await updateDoc(userRef, updates);
   };
 
+  const updateUserEmail = async (newEmail, currentPassword) => {
+    if (!auth.currentUser) throw new Error("Użytkownik nie jest zalogowany");
+
+    // Reautentykacja
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword,
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+
+    // Wyślij e-mail weryfikacyjny do nowego adresu
+    // Po weryfikacji Firebase automatycznie zmieni e-mail
+    await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
+
+    // Firestore zostanie zaktualizowany automatycznie przez Firebase Auth
+    // gdy użytkownik zweryfikuje nowy e-mail
+  };
+
+  const updateUserPassword = async (currentPassword, newPassword) => {
+    if (!auth.currentUser) throw new Error("Użytkownik nie jest zalogowany");
+
+    // Reautentykacja
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword,
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+
+    // Zmiana hasła
+    await updatePassword(auth.currentUser, newPassword);
+  };
+
   const deleteAccount = async () => {
     if (!currentUser) return;
     try {
@@ -177,19 +217,59 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        onSnapshot(userRef, (snapshot) => {
-          if (snapshot.exists()) {
-            setCurrentUser({ id: snapshot.id, ...snapshot.data() });
-          }
+      try {
+        if (user) {
+          const userRef = doc(db, "users", user.uid);
+          const unsubscribeSnapshot = onSnapshot(
+            userRef,
+            async (snapshot) => {
+              try {
+                if (snapshot.exists()) {
+                  const userData = { id: snapshot.id, ...snapshot.data() };
+
+                  // Sprawdź czy e-mail w Firebase Auth różni się od tego w Firestore
+                  // (może być po weryfikacji nowego e-maila)
+                  if (user.email && user.email !== userData.email) {
+                    try {
+                      await updateDoc(userRef, { email: user.email });
+                      userData.email = user.email; // Zaktualizuj lokalnie
+                    } catch (error) {
+                      console.error(
+                        "Błąd aktualizacji e-mail w Firestore:",
+                        error,
+                      );
+                      // Nie przerywaj procesu, kontynuuj z danymi z Firestore
+                    }
+                  }
+
+                  setCurrentUser(userData);
+                } else {
+                  console.warn("Dokument użytkownika nie istnieje:", user.uid);
+                }
+              } catch (error) {
+                console.error("Błąd w listener snapshot:", error);
+              } finally {
+                setLoading(false);
+              }
+            },
+            (error) => {
+              console.error("Błąd Firestore listener:", error);
+              setLoading(false);
+            },
+          );
+
+          // Cleanup function dla snapshot listener
+          return () => unsubscribeSnapshot();
+        } else {
+          setCurrentUser(null);
           setLoading(false);
-        });
-      } else {
-        setCurrentUser(null);
+        }
+      } catch (error) {
+        console.error("Błąd w onAuthStateChanged:", error);
         setLoading(false);
       }
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -202,6 +282,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     deleteAccount,
     updateProfile,
+    updateUserEmail,
+    updateUserPassword,
     submitEcoAction,
     submitChallengeSubmission,
     getUserEcoActionSubmissions,

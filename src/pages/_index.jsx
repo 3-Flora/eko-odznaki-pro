@@ -8,3 +8,5 @@ export { default as RankingPage } from "./RankingPage";
 export { default as EditProfilePage } from "./EditProfilePage";
 export { default as SelectSchoolPage } from "./SelectSchoolPage";
 export { default as DebugPage } from "./DebugPage";
+export { default as MySubmissionsPage } from "./MySubmissionsPage";
+export { default as EditPasswordPage } from "./EditPasswordPage";

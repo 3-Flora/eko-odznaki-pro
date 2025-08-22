@@ -4,8 +4,8 @@ import {
   getTestUserCounters,
 } from "../../data/badgeTemplates";
 import {
-  getBadgeTemplates,
   calculateBadgeProgress,
+  getBadgeTemplates,
 } from "../../services/badgeService";
 import { useAuth } from "../../contexts/AuthContext";
 import { doc, updateDoc } from "firebase/firestore";
