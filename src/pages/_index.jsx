@@ -10,3 +10,4 @@ export { default as SelectSchoolPage } from "./SelectSchoolPage";
 export { default as DebugPage } from "./DebugPage";
 export { default as MySubmissionsPage } from "./MySubmissionsPage";
 export { default as EditPasswordPage } from "./EditPasswordPage";
+export { default as EditEmailPage } from "./EditEmailPage";

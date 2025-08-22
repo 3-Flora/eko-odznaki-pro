@@ -3,8 +3,6 @@ import Input from "../components/ui/Input";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import { useState } from "react";
 import { Lock, Save } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router";
 import {
   updatePassword,
   reauthenticateWithCredential,
@@ -13,6 +11,7 @@ import {
 import { auth } from "../services/firebase";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
+import SuccessMessage from "../components/ui/SuccessMessage";
 
 export default function EditPasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -21,8 +20,6 @@ export default function EditPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  const navigate = useNavigate();
 
   const reauthenticate = async (currentPassword) => {
     const user = auth.currentUser;
@@ -86,11 +83,6 @@ export default function EditPasswordPage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
-
-      // Po 3 sekundach przekieruj z powrotem do ustawień
-      setTimeout(() => {
-        navigate("/profile/edit");
-      }, 3000);
     } catch (err) {
       if (err.code === "auth/wrong-password") {
         setError("Nieprawidłowe aktualne hasło");
@@ -117,12 +109,7 @@ export default function EditPasswordPage() {
       />
 
       <ErrorMessage error={error} />
-
-      {success && (
-        <div className="mb-4 rounded-xl bg-green-100 p-3 text-green-800 dark:bg-green-900 dark:text-green-200">
-          {success}
-        </div>
-      )}
+      <SuccessMessage success={success} />
 
       <form onSubmit={handlePasswordChange} className="space-y-4">
         <Label htmlFor="currentPassword">Aktualne hasło</Label>
@@ -158,12 +145,9 @@ export default function EditPasswordPage() {
           required
         />
 
-        <Button
-          icon={Save}
-          loading={loading}
-          text="Zmień Hasło"
-          loadingText="Zapisuję..."
-        />
+        <Button icon={Save} loading={loading}>
+          {loading ? "Zapisuję..." : "Zmień Hasło"}
+        </Button>
       </form>
     </div>
   );

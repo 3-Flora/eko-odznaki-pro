@@ -15,6 +15,7 @@ import {
   DebugPage,
   MySubmissionsPage,
   EditPasswordPage,
+  EditEmailPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -44,6 +45,7 @@ export default function App() {
               path="profile/edit/password"
               element={<EditPasswordPage />}
             />
+            <Route path="profile/edit/email" element={<EditEmailPage />} />
             <Route path="profile/debug" element={<DebugPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
