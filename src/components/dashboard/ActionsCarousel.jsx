@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import clsx from "clsx";
+import { backgroundEcoAction as backgroundStyles } from "../../utils/styleUtils";
 
 function ActionsCarousel({ data }) {
   const navigate = useNavigate();
-
-  console.log(data);
 
   return (
     <motion.div
@@ -35,10 +34,8 @@ function ActionsCarousel({ data }) {
               <div className="flex flex-col">
                 <div
                   className={clsx(
-                    "mx-auto flex h-24 w-24 items-center justify-center rounded-full text-white",
-                    action.style.color !== undefined &&
-                      `bg-${action.style.color}-500 dark:bg-${action.style.color}-600`,
-
+                    "mx-auto mb-2 flex h-20 w-20 items-center justify-center text-white",
+                    backgroundStyles[action.style.color || "default"],
                     action.style.shape === "circle" && "rounded-full",
                     action.style.shape === "square" && "rounded-md",
                     action.style.shape === "triangle" && "clip-triangle",
@@ -54,9 +51,10 @@ function ActionsCarousel({ data }) {
             </div>
             <div className="mt-2">
               <button
-                // tutaj przekierowywujne na /submit z wybranym EkoDziałaniem
-                onClick={() => console.log("quick action", action)}
-                className="w-full rounded-md bg-green-500 px-3 py-1 text-sm font-semibold text-white hover:bg-green-600"
+                onClick={() =>
+                  navigate("/submit/action", { state: { action } })
+                }
+                className="w-full rounded-md bg-green-500 px-3 py-1 text-sm font-semibold text-white transition-colors duration-200 hover:bg-green-600"
               >
                 Wykonaj
               </button>

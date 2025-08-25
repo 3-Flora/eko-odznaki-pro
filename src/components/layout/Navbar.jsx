@@ -24,14 +24,19 @@ export const Navbar = () => {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
-          <div className="mr-3 text-2xl" onClick={() => navigate("/")}>
-            🌱
+          <div
+            className="mr-3 text-2xl"
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            <img src="/favicon-32x32.png" alt="" />
           </div>
 
           <div className="flex flex-row gap-4">
             <DebugButton />
-            <ToggleTheme />
             <BadgesButton />
+            <ToggleTheme />
             <UserButton />
           </div>
         </div>

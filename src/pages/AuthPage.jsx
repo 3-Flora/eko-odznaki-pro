@@ -65,7 +65,7 @@ export default function AuthPage() {
 
   // Reszta komponentu bez zmian
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center p-8">
+    <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center p-8">
       <PageHeader
         emoji="🌱"
         title="EKO Odznaki"

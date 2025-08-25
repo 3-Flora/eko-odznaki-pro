@@ -2,6 +2,12 @@ import { motion } from "framer-motion";
 import { CalendarClockIcon } from "lucide-react";
 
 function LargeChallengeCard({ data }) {
+  if (!data) return null;
+  /* 
+  Jeśli nie ma żadnego EkoWyzwania,
+  nie wyświetlaj karty
+  */
+
   const end = new Date(data.endDate.seconds * 1000);
   const now = new Date();
   const msLeft = Math.max(0, end - now);

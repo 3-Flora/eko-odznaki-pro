@@ -1,19 +1,23 @@
 {
   "name": "Eko Odznaki",
   "short_name": "Eko Odznaki",
+  "description": "Aplikacja edukacyjna do zdobywania EkoOdznak poprzez realizację ekologicznych działań.",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "orientation": "portrait"
 }

@@ -3,6 +3,7 @@ import { Home, Plus, Trophy, User, BookOpen, CheckSquare } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink } from "react-router";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
+import { hapticFeedback } from "../../utils/hapticUtils";
 import clsx from "clsx";
 
 export const BottomNav = () => {
@@ -16,8 +17,8 @@ export const BottomNav = () => {
       icon: currentUser?.role === "teacher" ? CheckSquare : Plus,
       label: currentUser?.role === "teacher" ? "Sprawdź" : "Dodaj",
     },
-    { id: "/ranking", icon: Trophy, label: "Ranking" },
-    { id: "/challenges", icon: BookOpen, label: "Wyzwania" },
+    // { id: "/ranking", icon: Trophy, label: "Ranking" },
+    // { id: "/challenges", icon: BookOpen, label: "Wyzwania" },
     { id: "/profile", icon: User, label: "Profil" },
   ];
 
@@ -36,6 +37,7 @@ export const BottomNav = () => {
           <NavLink
             key={id}
             to={id}
+            onClick={hapticFeedback}
             className={({ isActive }) =>
               `flex flex-1 flex-col items-center rounded-lg px-3 py-2 transition-all duration-200 ` +
               (isActive

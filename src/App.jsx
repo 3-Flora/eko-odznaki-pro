@@ -4,6 +4,7 @@ import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import {
   ActivityPage,
+  SubmitEcoActionPage,
   AuthPage,
   BadgesPage,
   ChallengesPage,
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="" element={<Layout />}>
             <Route index element={<DashboardPage />} />
             <Route path="submit" element={<ActivityPage />} />
+            <Route path="submit/action" element={<SubmitEcoActionPage />} />
             <Route path="ranking" element={<RankingPage />} />
             <Route path="challenges" element={<ChallengesPage />} />
             <Route path="profile" element={<ProfilePage />} />

@@ -13,6 +13,9 @@ import {
   HelpCircle,
   ArrowRight,
   Settings,
+  Edit2,
+  LeafyGreen,
+  Award,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
@@ -27,6 +30,7 @@ import { ConfirmModal } from "../components/ui/ConfirmModal";
 import Badge from "../components/ui/Badge";
 import VerificationStatus from "../components/profile/VerificationStatus";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
+import Button from "../components/ui/Button";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();
@@ -134,18 +138,22 @@ export default function ProfilePage() {
 
   const stats = [
     {
-      label: "Odznaki",
+      label: "Dni aktywności",
+      value: currentUser?.counters?.totalActiveDays || 0,
+      icon: Calendar,
+      color: "text-blue-600",
+    },
+    {
+      label: "Zdobyte Odznaki",
       value: earnedBadgesCount,
-      icon: Star,
+      icon: Award,
       color: "text-purple-600",
     },
     {
-      label: "Dni aktywności",
-      // Use counters from the user document when available. `totalActions` is a
-      // reasonable proxy for activity days (adjust if you have a dedicated field).
+      label: "EkoDziałania",
       value: currentUser?.counters?.totalActions || 0,
-      icon: Calendar,
-      color: "text-blue-600",
+      icon: LeafyGreen,
+      color: "text-green-600",
     },
   ];
 
@@ -155,7 +163,7 @@ export default function ProfilePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-center text-white dark:bg-gradient-to-r dark:from-green-700 dark:to-emerald-900"
+        className="flex flex-col rounded-3xl bg-gray-500 p-6 text-center text-white dark:bg-gray-700"
       >
         <div className="mb-2 flex justify-center gap-6">
           <ProfilePhoto currentUser={currentUser} />
@@ -170,10 +178,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Verification status */}
-        <VerificationStatus currentUser={currentUser} />
+        {/* <VerificationStatus currentUser={currentUser} /> */}
 
-        <div className="flex items-center justify-between text-left">
+        <div className="mb-2 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <School className="mr-1 h-6 w-6" />
             <span className="text-sm">
@@ -184,6 +191,28 @@ export default function ProfilePage() {
             <Users className="mr-1 h-6 w-6" />
             <span className="text-sm">{classNameState}</span>
           </div>
+        </div>
+
+        <div className="flex justify-between">
+          <Button
+            size="sx"
+            style="lightBlue"
+            icon={Edit2}
+            onClick={() => navigate("/profile/edit")}
+            className="!w-fit"
+          >
+            Edytuj profil
+          </Button>
+
+          <Button
+            size="sx"
+            style="gray"
+            icon={LogOut}
+            onClick={handleLogout}
+            className="!w-fit"
+          >
+            Wyloguj się
+          </Button>
         </div>
       </motion.div>
 
@@ -224,14 +253,23 @@ export default function ProfilePage() {
           <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
             <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="text-left">
-            <p className="font-semibold text-gray-800 dark:text-white">
-              Moje zgłoszenia
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Zobacz historię
-            </p>
+          <p className="text-left font-semibold text-gray-800 dark:text-white">
+            Moje zgłoszenia
+          </p>
+        </motion.button>
+        {/*  */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/profile/badges")}
+          className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+        >
+          <div className="rounded-full bg-green-100 p-2 dark:bg-green-700">
+            <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
           </div>
+          <p className="text-left font-semibold text-gray-800 dark:text-white">
+            Moje Odznaki
+          </p>
         </motion.button>
       </motion.div>
 
@@ -294,34 +332,6 @@ export default function ProfilePage() {
             );
           })}
         </div>
-      </motion.div>
-
-      {/* Settings Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0 }}
-        className="flex cursor-pointer items-center rounded-xl bg-blue-50 p-4 shadow-md transition-colors hover:bg-blue-100 dark:bg-blue-900 dark:hover:bg-blue-800"
-        onClick={() => navigate("/profile/edit")}
-      >
-        <span className="flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-300">
-          <Settings size={18} />
-          Ustawienia konta
-        </span>
-      </motion.div>
-
-      {/* Logtout Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1 }}
-        className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 shadow-md transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-        onClick={handleLogout}
-      >
-        <span className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-300">
-          <LogOut size={18} />
-          Wyloguj
-        </span>
       </motion.div>
     </>
   );

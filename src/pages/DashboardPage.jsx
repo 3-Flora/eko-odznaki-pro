@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const { currentUser } = useAuth();
 
   // prefer real user from context when available, otherwise use static sample
-  const user = currentUser || { displayName: "Jan Kowalski" };
+  const user = currentUser || { displayName: "Nie zalogowany" };
 
   // Live data states
   const [assignedChallenge, setAssignedChallenge] = useState(null);

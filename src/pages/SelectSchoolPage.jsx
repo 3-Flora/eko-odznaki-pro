@@ -77,7 +77,7 @@ export default function SelectSchoolPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center p-8">
+    <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center p-8">
       <div className="mb-8 text-center">
         <div className="mb-4 text-6xl">🏫</div>
         <h1 className="mb-2 text-3xl font-bold text-gray-800 dark:text-white">

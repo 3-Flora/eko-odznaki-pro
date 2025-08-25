@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Tworzenie konta
   const createUserDocument = async (firebaseUser, additionalData) => {
     const userRef = doc(db, "users", firebaseUser.uid);
     const userSnap = await getDoc(userRef);
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }) => {
           transportActions: 0,
           energyActions: 0,
           foodActions: 0,
+          totalActiveDays: 0,
         },
         earnedBadges: {},
         ...(firebaseUser.photoURL && { photoURL: firebaseUser.photoURL }),

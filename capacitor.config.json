@@ -1,7 +1,8 @@
 {
   "appId": "pl.kunasz.eko",
-  "appName": "eko-odznaki-pro",
+  "appName": "Eko Odznaki",
   "webDir": "dist",
+  "loggingBehavior": "development",
   "server": {
     "cleartext": true,
     "allowNavigation": [
