@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Trophy, Star, Target } from "lucide-react";
-import { motion } from "framer-motion";
 import {
   getBadgeTemplates,
   calculateBadgeProgress,
 } from "../services/badgeService";
 import Badge from "../components/ui/Badge";
 import BackButton from "../components/ui/BackButton";
+import clsx from "clsx";
 
 export default function BadgesPage() {
   const { currentUser } = useAuth();
@@ -86,12 +86,7 @@ export default function BadgesPage() {
   return (
     <>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0 }}
-        className="flex items-center gap-4"
-      >
+      <div className="flex items-center gap-4">
         <BackButton />
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -101,57 +96,50 @@ export default function BadgesPage() {
             Przeglądaj swoje osiągnięcia i postępy
           </p>
         </div>
-      </motion.div>
-
-      {/* Stats */}
+      </div>
       <div className="mb-0 grid grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <motion.button
+          <button
             key={stat.label}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 + index * 0.1 }}
             onClick={() => setFilter(stat.filter)}
-            className={`rounded-2xl p-4 text-center shadow-lg transition-all ${
+            className={clsx(
+              "rounded-2xl p-4 text-center shadow-lg transition-all",
               filter === stat.filter
                 ? "bg-green-500 text-white dark:bg-green-600"
-                : "bg-white dark:bg-gray-800"
-            }`}
+                : "bg-white dark:bg-gray-800",
+            )}
           >
             <stat.icon
-              className={`mx-auto mb-2 h-8 w-8 ${
-                filter === stat.filter ? "text-white" : stat.color
-              }`}
+              className={clsx(
+                "mx-auto mb-2 h-8 w-8",
+                filter === stat.filter ? "text-white" : stat.color,
+              )}
             />
             <p
-              className={`text-2xl font-bold ${
+              className={clsx(
+                "text-2xl font-bold",
                 filter === stat.filter
                   ? "text-white"
-                  : "text-gray-800 dark:text-white"
-              }`}
+                  : "text-gray-800 dark:text-white",
+              )}
             >
               {stat.value}
             </p>
             <p
-              className={`text-sm ${
+              className={clsx(
+                "text-sm",
                 filter === stat.filter
                   ? "text-green-100"
-                  : "text-gray-600 dark:text-gray-300"
-              }`}
+                  : "text-gray-600 dark:text-gray-300",
+              )}
             >
               {stat.label}
             </p>
-          </motion.button>
+          </button>
         ))}
       </div>
-
       {/* Badges Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
+      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
         <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
           {filter === "earned" && "Zdobyte odznaki"}
           {filter === "inProgress" && "Odznaki w trakcie"}
@@ -181,12 +169,7 @@ export default function BadgesPage() {
               : nextLevelIcon;
 
             return (
-              <motion.div
-                key={badge.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + index * 0.05, duration: 0 }}
-              >
+              <div key={badge.id}>
                 <Badge
                   icon={displayIcon}
                   name={badge.name}
@@ -202,11 +185,11 @@ export default function BadgesPage() {
                   nextLevelData={badge.nextLevelData}
                   isEarned={badge.isEarned}
                 />
-              </motion.div>
+              </div>
             );
           })}
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { useNavigate } from "react-router";
 import { getEcoActions } from "../services/ecoActionService";
 import ErrorMessage from "../components/ui/ErrorMessage";
@@ -50,25 +50,17 @@ export default function ActivityPage() {
 
         {/* Loading state */}
         {loadingActions && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center py-20"
-          >
+          <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-green-500" />
             <span className="ml-2 text-gray-600 dark:text-gray-400">
               Ładowanie EkoDziałań...
             </span>
-          </motion.div>
+          </div>
         )}
 
         {/* No actions available */}
         {!loadingActions && ecoActions.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 rounded-2xl bg-yellow-50 p-8 text-center dark:bg-yellow-900/20"
-          >
+          <div className="mt-8 rounded-2xl bg-yellow-50 p-8 text-center dark:bg-yellow-900/20">
             <div className="mb-4 text-4xl">📝</div>
             <h3 className="mb-2 text-lg font-semibold text-yellow-800 dark:text-yellow-200">
               Brak dostępnych EkoDziałań
@@ -76,22 +68,15 @@ export default function ActivityPage() {
             <p className="text-yellow-600 dark:text-yellow-400">
               W bazie danych nie ma jeszcze żadnych EkoDziałań do zgłoszenia.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Actions Grid */}
         {!loadingActions && ecoActions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 grid grid-cols-2 gap-4"
-          >
+          <div className="mt-4 grid grid-cols-2 gap-4">
             {ecoActions.map((action, index) => (
-              <motion.button
+              <button
                 key={action.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
                 onClick={() => handleActionSelect(action)}
                 className="flex aspect-square flex-col items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 dark:border-gray-700 dark:bg-gray-800"
               >
@@ -116,9 +101,9 @@ export default function ActivityPage() {
                 <h3 className="leading-tight font-semibold text-gray-800 dark:text-white">
                   {action.name}
                 </h3>
-              </motion.button>
+              </button>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

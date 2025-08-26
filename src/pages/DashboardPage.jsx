@@ -1,5 +1,5 @@
 import { useAuth } from "../contexts/AuthContext";
-import { motion } from "framer-motion";
+
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -116,11 +116,7 @@ export default function DashboardPage() {
   return (
     <>
       {/* Top welcome */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:from-green-700 dark:to-emerald-900"
-      >
+      <div className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:from-green-700 dark:to-emerald-900">
         <h2 className="mb-2 text-2xl font-bold">
           Cześć, {user.displayName.split(" ")[0]}! 👋
         </h2>
@@ -128,7 +124,7 @@ export default function DashboardPage() {
           Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie
           działania i swój postęp.
         </p>
-      </motion.div>
+      </div>
 
       {/* Render sections explicitly (prefer live DB data, fallback to static samples) */}
       {loadingAssigned ? (

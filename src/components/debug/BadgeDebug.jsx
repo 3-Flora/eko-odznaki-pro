@@ -113,9 +113,7 @@ export default function BadgeDebug() {
 
         {message && (
           <div className="rounded-lg bg-gray-100 p-3 dark:bg-gray-700">
-            <p className="text-sm text-gray-800 dark:text-gray-200">
-              {message}
-            </p>
+            <p className="text-gray-800 dark:text-gray-200">{message}</p>
           </div>
         )}
 

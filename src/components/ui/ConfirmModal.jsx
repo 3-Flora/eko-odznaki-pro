@@ -41,13 +41,16 @@ export const ConfirmModal = ({
         {children}
         <div className="mt-4 flex justify-end gap-2">
           <button
-            className="rounded-lg bg-gray-100 px-4 py-2 text-sm hover:bg-gray-200"
+            className={clsx(
+              "rounded-lg px-4 py-2 text-sm",
+              "bg-gray-100 hover:bg-gray-200",
+            )}
             onClick={onClose}
           >
             {cancelLabel}
           </button>
           <button
-            className={`rounded-lg px-4 py-2 text-sm ${confirmClassName}`}
+            className={clsx("rounded-lg px-4 py-2 text-sm", confirmClassName)}
             onClick={onConfirm}
           >
             {confirmLabel}

@@ -1,13 +1,8 @@
-import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 
 function ActivityFeed({ data }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-    >
+    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Co słychać w klasie?
@@ -36,7 +31,7 @@ function ActivityFeed({ data }) {
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

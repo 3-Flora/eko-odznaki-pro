@@ -3,7 +3,6 @@ import CountersEditor from "../components/debug/CountersEditor";
 import DatabaseManager from "../components/debug/DatabaseManager";
 import DatabaseViewer from "../components/debug/DatabaseViewer";
 
-import { motion } from "framer-motion";
 import {
   calculateBadgeProgress,
   getBadgeTemplates,
@@ -37,37 +36,10 @@ export default function DebugPage() {
 
   return (
     <>
-      {/* Counters Editor Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <CountersEditor onCountersUpdate={handleCountersUpdate} />
-      </motion.div>
-
-      {/* Database Manager Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <DatabaseManager />
-      </motion.div>
-
-      {/* Database Viewer Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <DatabaseViewer />
-      </motion.div>
-
-      {/* Debug Section - usuń to w produkcji */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <BadgeDebug />
-      </motion.div>
+      <CountersEditor onCountersUpdate={handleCountersUpdate} />
+      <DatabaseManager />
+      <DatabaseViewer />
+      <BadgeDebug />
     </>
   );
 }

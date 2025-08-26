@@ -1,5 +1,5 @@
 import { Calendar, Users, Gift } from "lucide-react";
-import { motion } from "framer-motion";
+
 import {
   currentChallenge,
   upcomingChallenges,
@@ -10,11 +10,7 @@ export default function ChallengesPage() {
   return (
     <>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
+      <div className="text-center">
         <div className="mb-4 text-4xl">🎯</div>
         <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
           Wyzwania
@@ -22,15 +18,10 @@ export default function ChallengesPage() {
         <p className="text-gray-600 dark:text-gray-300">
           Dołącz do wyzwań i zdobywaj bonusowe punkty!
         </p>
-      </motion.div>
+      </div>
 
       {/* Current Challenge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-3xl bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white dark:from-blue-800 dark:to-purple-900"
-      >
+      <div className="rounded-3xl bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white dark:from-blue-800 dark:to-purple-900">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="mr-3 text-3xl">{currentChallenge.icon}</div>
@@ -73,25 +64,17 @@ export default function ChallengesPage() {
             Weź udział
           </button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Upcoming Challenges */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
+      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
         <h3 className="mb-4 text-lg font-bold text-gray-800 dark:text-white">
           Nadchodzące wyzwania
         </h3>
         <div className="space-y-4">
           {upcomingChallenges.map((challenge, index) => (
-            <motion.div
+            <div
               key={challenge.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + index * 0.05 }}
               className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 transition-colors hover:bg-green-50 dark:bg-gray-900 dark:hover:bg-green-900"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
@@ -116,28 +99,20 @@ export default function ChallengesPage() {
                   <p className="text-xs font-bold">+{challenge.bonusPoints}</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Completed Challenges */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
+      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
         <h3 className="mb-4 text-lg font-bold text-gray-800 dark:text-white">
           Ukończone wyzwania
         </h3>
         <div className="space-y-4">
           {completedChallenges.map((challenge, index) => (
-            <motion.div
+            <div
               key={challenge.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + index * 0.05 }}
               className="flex items-center rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-700 dark:bg-green-900"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
@@ -155,25 +130,20 @@ export default function ChallengesPage() {
                   <p className="text-sm font-bold">+{challenge.earnedPoints}</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Challenge Tips */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 p-6 text-white dark:from-emerald-700 dark:to-green-900"
-      >
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 p-6 text-white dark:from-emerald-700 dark:to-green-900">
         <h3 className="mb-2 text-lg font-bold">💡 Wskazówka</h3>
         <p className="text-green-100 dark:text-green-200">
           Uczestnicząc w wyzwaniach możesz zdobyć znacznie więcej punktów!
           Pamiętaj, że każde wyzwanie ma określony czas trwania i bonusowe
           punkty.
         </p>
-      </motion.div>
+      </div>
     </>
   );
 }

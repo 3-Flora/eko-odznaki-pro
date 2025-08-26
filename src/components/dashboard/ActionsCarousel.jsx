@@ -1,17 +1,16 @@
 import { useNavigate } from "react-router";
-import { motion } from "framer-motion";
 import clsx from "clsx";
 import { backgroundEcoAction as backgroundStyles } from "../../utils/styleUtils";
 
 function ActionsCarousel({ data }) {
   const navigate = useNavigate();
 
+  const handleActionSelect = (action) => {
+    navigate("/submit/action", { state: { action } });
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-    >
+    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Szybkie Działania
@@ -26,43 +25,37 @@ function ActionsCarousel({ data }) {
 
       <div className="flex space-x-3 overflow-x-auto pb-2">
         {data.map((action) => (
-          <div
+          <button
             key={action.id}
-            className="min-w-[160px] flex-none rounded-xl border bg-white p-3 text-left dark:border-gray-700 dark:bg-gray-800"
+            onClick={() => handleActionSelect(action)}
+            className="flex aspect-square flex-col items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 dark:border-gray-700 dark:bg-gray-800"
           >
-            <div className="mb-2 flex justify-center">
-              <div className="flex flex-col">
-                <div
-                  className={clsx(
-                    "mx-auto mb-2 flex h-20 w-20 items-center justify-center text-white",
-                    backgroundStyles[action.style.color || "default"],
-                    action.style.shape === "circle" && "rounded-full",
-                    action.style.shape === "square" && "rounded-md",
-                    action.style.shape === "triangle" && "clip-triangle",
-                  )}
-                >
-                  {/* icon */}
-                  <span className="text-4xl">{action.style.icon}</span>
-                </div>
-                <div className="text-xl font-medium text-gray-800 dark:text-white">
-                  {action.name}
-                </div>
+            <div className="mb-2 flex flex-col items-center">
+              <div
+                className={clsx(
+                  "mb-3 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl",
+                  backgroundStyles[action.style?.color || "default"],
+                )}
+              >
+                {action.style?.icon || "🌱"}
+              </div>
+              <div
+                className={clsx(
+                  "rounded-full px-2 py-1 text-xs font-medium",
+                  backgroundStyles[action.style?.color || "default"],
+                )}
+              >
+                {action.category}
               </div>
             </div>
-            <div className="mt-2">
-              <button
-                onClick={() =>
-                  navigate("/submit/action", { state: { action } })
-                }
-                className="w-full rounded-md bg-green-500 px-3 py-1 text-sm font-semibold text-white transition-colors duration-200 hover:bg-green-600"
-              >
-                Wykonaj
-              </button>
-            </div>
-          </div>
+
+            <h3 className="leading-tight font-semibold text-gray-800 dark:text-white">
+              {action.name}
+            </h3>
+          </button>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

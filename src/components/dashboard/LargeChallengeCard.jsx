@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { CalendarClockIcon } from "lucide-react";
 
 function LargeChallengeCard({ data }) {
@@ -17,11 +16,7 @@ function LargeChallengeCard({ data }) {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-3xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900 dark:text-white"
-    >
+    <div className="rounded-3xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900 dark:text-white">
       <div className="flex items-start justify-between">
         <div>
           <h4 className="text-2xl font-bold">{data.challengeName}</h4>
@@ -67,7 +62,7 @@ function LargeChallengeCard({ data }) {
           Wykonaj działanie
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

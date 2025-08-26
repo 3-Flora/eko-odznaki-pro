@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Pickaxe } from "lucide-react";
 
 function ProgressCard({ data }) {
@@ -10,11 +9,7 @@ function ProgressCard({ data }) {
   const badgePct = 50;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-    >
+    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Mój Postęp
@@ -73,7 +68,7 @@ function ProgressCard({ data }) {
           {/* {data.callToAction.text} */} CTA TEXT
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

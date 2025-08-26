@@ -1,23 +1,16 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-
 import {
-  Trophy,
-  Star,
   Calendar,
   School,
   Users,
-  Trash2,
   LogOut,
   CheckCircle,
-  HelpCircle,
   ArrowRight,
-  Settings,
   Edit2,
   LeafyGreen,
   Award,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
@@ -26,11 +19,10 @@ import {
   calculateBadgeProgress,
   getRecentBadgesForProfile,
 } from "../services/badgeService";
-import { ConfirmModal } from "../components/ui/ConfirmModal";
 import Badge from "../components/ui/Badge";
-import VerificationStatus from "../components/profile/VerificationStatus";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
 import Button from "../components/ui/Button";
+import clsx from "clsx";
 
 export default function ProfilePage() {
   const { currentUser, logout, deleteAccount } = useAuth();
@@ -160,11 +152,7 @@ export default function ProfilePage() {
   return (
     <>
       {/* Profile Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col rounded-3xl bg-gray-500 p-6 text-center text-white dark:bg-gray-700"
-      >
+      <div className="flex flex-col rounded-3xl bg-gray-500 p-6 text-center text-white dark:bg-gray-700">
         <div className="mb-2 flex justify-center gap-6">
           <ProfilePhoto currentUser={currentUser} />
 
@@ -214,39 +202,26 @@ export default function ProfilePage() {
             Wyloguj się
           </Button>
         </div>
-      </motion.div>
-
-      {/* Stats */}
+      </div>
       <div className="grid grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <motion.div
+          <div
             key={stat.label}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 + index * 0.1 }}
             className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
           >
-            <stat.icon className={`mx-auto mb-2 h-8 w-8 ${stat.color}`} />
+            <stat.icon className={clsx("mx-auto mb-2 h-8 w-8", stat.color)} />
             <p className="text-2xl font-bold text-gray-800 dark:text-white">
               {stat.value}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300">
               {stat.label}
             </p>
-          </motion.div>
+          </div>
         ))}
       </div>
-
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="grid grid-cols-2 gap-4"
-      >
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+      <div className="grid grid-cols-2 gap-4">
+        <button
           onClick={() => navigate("/profile/submissions")}
           className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
@@ -256,11 +231,9 @@ export default function ProfilePage() {
           <p className="text-left font-semibold text-gray-800 dark:text-white">
             Moje zgłoszenia
           </p>
-        </motion.button>
+        </button>
         {/*  */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => navigate("/profile/badges")}
           className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
@@ -270,16 +243,10 @@ export default function ProfilePage() {
           <p className="text-left font-semibold text-gray-800 dark:text-white">
             Moje Odznaki
           </p>
-        </motion.button>
-      </motion.div>
-
+        </button>
+      </div>
       {/* Badges Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-      >
+      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">
             Ostatnie odznaki {loading && "(Ładowanie...)"}
@@ -332,7 +299,7 @@ export default function ProfilePage() {
             );
           })}
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

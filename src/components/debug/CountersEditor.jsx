@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Save, X, Edit3, RefreshCw, Plus, Minus } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function CountersEditor({ onCountersUpdate }) {
   const { currentUser, updateProfile } = useAuth();
@@ -77,11 +76,7 @@ export default function CountersEditor({ onCountersUpdate }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-    >
+    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           Statystyki działań
@@ -105,60 +100,45 @@ export default function CountersEditor({ onCountersUpdate }) {
             </label>
 
             <div className="flex items-center gap-2">
-              <AnimatePresence mode="wait">
-                {isEditing ? (
-                  <motion.div
-                    key="edit-controls"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex items-center gap-2"
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => decrementCounter(key)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
                   >
-                    <button
-                      onClick={() => decrementCounter(key)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </button>
+                    <Minus className="h-3 w-3" />
+                  </button>
 
-                    <input
-                      type="number"
-                      min="0"
-                      value={counters[key]}
-                      onChange={(e) => handleCounterChange(key, e.target.value)}
-                      className="w-16 rounded-lg border border-gray-300 bg-white px-2 py-1 text-center text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    />
+                  <input
+                    type="number"
+                    min="0"
+                    value={counters[key]}
+                    onChange={(e) => handleCounterChange(key, e.target.value)}
+                    className="w-16 rounded-lg border border-gray-300 bg-white px-2 py-1 text-center text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  />
 
-                    <button
-                      onClick={() => incrementCounter(key)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </button>
-                  </motion.div>
-                ) : (
-                  <motion.span
-                    key="display"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="text-lg font-bold text-gray-800 dark:text-white"
+                  <button
+                    onClick={() => incrementCounter(key)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
                   >
-                    {currentUser?.counters?.[key] || 0}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <span
+                  key="display"
+                  className="text-lg font-bold text-gray-800 dark:text-white"
+                >
+                  {currentUser?.counters?.[key] || 0}
+                </span>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       {isEditing && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 flex gap-3"
-        >
+        <div className="mt-6 flex gap-3">
           <button
             onClick={handleSave}
             disabled={loading}
@@ -176,7 +156,7 @@ export default function CountersEditor({ onCountersUpdate }) {
             <X className="h-4 w-4" />
             Anuluj
           </button>
-        </motion.div>
+        </div>
       )}
 
       <div className="mt-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
@@ -185,6 +165,6 @@ export default function CountersEditor({ onCountersUpdate }) {
           odznak. Zwiększaj je wykonując EkoDziałania i EkoWyzwania!
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }

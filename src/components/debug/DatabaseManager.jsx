@@ -7,7 +7,6 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   addEcoActionsToFirestore,
   addChallengeTemplatesToFirestore,
@@ -20,6 +19,7 @@ import {
   addBadgeTemplatesToFirestore,
   clearBadgeTemplates,
 } from "../../data/badgeTemplates";
+import clsx from "clsx";
 
 export default function DatabaseManager() {
   const [loading, setLoading] = useState(false);
@@ -109,11 +109,7 @@ export default function DatabaseManager() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
-    >
+    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       {/* Header */}
       <div className="mb-6 flex items-center gap-3">
         <div className="rounded-full bg-indigo-100 p-3 dark:bg-indigo-900">
@@ -128,7 +124,6 @@ export default function DatabaseManager() {
           </p>
         </div>
       </div>
-
       {/* Warning */}
       <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
         <div className="flex items-start gap-3">
@@ -144,17 +139,21 @@ export default function DatabaseManager() {
           </div>
         </div>
       </div>
-
-      {/* Operations Grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {operations.map((operation) => (
-          <motion.button
+          <button
             key={operation.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             onClick={() => executeOperation(operation)}
             disabled={loading}
-            className={`relative overflow-hidden rounded-xl p-4 text-left text-white transition-all duration-200 ${operation.color} ${loading ? "cursor-not-allowed opacity-50" : "shadow-lg hover:shadow-xl"} ${operation.dangerous ? "ring-2 ring-red-200 dark:ring-red-800" : ""} `}
+            className={clsx(
+              "relative overflow-hidden rounded-xl p-4 text-left text-white transition-all duration-200",
+              operation.color,
+              {
+                "cursor-not-allowed opacity-50": loading,
+                "shadow-lg hover:shadow-xl": !loading,
+                "ring-2 ring-red-200 dark:ring-red-800": operation.dangerous,
+              },
+            )}
           >
             {/* Loading overlay */}
             {loading && activeOperation === operation.id && (
@@ -162,7 +161,6 @@ export default function DatabaseManager() {
                 <RefreshCw className="h-6 w-6 animate-spin" />
               </div>
             )}
-
             <div className="flex items-start gap-3">
               <operation.icon className="mt-1 h-6 w-6" />
               <div className="flex-1">
@@ -177,59 +175,44 @@ export default function DatabaseManager() {
                 )}
               </div>
             </div>
-          </motion.button>
+          </button>
         ))}
       </div>
-
       {/* Results */}
-      <AnimatePresence>
-        {results.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-900"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800 dark:text-white">
-                Wyniki operacji:
-              </h3>
-              <button
-                onClick={clearResults}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                Wyczyść
-              </button>
-            </div>
+      {results.length > 0 && (
+        <div className="mt-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-900">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-800 dark:text-white">
+              Wyniki operacji:
+            </h3>
+            <button
+              onClick={clearResults}
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Wyczyść
+            </button>
+          </div>
 
-            <div className="max-h-64 space-y-2 overflow-y-auto">
-              {results.map((result, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  {result.startsWith("✅") && (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  )}
-                  {result.startsWith("❌") && (
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                  )}
-                  {result.startsWith("🗑️") && (
-                    <Trash2 className="h-4 w-4 text-orange-600" />
-                  )}
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {result}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+          <div className="max-h-64 space-y-2 overflow-y-auto">
+            {results.map((result, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                {result.startsWith("✅") && (
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                )}
+                {result.startsWith("❌") && (
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                )}
+                {result.startsWith("🗑️") && (
+                  <Trash2 className="h-4 w-4 text-orange-600" />
+                )}
+                <span className="text-gray-700 dark:text-gray-300">
+                  {result}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Data Preview */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
@@ -259,6 +242,6 @@ export default function DatabaseManager() {
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

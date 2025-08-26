@@ -234,7 +234,6 @@ ecoActions/{ecoActionId}/
   - counterToIncrement: "savingActions"
   - style: {
     - color: "green",
-    - shape: "circle",
     - icon: "♻️",
   }
   - maxDaily: 3

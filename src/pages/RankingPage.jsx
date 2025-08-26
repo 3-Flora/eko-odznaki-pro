@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Trophy, Medal, Award, Users, School, Globe } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "../services/firebase";
 
@@ -83,50 +83,37 @@ export default function RankingPage() {
   return (
     <>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
+      <div className="text-center">
         <div className="mb-4 text-4xl">🏆</div>
         <h1 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
           Ranking
         </h1>
         <p className="text-gray-600">Zobacz najlepszych eko-wojowników!</p>
-      </motion.div>
+      </div>
 
       {/* Tabs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-2xl bg-white p-2 shadow-lg dark:bg-gray-900"
-      >
+      <div className="rounded-2xl bg-white p-2 shadow-lg dark:bg-gray-900">
         <div className="flex">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex flex-1 items-center justify-center rounded-xl px-4 py-3 transition-all duration-200 ${
+              className={clsx(
+                "flex flex-1 items-center justify-center rounded-xl px-4 py-3 transition-all duration-200",
                 activeTab === id
                   ? "bg-green-500 text-white shadow-lg dark:bg-green-700"
-                  : "text-gray-600 hover:text-green-600 dark:text-green-400 dark:hover:text-green-400"
-              }`}
+                  : "text-gray-600 hover:text-green-600 dark:text-green-400 dark:hover:text-green-400",
+              )}
             >
               <Icon className="mr-2 h-4 w-4" />
               <span className="text-sm font-medium">{label}</span>
             </button>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Ranking List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-3"
-      >
+      <div className="space-y-3">
         {loading ? (
           <div className="py-8 text-center">
             <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-green-500 dark:border-green-700"></div>
@@ -140,25 +127,28 @@ export default function RankingPage() {
             </div>
           ) : (
             individualRanking.map((user, index) => (
-              <motion.div
+              <div
                 key={user.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + index * 0.05 }}
-                className={`${getRankBg(user.rank).replace("bg-white", "bg-white dark:bg-gray-900")} rounded-2xl p-4 shadow-lg ${
-                  user.rank <= 3 ? "text-white" : "bg-white dark:bg-gray-900"
-                }`}
+                className={clsx(
+                  getRankBg(user.rank).replace(
+                    "bg-white",
+                    "bg-white dark:bg-gray-900",
+                  ),
+                  "rounded-2xl p-4 shadow-lg",
+                  user.rank <= 3 ? "text-white" : "bg-white dark:bg-gray-900",
+                )}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="mr-4">{getRankIcon(user.rank)}</div>
                     <div className="flex items-center">
                       <div
-                        className={`mr-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl ${
+                        className={clsx(
+                          "mr-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl",
                           user.rank <= 3
                             ? "bg-white/20"
-                            : "bg-green-100 dark:bg-green-900"
-                        }`}
+                            : "bg-green-100 dark:bg-green-900",
+                        )}
                       >
                         {user.photoURL ? (
                           <img
@@ -168,11 +158,12 @@ export default function RankingPage() {
                           />
                         ) : (
                           <span
-                            className={`text-lg font-bold ${
+                            className={clsx(
+                              "text-lg font-bold",
                               user.rank <= 3
                                 ? "text-white"
-                                : "text-green-600 dark:text-green-400"
-                            }`}
+                                : "text-green-600 dark:text-green-400",
+                            )}
                           >
                             {user.displayName?.charAt(0) || "U"}
                           </span>
@@ -180,18 +171,20 @@ export default function RankingPage() {
                       </div>
                       <div>
                         <h3
-                          className={`font-bold ${
+                          className={clsx(
+                            "font-bold",
                             user.rank <= 3
                               ? "text-white"
-                              : "text-gray-800 dark:text-white"
-                          }`}
+                              : "text-gray-800 dark:text-white",
+                          )}
                         >
                           {user.displayName}
                         </h3>
                         <p
-                          className={`text-sm ${
-                            user.rank <= 3 ? "text-white/70" : "text-gray-600"
-                          }`}
+                          className={clsx(
+                            "text-sm",
+                            user.rank <= 3 ? "text-white/70" : "text-gray-600",
+                          )}
                         >
                           {user.school} • {user.className}
                         </p>
@@ -200,17 +193,18 @@ export default function RankingPage() {
                   </div>
                   <div className="text-right">
                     <p
-                      className={`text-lg font-bold ${
+                      className={clsx(
+                        "text-lg font-bold",
                         user.rank <= 3
                           ? "text-white"
-                          : "text-green-600 dark:text-green-400"
-                      }`}
+                          : "text-green-600 dark:text-green-400",
+                      )}
                     >
                       {user.points} pkt
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))
           )
         ) : (
@@ -219,7 +213,7 @@ export default function RankingPage() {
             <p className="text-gray-600">Ta funkcja będzie dostępna wkrótce</p>
           </div>
         )}
-      </motion.div>
+      </div>
     </>
   );
 }

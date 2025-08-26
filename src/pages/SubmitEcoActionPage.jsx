@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Camera, Upload, CheckCircle, X, Plus } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router";
 import ErrorMessage from "../components/ui/ErrorMessage";
@@ -180,11 +180,7 @@ export default function SubmitEcoActionPage() {
   if (submitted) {
     return (
       <div className="flex min-h-[80vh] items-center justify-center p-4">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-center"
-        >
+        <div className="text-center">
           <div className="mb-4 text-6xl">🎉</div>
           <h2 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
             Wysłano!
@@ -197,7 +193,7 @@ export default function SubmitEcoActionPage() {
             <CheckCircle className="mr-1 inline h-4 w-4" />
             Oczekuje na zatwierdzenie
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -225,11 +221,7 @@ export default function SubmitEcoActionPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Selected Action Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-          >
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div className="mb-4 flex items-center justify-center">
               <div
                 className={clsx(
@@ -260,15 +252,10 @@ export default function SubmitEcoActionPage() {
                 {selectedAction.description}
               </p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Comment Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-          >
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <label className="mb-2 block font-medium text-gray-700 dark:text-gray-300">
               Opisz jak wykonałeś to działanie
             </label>
@@ -279,15 +266,10 @@ export default function SubmitEcoActionPage() {
               rows={4}
               className="w-full resize-none rounded-xl border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
-          </motion.div>
+          </div>
 
           {/* Photo Upload */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-          >
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <label className="mb-2 block font-medium text-gray-700 dark:text-gray-300">
               Dodaj zdjęcia (opcjonalne, max {MAX_PHOTOS})
             </label>
@@ -362,13 +344,10 @@ export default function SubmitEcoActionPage() {
                 </p>
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Submit Button */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+          <button
             type="submit"
             disabled={loading}
             className="sticky bottom-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 font-semibold text-white shadow-lg transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
@@ -409,7 +388,7 @@ export default function SubmitEcoActionPage() {
                 )}
               </>
             )}
-          </motion.button>
+          </button>
         </form>
       </div>
     </div>
