@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"; // Dodajemy useEffect
+import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Mail, Lock, User, School, Users } from "lucide-react";
-import { useNavigate } from "react-router"; // Poprawiony import
-import ErrorMessage from "../components/ui/ErrorMessage";
+import { useNavigate } from "react-router";
 import Input from "../components/ui/Input";
 import PageHeader from "../components/ui/PageHeader";
+import { useToast } from "../contexts/ToastContext";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -12,8 +12,9 @@ export default function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+
+  const { showError } = useToast();
 
   const { login, register, loginWithGoogle, currentUser } = useAuth();
 
@@ -29,14 +30,12 @@ export default function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-
     try {
       if (isLogin) {
         await login(email, password);
       } else {
         if (password !== confirmPassword) {
-          setError("Hasła nie pasują do siebie");
+          showError("Hasła nie pasują do siebie");
           setLoading(false);
           return;
         }
@@ -45,7 +44,7 @@ export default function AuthPage() {
         });
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     } finally {
       setLoading(false);
     }
@@ -53,11 +52,10 @@ export default function AuthPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    setError("");
     try {
       await loginWithGoogle();
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     } finally {
       setLoading(false);
     }
@@ -66,15 +64,17 @@ export default function AuthPage() {
   // Reszta komponentu bez zmian
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center p-8">
+      <object
+        data="/logo.svg"
+        type="image/svg+xml"
+        className="mx-auto h-20 w-20"
+      ></object>
       <PageHeader
-        emoji="🌱"
         title="EKO Odznaki"
         subtitle={
           isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"
         }
       />
-
-      <ErrorMessage error={error} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input

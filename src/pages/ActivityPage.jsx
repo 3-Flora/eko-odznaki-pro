@@ -3,16 +3,17 @@ import { Loader2 } from "lucide-react";
 
 import { useNavigate } from "react-router";
 import { getEcoActions } from "../services/ecoActionService";
-import ErrorMessage from "../components/ui/ErrorMessage";
 import PageHeader from "../components/ui/PageHeader";
 import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
 import clsx from "clsx";
+import { useToast } from "../contexts/ToastContext";
 
 export default function ActivityPage() {
   const navigate = useNavigate();
   const [ecoActions, setEcoActions] = useState([]);
   const [loadingActions, setLoadingActions] = useState(true);
-  const [error, setError] = useState("");
+
+  const { showError } = useToast();
 
   // Ładowanie EkoDziałań z bazy danych
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function ActivityPage() {
         setEcoActions(actions);
       } catch (error) {
         console.error("Error loading eco actions:", error);
-        setError("Nie udało się załadować EkoDziałań");
+        showError("Nie udało się załadować EkoDziałań");
       } finally {
         setLoadingActions(false);
       }
@@ -45,8 +46,6 @@ export default function ActivityPage() {
       />
 
       <div>
-        <ErrorMessage error={error} />
-
         {/* Loading state */}
         {loadingActions && (
           <div className="flex items-center justify-center py-20">

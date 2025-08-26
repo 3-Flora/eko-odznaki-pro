@@ -4,20 +4,21 @@ import { Mail, Lock, User, Trash2, Save, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router";
 import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { auth } from "../services/firebase";
-import ErrorMessage from "../components/ui/ErrorMessage";
 import Input from "../components/ui/Input";
 import Label from "../components/ui/Label";
 import PageHeader from "../components/ui/PageHeader";
 import SuccessMessage from "../components/ui/SuccessMessage";
 import Button from "../components/ui/Button";
+import { useToast } from "../contexts/ToastContext";
 
 export default function EditProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const { showError } = useToast();
 
   const { currentUser, updateProfile, deleteAccount } = useAuth();
   const navigate = useNavigate();
@@ -34,7 +35,6 @@ export default function EditProfilePage() {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     setSuccess("");
 
     try {
@@ -54,11 +54,13 @@ export default function EditProfilePage() {
       console.error("Błąd aktualizacji profilu:", err);
 
       if (err.code === "permission-denied") {
-        setError("Brak uprawnień do wykonania tej operacji");
+        showError("Brak uprawnień do wykonania tej operacji");
       } else if (err.code === "network-request-failed") {
-        setError("Błąd połączenia sieciowego. Sprawdź połączenie internetowe.");
+        showError(
+          "Błąd połączenia sieciowego. Sprawdź połączenie internetowe.",
+        );
       } else {
-        setError(err.message || "Wystąpił błąd podczas aktualizacji profilu");
+        showError(err.message || "Wystąpił błąd podczas aktualizacji profilu");
       }
     } finally {
       setLoading(false);
@@ -72,11 +74,10 @@ export default function EditProfilePage() {
     }
 
     setLoading(true);
-    setError("");
 
     try {
       if (!currentPassword) {
-        setError("Podaj aktualne hasło, aby usunąć konto");
+        showError("Podaj aktualne hasło, aby usunąć konto");
         setLoading(false);
         return;
       }
@@ -98,9 +99,9 @@ export default function EditProfilePage() {
     } catch (err) {
       if (err.code === "auth/invalid-credential") {
         setCurrentPassword("");
-        setError("Nieprawidłowe hasło");
+        showError("Nieprawidłowe hasło");
       } else {
-        setError(err.message || "Wystąpił błąd podczas usuwania konta");
+        showError(err.message || "Wystąpił błąd podczas usuwania konta");
       }
     } finally {
       setLoading(false);
@@ -116,7 +117,6 @@ export default function EditProfilePage() {
         subtitle="Zarządzaj swoim profilem i ustawieniami"
       />
 
-      <ErrorMessage error={error} />
       <SuccessMessage success={success} />
 
       <form onSubmit={handleUpdateProfile} className="mb-4 space-y-4">
@@ -214,7 +214,6 @@ export default function EditProfilePage() {
             onClick={() => {
               setShowDeleteConfirmation(false);
               setCurrentPassword("");
-              setError("");
             }}
             className="w-full rounded-xl border-2 border-gray-200 bg-white py-2 font-medium text-gray-700 transition duration-200 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >

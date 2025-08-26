@@ -9,7 +9,7 @@ export default function BackButton({ className }) {
     <button
       onClick={() => navigate(-1)}
       className={clsx(
-        "flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700",
+        "flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700",
         className,
       )}
     >

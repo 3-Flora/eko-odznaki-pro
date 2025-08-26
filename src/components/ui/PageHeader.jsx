@@ -1,5 +1,3 @@
-import BackButton from "./BackButton";
-
 export default function PageHeader({ emoji, title, subtitle }) {
   return (
     <div className="relative mt-2 mb-4 text-center">

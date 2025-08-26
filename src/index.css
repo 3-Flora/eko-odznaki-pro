@@ -10,6 +10,14 @@
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
+.mt-safe {
+  margin-top: env(safe-area-inset-top, 20px);
+}
+
+.mt-safe {
+  margin-bottom: env(safe-area-inset-bottom, 20px);
+}
+
 @theme {
   --color-brown-50: #f5f5f5;
   --color-brown-100: #f0e6e2;

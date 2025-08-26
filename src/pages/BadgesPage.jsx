@@ -6,7 +6,7 @@ import {
   calculateBadgeProgress,
 } from "../services/badgeService";
 import Badge from "../components/ui/Badge";
-import BackButton from "../components/ui/BackButton";
+import PageHeader from "../components/ui/PageHeader";
 import clsx from "clsx";
 
 export default function BadgesPage() {
@@ -86,16 +86,11 @@ export default function BadgesPage() {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Wszystkie odznaki
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Przeglądaj swoje osiągnięcia i postępy
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Wszystkie odznaki"
+        subtitle="Przeglądaj swoje osiągnięcia i postępy"
+        emoji="🏅"
+      />
       <div className="mb-0 grid grid-cols-3 gap-4">
         {stats.map((stat, index) => (
           <button

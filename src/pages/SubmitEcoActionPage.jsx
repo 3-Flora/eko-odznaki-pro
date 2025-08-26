@@ -1,11 +1,7 @@
 import { useState } from "react";
-import { Camera, Upload, CheckCircle, X, Plus } from "lucide-react";
-
+import { Upload, X, Plus, Eye, Trash2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router";
-import ErrorMessage from "../components/ui/ErrorMessage";
-import SuccessMessage from "../components/ui/SuccessMessage";
-import BackButton from "../components/ui/BackButton";
 import clsx from "clsx";
 import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
 import {
@@ -16,11 +12,12 @@ import {
   validateImageFile,
   validateMultipleImageFiles,
   createImagePreview,
-  calculateTotalSizeMB,
-  formatFileSize,
 } from "../utils/imageUtils";
+import TextareaAutosize from "react-textarea-autosize";
+import { useToast } from "../contexts/ToastContext";
 
 export default function SubmitEcoActionPage() {
+  const { showError, showSuccess } = useToast();
   const { submitEcoAction } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,11 +27,9 @@ export default function SubmitEcoActionPage() {
   const [photos, setPhotos] = useState([]); // Array zamiast pojedynczego photo
   const [photoPreviews, setPhotoPreviews] = useState([]); // Array preview'ów
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadStatus, setUploadStatus] = useState(null); // Dodany stan dla szczegółowego postępu
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null); // Stan dla otwartego podglądu zdjęcia
 
   const MAX_PHOTOS = 4;
 
@@ -49,11 +44,14 @@ export default function SubmitEcoActionPage() {
 
     if (files.length === 0) return;
 
+    console.log("photochange");
     // Sprawdź czy nie przekraczamy limitu zdjęć
     if (photos.length + files.length > MAX_PHOTOS) {
-      setError(
+      showError(
         `Można dodać maksymalnie ${MAX_PHOTOS} zdjęcia. Obecnie masz ${photos.length} zdjęć. Spróbuj wybrać ${MAX_PHOTOS - photos.length} lub mniej zdjęć.`,
       );
+      // clear input
+      e.target.value = "";
       return;
     }
 
@@ -63,12 +61,11 @@ export default function SubmitEcoActionPage() {
       MAX_PHOTOS - photos.length,
     );
     if (!multiValidation.isValid) {
-      setError(multiValidation.error);
+      showError(multiValidation.error);
       return;
     }
 
     try {
-      setError(""); // Wyczyść poprzednie błędy
       const validFiles = [];
       const newPreviews = [];
 
@@ -76,7 +73,7 @@ export default function SubmitEcoActionPage() {
         // Dodatkowa walidacja pojedynczego pliku
         const validation = validateImageFile(file);
         if (!validation.isValid) {
-          setError(validation.error);
+          showError(validation.error);
           return; // Przerwij jeśli którykolwiek plik jest nieprawidłowy
         }
 
@@ -93,19 +90,14 @@ export default function SubmitEcoActionPage() {
 
         // Komunikat o pomyślnym dodaniu
         if (validFiles.length === 1) {
-          setSuccessMessage("✅ Dodano 1 zdjęcie");
+          showSuccess("✅ Dodano 1 zdjęcie");
         } else {
-          setSuccessMessage(`✅ Dodano ${validFiles.length} zdjęć`);
+          showSuccess(`✅ Dodano ${validFiles.length} zdjęć`);
         }
-
-        // Wyczyść komunikaty po 3 sekundach
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 3000);
       }
     } catch (err) {
       console.error("Błąd podczas przetwarzania zdjęć:", err);
-      setError("Błąd podczas przetwarzania zdjęć: " + err.message);
+      showError("Błąd podczas przetwarzania zdjęć: " + err.message);
     }
 
     // Wyczyść input
@@ -115,16 +107,23 @@ export default function SubmitEcoActionPage() {
   const removePhoto = (index) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
-    setError(""); // Wyczyść błędy
-    setSuccessMessage(""); // Wyczyść komunikaty sukcesu
+    showSuccess("🗑️ Zdjęcie zostało usunięte");
+    setSelectedPhotoIndex(null); // Zamknij popup po usunięciu
+  };
+
+  const openPhotoPreview = (index) => {
+    console.log(index);
+    setSelectedPhotoIndex(index);
+  };
+
+  const closePhotoPreview = () => {
+    setSelectedPhotoIndex(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setLoading(true);
-    setError("");
-    setSuccessMessage("");
     setUploadProgress("");
     setUploadStatus(null);
 
@@ -158,15 +157,16 @@ export default function SubmitEcoActionPage() {
         comment,
       });
 
-      setSubmitted(true);
+      // Pokaż toast sukcesu i przekieruj
+      showSuccess(
+        "🎉 EkoDziałanie zostało wysłane! Oczekuje na zatwierdzenie przez nauczyciela.",
+      );
 
-      // Navigate back after 3 seconds
-      setTimeout(() => {
-        navigate("/submit");
-      }, 3000);
+      // Natychmiastowe przekierowanie
+      navigate("/submit");
     } catch (err) {
       console.error("Error submitting eco action:", err);
-      setError(
+      showError(
         err.message ||
           "Wystąpił błąd podczas wysyłania EkoDziałania. Spróbuj ponownie.",
       );
@@ -177,33 +177,9 @@ export default function SubmitEcoActionPage() {
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="flex min-h-[80vh] items-center justify-center p-4">
-        <div className="text-center">
-          <div className="mb-4 text-6xl">🎉</div>
-          <h2 className="mb-2 text-2xl font-bold text-gray-800 dark:text-white">
-            Wysłano!
-          </h2>
-          <p className="mb-4 text-gray-600 dark:text-gray-300">
-            Twoje EkoDziałanie zostało przesłane do weryfikacji przez
-            nauczyciela
-          </p>
-          <div className="inline-block rounded-full bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-300">
-            <CheckCircle className="mr-1 inline h-4 w-4" />
-            Oczekuje na zatwierdzenie
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="space-y-4">
-        <ErrorMessage error={error} />
-        <SuccessMessage success={successMessage} />
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Selected Action Card */}
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -244,11 +220,11 @@ export default function SubmitEcoActionPage() {
             <label className="mb-2 block font-medium text-gray-700 dark:text-gray-300">
               Opisz jak wykonałeś to działanie
             </label>
-            <textarea
+            <TextareaAutosize
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Opisz szczegóły wykonania tego EkoDziałania..."
-              rows={4}
+              minRows={4}
               className="w-full resize-none rounded-xl border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
           </div>
@@ -260,66 +236,60 @@ export default function SubmitEcoActionPage() {
             </label>
 
             {/* Photo Previews Grid */}
-            {photoPreviews.length > 0 && (
-              <div className="mb-4">
-                <div className="grid grid-cols-2 gap-2">
-                  {photoPreviews.map((preview, index) => (
-                    <div key={index} className="relative">
+            <div className="mb-4">
+              <div className="grid grid-flow-dense grid-cols-2 gap-2">
+                {photoPreviews.length > 0 &&
+                  photoPreviews.map((preview, index) => (
+                    <div
+                      key={index}
+                      className="group relative"
+                      onClick={() => openPhotoPreview(index)}
+                    >
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
-                        className="h-24 w-full rounded-lg object-cover"
+                        className="h-24 w-full cursor-pointer rounded-lg object-cover transition-opacity group-hover:opacity-75"
                       />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                        <Eye className="h-6 w-6 text-white drop-shadow-lg" />
+                      </div>
                       <button
                         type="button"
-                        onClick={() => removePhoto(index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removePhoto(index);
+                        }}
                         className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white transition hover:bg-red-600"
                       >
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   ))}
-                </div>
-
-                {/* Informacja o rozmiarze */}
-                <div className="mt-2 text-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {photos.length} {photos.length === 1 ? "zdjęcie" : "zdjęć"}{" "}
-                    • Całkowity rozmiar:{" "}
-                    {formatFileSize(calculateTotalSizeMB(photos) * 1024 * 1024)}
-                  </span>
-                </div>
+                {photos.length < MAX_PHOTOS && (
+                  <label
+                    className={clsx(
+                      "h-24 cursor-pointer items-center justify-center",
+                      photos.length === 0 && "col-span-2",
+                      photos.length === 2 && "col-span-2",
+                    )}
+                  >
+                    <div className="flex h-full flex-col justify-center rounded-xl border-2 border-dashed border-gray-300 p-1 text-center transition hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500">
+                      <Plus className="mx-auto h-8 w-8 text-gray-400 dark:text-gray-500" />
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Dotknij, aby dodać zdjęcia
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
-            )}
-
-            {/* Add Photo Button */}
-            {photos.length < MAX_PHOTOS && (
-              <label className="block cursor-pointer">
-                <div className="rounded-xl border-2 border-dashed border-gray-300 p-6 text-center transition hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500">
-                  <Plus className="mx-auto mb-2 h-8 w-8 text-gray-400 dark:text-gray-500" />
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {photos.length === 0
-                      ? "Dotknij, aby dodać zdjęcia"
-                      : `Dodaj kolejne zdjęcie (${photos.length}/${MAX_PHOTOS})`}
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                />
-              </label>
-            )}
-
-            {photos.length >= MAX_PHOTOS && (
-              <div className="rounded-lg bg-gray-100 p-3 text-center dark:bg-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Dodano maksymalną liczbę zdjęć ({MAX_PHOTOS})
-                </p>
-              </div>
-            )}
+            </div>
 
             {/* Status i komunikaty */}
             {uploadProgress && !loading && (
@@ -365,16 +335,50 @@ export default function SubmitEcoActionPage() {
               <>
                 <Upload className="h-5 w-5" />
                 Wyślij działanie
-                {photos.length > 0 && (
-                  <span className="ml-1 text-sm opacity-80">
-                    ({photos.length} {photos.length === 1 ? "zdjęcie" : "zdjęć"}
-                    )
-                  </span>
-                )}
               </>
             )}
           </button>
         </form>
+
+        {/* Photo Preview Modal */}
+        {selectedPhotoIndex !== null && (
+          <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="relative max-h-full max-w-full">
+              <img
+                src={photoPreviews[selectedPhotoIndex]}
+                alt={`Podgląd zdjęcia ${selectedPhotoIndex + 1}`}
+                className="max-h-[80vh] max-w-full rounded-lg object-contain"
+              />
+
+              {/* Close button */}
+              <button
+                onClick={closePhotoPreview}
+                className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-white transition hover:bg-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Delete button */}
+              <button
+                onClick={() => removePhoto(selectedPhotoIndex)}
+                className="absolute -top-2 -left-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition hover:bg-red-600"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+
+              {/* Photo counter */}
+              <div className="bg-opacity-60 absolute bottom-2 left-2 rounded-lg bg-black px-2 py-1 text-sm text-white">
+                {selectedPhotoIndex + 1} / {photoPreviews.length}
+              </div>
+            </div>
+
+            {/* Background click to close */}
+            <div
+              className="absolute inset-0 -z-10"
+              onClick={closePhotoPreview}
+            ></div>
+          </div>
+        )}
       </div>
     </div>
   );

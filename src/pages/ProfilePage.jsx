@@ -171,9 +171,7 @@ export default function ProfilePage() {
         <div className="mb-2 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <School className="mr-1 h-6 w-6" />
-            <span className="text-sm">
-              {schoolName || "Nie wybrano szkoły"}
-            </span>
+            <span className="text-sm">{schoolName || ""}</span>
           </div>
           <div className="flex items-center gap-2">
             <Users className="mr-1 h-6 w-6" />
@@ -249,7 +247,7 @@ export default function ProfilePage() {
       <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-            Ostatnie odznaki {loading && "(Ładowanie...)"}
+            Ostatnie odznaki
           </h2>
           <button
             onClick={() => navigate("/profile/badges")}

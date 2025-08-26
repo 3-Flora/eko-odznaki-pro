@@ -1,6 +1,5 @@
 import Label from "../components/ui/Label";
 import Input from "../components/ui/Input";
-import ErrorMessage from "../components/ui/ErrorMessage";
 import { useState } from "react";
 import { Mail, Lock, Save } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -13,13 +12,15 @@ import { auth } from "../services/firebase";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import SuccessMessage from "../components/ui/SuccessMessage";
+import { useToast } from "../contexts/ToastContext";
 
 export default function EditEmailPage() {
   const [newEmail, setNewEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const { showError } = useToast();
 
   const { currentUser } = useAuth();
 
@@ -47,7 +48,6 @@ export default function EditEmailPage() {
   const handleEmailChange = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     setSuccess("");
 
     try {
@@ -58,19 +58,19 @@ export default function EditEmailPage() {
 
       // Walidacja
       if (!newEmail) {
-        setError("Podaj nowy adres e-mail");
+        showError("Podaj nowy adres e-mail");
         setLoading(false);
         return;
       }
 
       if (newEmail === currentUser.email) {
-        setError("Nowy adres e-mail jest taki sam jak aktualny");
+        showError("Nowy adres e-mail jest taki sam jak aktualny");
         setLoading(false);
         return;
       }
 
       if (!currentPassword) {
-        setError("Podaj aktualne hasło");
+        showError("Podaj aktualne hasło");
         setLoading(false);
         return;
       }
@@ -89,21 +89,23 @@ export default function EditEmailPage() {
       setCurrentPassword("");
     } catch (err) {
       if (err.code === "auth/wrong-password") {
-        setError("Nieprawidłowe aktualne hasło");
+        showError("Nieprawidłowe aktualne hasło");
       } else if (err.code === "auth/email-already-in-use") {
-        setError("Ten adres e-mail jest już używany przez inne konto");
+        showError("Ten adres e-mail jest już używany przez inne konto");
       } else if (err.code === "auth/invalid-email") {
-        setError("Nieprawidłowy format adresu e-mail");
+        showError("Nieprawidłowy format adresu e-mail");
       } else if (err.code === "auth/requires-recent-login") {
-        setError("Ze względów bezpieczeństwa musisz się ponownie zalogować");
+        showError("Ze względów bezpieczeństwa musisz się ponownie zalogować");
       } else if (err.code === "auth/too-many-requests") {
-        setError("Zbyt wiele prób. Spróbuj ponownie później.");
+        showError("Zbyt wiele prób. Spróbuj ponownie później.");
       } else if (err.code === "auth/network-request-failed") {
-        setError("Błąd połączenia sieciowego. Sprawdź połączenie internetowe.");
+        showError(
+          "Błąd połączenia sieciowego. Sprawdź połączenie internetowe.",
+        );
       } else if (err.code === "auth/invalid-credential") {
-        setError("Nieprawidłowe hasło. Spróbuj ponownie.");
+        showError("Nieprawidłowe hasło. Spróbuj ponownie.");
       } else {
-        setError(err.message || "Wystąpił błąd podczas zmiany e-mail");
+        showError(err.message || "Wystąpił błąd podczas zmiany e-mail");
       }
     } finally {
       setLoading(false);
@@ -132,7 +134,6 @@ export default function EditEmailPage() {
         </div>
       </div>
 
-      <ErrorMessage error={error} />
       <SuccessMessage success={success} />
 
       <form onSubmit={handleEmailChange} className="space-y-4">

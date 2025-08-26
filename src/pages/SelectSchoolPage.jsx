@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
-import ErrorMessage from "../components/ui/ErrorMessage";
 import Select from "../components/ui/Select";
 import { School, Users } from "lucide-react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../services/firebase";
+import { useToast } from "../contexts/ToastContext";
 
 export default function SelectSchoolPage() {
   const { currentUser, updateProfile, loading } = useAuth();
@@ -15,8 +15,9 @@ export default function SelectSchoolPage() {
   const [classes, setClasses] = useState([]);
   const [selectedSchool, setSelectedSchool] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
-  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const { showError } = useToast;
 
   // Przekieruj uzytkownika gdy posiada classID
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function SelectSchoolPage() {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setSchools(list);
     };
-    load().catch((e) => setError(e.message));
+    load().catch((e) => showError(e.message));
   }, []);
 
   useEffect(() => {
@@ -54,14 +55,13 @@ export default function SelectSchoolPage() {
       setClasses(list);
     };
 
-    loadClasses().catch((e) => setError(e.message));
+    loadClasses().catch((e) => showError(e.message));
   }, [selectedSchool]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     if (!selectedSchool || !selectedClass) {
-      setError("Wybierz szkołę i klasę");
+      showError("Wybierz szkołę i klasę");
       return;
     }
 
@@ -70,7 +70,7 @@ export default function SelectSchoolPage() {
       await updateProfile({ schoolId: selectedSchool, classId: selectedClass });
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err.message || String(err));
+      showError(err.message || String(err));
     } finally {
       setSubmitting(false);
     }
@@ -87,8 +87,6 @@ export default function SelectSchoolPage() {
           Aby dokończyć rejestrację wybierz swoją szkołę i klasę.
         </p>
       </div>
-
-      <ErrorMessage error={error} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Select

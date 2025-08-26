@@ -1,6 +1,5 @@
 import Label from "../components/ui/Label";
 import Input from "../components/ui/Input";
-import ErrorMessage from "../components/ui/ErrorMessage";
 import { useState } from "react";
 import { Lock, Save } from "lucide-react";
 import {
@@ -12,14 +11,16 @@ import { auth } from "../services/firebase";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
 import SuccessMessage from "../components/ui/SuccessMessage";
+import { useToast } from "../contexts/ToastContext";
 
 export default function EditPasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const { showError } = useToast();
 
   const reauthenticate = async (currentPassword) => {
     const user = auth.currentUser;
@@ -45,8 +46,6 @@ export default function EditPasswordPage() {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
       const user = auth.currentUser;
@@ -56,19 +55,19 @@ export default function EditPasswordPage() {
 
       // Walidacja haseł
       if (newPassword !== confirmNewPassword) {
-        setError("Nowe hasła nie pasują do siebie");
+        showError("Nowe hasła nie pasują do siebie");
         setLoading(false);
         return;
       }
 
       if (newPassword.length < 6) {
-        setError("Nowe hasło musi mieć co najmniej 6 znaków");
+        showError("Nowe hasło musi mieć co najmniej 6 znaków");
         setLoading(false);
         return;
       }
 
       if (!currentPassword) {
-        setError("Podaj aktualne hasło");
+        showError("Podaj aktualne hasło");
         setLoading(false);
         return;
       }
@@ -85,15 +84,17 @@ export default function EditPasswordPage() {
       setConfirmNewPassword("");
     } catch (err) {
       if (err.code === "auth/wrong-password") {
-        setError("Nieprawidłowe aktualne hasło");
+        showError("Nieprawidłowe aktualne hasło");
       } else if (err.code === "auth/requires-recent-login") {
-        setError("Ze względów bezpieczeństwa musisz się ponownie zalogować");
+        showError("Ze względów bezpieczeństwa musisz się ponownie zalogować");
       } else if (err.code === "auth/too-many-requests") {
-        setError("Zbyt wiele prób. Spróbuj ponownie później.");
+        showError("Zbyt wiele prób. Spróbuj ponownie później.");
       } else if (err.code === "auth/network-request-failed") {
-        setError("Błąd połączenia sieciowego. Sprawdź połączenie internetowe.");
+        showError(
+          "Błąd połączenia sieciowego. Sprawdź połączenie internetowe.",
+        );
       } else {
-        setError(err.message || "Wystąpił błąd podczas zmiany hasła");
+        showError(err.message || "Wystąpił błąd podczas zmiany hasła");
       }
     } finally {
       setLoading(false);
@@ -108,7 +109,6 @@ export default function EditPasswordPage() {
         subtitle="Zabezpiecz swoje konto nowym hasłem"
       />
 
-      <ErrorMessage error={error} />
       <SuccessMessage success={success} />
 
       <form onSubmit={handlePasswordChange} className="space-y-4">

@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import Loading from "./components/routing/Loading";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
+import { ToastProvider } from "./contexts/ToastContext";
+import ToastContainer from "./components/ui/ToastContainer";
 import {
   ActivityPage,
   SubmitEcoActionPage,
@@ -28,31 +30,37 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/selectSchool" element={<SelectSchoolPage />} />
-        <Route path="/" element={<ProtectedRoute />}>
-          <Route path="" element={<Layout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="submit" element={<ActivityPage />} />
-            <Route path="submit/action" element={<SubmitEcoActionPage />} />
-            <Route path="ranking" element={<RankingPage />} />
-            <Route path="challenges" element={<ChallengesPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="profile/badges" element={<BadgesPage />} />
-            <Route path="profile/submissions" element={<MySubmissionsPage />} />
-            <Route path="profile/edit" element={<EditProfilePage />} />
-            <Route
-              path="profile/edit/password"
-              element={<EditPasswordPage />}
-            />
-            <Route path="profile/edit/email" element={<EditEmailPage />} />
-            <Route path="profile/debug" element={<DebugPage />} />
-            <Route path="*" element={<Navigate to="/" />} />
+    <ToastProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/selectSchool" element={<SelectSchoolPage />} />
+          <Route path="/" element={<ProtectedRoute />}>
+            <Route path="" element={<Layout />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="submit" element={<ActivityPage />} />
+              <Route path="submit/action" element={<SubmitEcoActionPage />} />
+              <Route path="ranking" element={<RankingPage />} />
+              <Route path="challenges" element={<ChallengesPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="profile/badges" element={<BadgesPage />} />
+              <Route
+                path="profile/submissions"
+                element={<MySubmissionsPage />}
+              />
+              <Route path="profile/edit" element={<EditProfilePage />} />
+              <Route
+                path="profile/edit/password"
+                element={<EditPasswordPage />}
+              />
+              <Route path="profile/edit/email" element={<EditEmailPage />} />
+              <Route path="profile/debug" element={<DebugPage />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+        <ToastContainer />
+      </BrowserRouter>
+    </ToastProvider>
   );
 }

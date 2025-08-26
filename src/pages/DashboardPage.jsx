@@ -15,9 +15,12 @@ import LargeChallengeCard from "../components/dashboard/LargeChallengeCard";
 import ActionsCarousel from "../components/dashboard/ActionsCarousel";
 import ProgressCard from "../components/dashboard/ProgressCard";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
+import { useToast } from "../contexts/ToastContext";
 
 export default function DashboardPage() {
   const { currentUser } = useAuth();
+
+  const { showError, showSuccess } = useToast();
 
   // prefer real user from context when available, otherwise use static sample
   const user = currentUser || { displayName: "Nie zalogowany" };
@@ -148,7 +151,7 @@ export default function DashboardPage() {
       {loadingFeed ? (
         <ActivityFeed.Skeleton />
       ) : (
-        <ActivityFeed data={{ feedItems: feedItems || feedData.feedItems }} />
+        <ActivityFeed data={{ feedItems: feedItems || [] }} />
       )}
     </>
   );
