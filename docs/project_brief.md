@@ -248,7 +248,7 @@ submissions/{submissionId}/
   - ecoActionId: "gaszenie_swiatla_id"
   - createdAt: Timestamp // Data zgłoszenia
   - status: "approved" | "rejected" // Domyślnie 'approved'
-  - photoUrl: "url/do/zdjecia.jpg" // Opcjonalne
+  - photoUrls: [] // Lista URLi zdjęć hostowanych na firebase storage
   - comment: "Zgasiłem światło w całej szkole!" // Opcjonalne
 
 // Szablony/biblioteka EkoWyzwań

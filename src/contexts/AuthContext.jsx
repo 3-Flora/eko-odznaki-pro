@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
       category: ecoAction.category, // Ważne dla Cloud Function liczącej punkty
       createdAt: serverTimestamp(),
       status: "approved",
-      photoUrl: optionalData.photoUrl || "",
+      photoUrls: optionalData.photoUrls || [], // Zmiana z photoUrl na photoUrls (array)
       comment: optionalData.comment || "",
     };
 
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }) => {
       classId: currentUser.classId,
       createdAt: serverTimestamp(),
       status: "approved",
-      photoUrl: optionalData.photoUrl || "",
+      photoUrls: optionalData.photoUrls || [], // Zmiana z photoUrl na photoUrls (array)
       comment: optionalData.comment || "",
     };
 

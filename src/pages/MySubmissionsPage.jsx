@@ -316,8 +316,43 @@ export default function MySubmissionsPage() {
                       </div>
                     )}
 
-                    {/* Zdjęcie */}
-                    {submission.photoUrl && (
+                    {/* Zdjęcia */}
+                    {submission.photoUrls &&
+                      submission.photoUrls.length > 0 && (
+                        <div className="mb-4">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Camera className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                              {submission.photoUrls.length === 1
+                                ? "Zdjęcie załączone"
+                                : `${submission.photoUrls.length} zdjęć załączonych`}
+                            </span>
+                          </div>
+                          <div
+                            className={
+                              submission.photoUrls.length === 1
+                                ? ""
+                                : "grid grid-cols-2 gap-2"
+                            }
+                          >
+                            {submission.photoUrls.map((photoUrl, index) => (
+                              <img
+                                key={index}
+                                src={photoUrl}
+                                alt={`Zdjęcie działania ${index + 1}`}
+                                className={
+                                  submission.photoUrls.length === 1
+                                    ? "h-32 w-full rounded-lg object-cover"
+                                    : "h-24 w-full rounded-lg object-cover"
+                                }
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Fallback dla starych submission'ów z photoUrl */}
+                    {submission.photoUrl && !submission.photoUrls && (
                       <div className="mb-4">
                         <div className="mb-2 flex items-center gap-2">
                           <Camera className="h-4 w-4 text-gray-400" />
