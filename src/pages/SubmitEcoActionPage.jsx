@@ -200,21 +200,6 @@ export default function SubmitEcoActionPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="sticky top-0 z-10 mb-4 border-gray-200 dark:border-gray-700">
-        <div className="flex items-center">
-          <BackButton className="mr-4" />
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold text-gray-800 dark:text-white">
-              Zgłoś EkoDziałanie
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {selectedAction.name}
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-4">
         <ErrorMessage error={error} />
         <SuccessMessage success={successMessage} />
@@ -350,7 +335,7 @@ export default function SubmitEcoActionPage() {
           <button
             type="submit"
             disabled={loading}
-            className="sticky bottom-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 font-semibold text-white shadow-lg transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+            className="bottom-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 font-semibold text-white shadow-lg transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
           >
             {loading ? (
               <div className="flex flex-col items-center space-y-1">

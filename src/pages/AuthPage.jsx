@@ -72,7 +72,6 @@ export default function AuthPage() {
         subtitle={
           isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"
         }
-        disableBackButton
       />
 
       <ErrorMessage error={error} />

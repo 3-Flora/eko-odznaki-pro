@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { useLocation } from "react-router";
 
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
@@ -6,10 +7,15 @@ import ToggleTheme from "../ui/ToggleTheme";
 import BadgesButton from "../ui/Badgesbutton";
 import UserButton from "../ui/UserButton";
 import DebugButton from "../debug/DebugButton";
+import BackButton from "../ui/BackButton";
 
 export const Navbar = () => {
   const { mobileDeviceType } = useDeviceEnvironment();
+  const { pathname } = useLocation();
 
+  // pokaż BackButton gdy jesteśmy na podstronie (ścieżka różna od "/", "/profile", "/submit")
+  const showBackButton =
+    pathname !== "/" && pathname !== "/profile" && pathname !== "/submit";
   const navigate = useNavigate();
 
   return (
@@ -22,23 +28,14 @@ export const Navbar = () => {
         },
       )}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-12 items-center justify-between">
-          <div
-            className="mr-3 text-2xl"
-            onClick={() => {
-              navigate("/");
-            }}
-          >
-            <img src="/favicon-32x32.png" alt="" />
-          </div>
+      <div className="flex max-w-7xl flex-row items-center justify-center px-4 py-2 sm:px-6 lg:px-8">
+        <div className="">{showBackButton && <BackButton />}</div>
 
-          <div className="flex flex-row gap-4">
-            <DebugButton />
-            <BadgesButton />
-            <ToggleTheme />
-            <UserButton />
-          </div>
+        <div className="ml-auto flex flex-row gap-4">
+          <DebugButton />
+          <BadgesButton />
+          <ToggleTheme />
+          <UserButton />
         </div>
       </div>
     </nav>

@@ -39,13 +39,12 @@ export default function ActivityPage() {
   return (
     <div className="min-h-svh bg-gray-50 dark:bg-gray-900">
       <PageHeader
-        disableBackButton
         title="Wybierz EkoDziałanie"
         emoji="🌍"
         subtitle="Dotknij działania, które chcesz zgłosić"
       />
 
-      <div className="p-4">
+      <div>
         <ErrorMessage error={error} />
 
         {/* Loading state */}
