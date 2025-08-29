@@ -9,12 +9,17 @@ import {
   limit,
   getDocs,
   onSnapshot,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import LargeChallengeCard from "../components/dashboard/LargeChallengeCard";
 import ActionsCarousel from "../components/dashboard/ActionsCarousel";
 import ProgressCard from "../components/dashboard/ProgressCard";
 import ActivityFeed from "../components/dashboard/ActivityFeed";
+import TeacherStatsCard from "../components/dashboard/TeacherStatsCard";
+import PendingVerificationCard from "../components/dashboard/PendingVerificationCard";
+import QuickActionsCard from "../components/dashboard/QuickActionsCard";
 import { useToast } from "../contexts/ToastContext";
 
 export default function DashboardPage() {
@@ -25,7 +30,10 @@ export default function DashboardPage() {
   // prefer real user from context when available, otherwise use static sample
   const user = currentUser || { displayName: "Nie zalogowany" };
 
-  // Live data states
+  // Determine if user is a teacher
+  const isTeacher = currentUser?.role === "teacher";
+
+  // Live data states for students
   const [assignedChallenge, setAssignedChallenge] = useState(null);
   const [ecoActions, setEcoActions] = useState(null);
   const [feedItems, setFeedItems] = useState(null);
@@ -33,9 +41,16 @@ export default function DashboardPage() {
   const [loadingEcoActions, setLoadingEcoActions] = useState(true);
   const [loadingFeed, setLoadingFeed] = useState(true);
 
-  // Fetch assigned challenge for the user's class (current active one)
+  // Teacher-specific data states
+  const [teacherStats, setTeacherStats] = useState(null);
+  const [pendingVerifications, setPendingVerifications] = useState(null);
+  const [loadingTeacherStats, setLoadingTeacherStats] = useState(true);
+  const [loadingPendingVerifications, setLoadingPendingVerifications] =
+    useState(true);
+
+  // Fetch assigned challenge for the user's class (current active one) - only for students
   useEffect(() => {
-    if (!currentUser?.classId) return;
+    if (!currentUser?.classId || isTeacher) return;
 
     let mounted = true;
     setLoadingAssigned(true);
@@ -69,10 +84,12 @@ export default function DashboardPage() {
     return () => {
       mounted = false;
     };
-  }, [currentUser?.classId]);
+  }, [currentUser?.classId, isTeacher]);
 
-  // Fetch ecoActions (small list for quick actions)
+  // Fetch ecoActions (small list for quick actions) - only for students
   useEffect(() => {
+    if (isTeacher) return;
+
     let mounted = true;
     setLoadingEcoActions(true);
     (async () => {
@@ -93,7 +110,7 @@ export default function DashboardPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isTeacher]);
 
   // Subscribe to activity feed for the class
   useEffect(() => {
@@ -116,6 +133,150 @@ export default function DashboardPage() {
     return () => unsub();
   }, [currentUser?.classId]);
 
+  // Fetch teacher statistics
+  useEffect(() => {
+    if (!isTeacher || !currentUser?.classId) return;
+
+    let mounted = true;
+    setLoadingTeacherStats(true);
+
+    (async () => {
+      try {
+        // Get class information
+        const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
+        let className = "";
+        let schoolName = "";
+
+        if (classDoc.exists()) {
+          const classData = classDoc.data();
+          className = classData.name || "";
+
+          // Get school information
+          if (classData.schoolId) {
+            const schoolDoc = await getDoc(
+              doc(db, "schools", classData.schoolId),
+            );
+            if (schoolDoc.exists()) {
+              schoolName = schoolDoc.data().name || "";
+            }
+          }
+        }
+
+        // Get students from this class
+        const studentsQuery = query(
+          collection(db, "users"),
+          where("classId", "==", currentUser.classId),
+          where("role", "==", "student"),
+          where("isVerified", "==", true),
+        );
+
+        const studentsSnapshot = await getDocs(studentsQuery);
+        const students = studentsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Calculate class statistics
+        const classStats = students.reduce(
+          (acc, student) => {
+            const counters = student.counters || {};
+            return {
+              totalActions: acc.totalActions + (counters.totalActions || 0),
+              totalChallenges:
+                acc.totalChallenges + (counters.totalChallenges || 0),
+              totalActiveDays:
+                acc.totalActiveDays + (counters.totalActiveDays || 0),
+              recyclingActions:
+                acc.recyclingActions + (counters.recyclingActions || 0),
+              educationActions:
+                acc.educationActions + (counters.educationActions || 0),
+              savingActions: acc.savingActions + (counters.savingActions || 0),
+              transportActions:
+                acc.transportActions + (counters.transportActions || 0),
+              energyActions: acc.energyActions + (counters.energyActions || 0),
+              foodActions: acc.foodActions + (counters.foodActions || 0),
+            };
+          },
+          {
+            totalActions: 0,
+            totalChallenges: 0,
+            totalActiveDays: 0,
+            recyclingActions: 0,
+            educationActions: 0,
+            savingActions: 0,
+            transportActions: 0,
+            energyActions: 0,
+            foodActions: 0,
+          },
+        );
+
+        if (mounted) {
+          setTeacherStats({
+            classStats,
+            studentsCount: students.length,
+            className,
+            schoolName,
+          });
+        }
+      } catch (e) {
+        console.warn("failed to fetch teacher stats", e);
+      }
+      if (mounted) setLoadingTeacherStats(false);
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isTeacher, currentUser?.classId]);
+
+  // Fetch pending verifications for teacher
+  useEffect(() => {
+    if (!isTeacher || !currentUser?.classId) return;
+
+    let mounted = true;
+    setLoadingPendingVerifications(true);
+
+    (async () => {
+      try {
+        // Get pending submissions
+        const submissionsQuery = query(
+          collection(db, "submissions"),
+          where("classId", "==", currentUser.classId),
+          where("status", "in", ["pending", null]),
+          limit(50),
+        );
+
+        const submissionsSnapshot = await getDocs(submissionsQuery);
+        const pendingSubmissions = submissionsSnapshot.docs.length;
+
+        // Get pending students (unverified)
+        const studentsQuery = query(
+          collection(db, "users"),
+          where("classId", "==", currentUser.classId),
+          where("role", "==", "student"),
+          where("isVerified", "!=", true),
+        );
+
+        const studentsSnapshot = await getDocs(studentsQuery);
+        const pendingStudents = studentsSnapshot.docs.length;
+
+        if (mounted) {
+          setPendingVerifications({
+            pendingSubmissions,
+            pendingStudents,
+          });
+        }
+      } catch (e) {
+        console.warn("failed to fetch pending verifications", e);
+      }
+      if (mounted) setLoadingPendingVerifications(false);
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isTeacher, currentUser?.classId]);
+
   return (
     <>
       {/* Top welcome */}
@@ -124,34 +285,62 @@ export default function DashboardPage() {
           Cześć, {user.displayName.split(" ")[0]}! 👋
         </h2>
         <p className="text-sm text-white/90">
-          Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie
-          działania i swój postęp.
+          {isTeacher
+            ? "Witaj w panelu nauczyciela — tutaj zobaczysz statystyki klasy, zgłoszenia do weryfikacji i szybkie akcje."
+            : "Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie działania i swój postęp."}
         </p>
       </div>
 
-      {/* Render sections explicitly (prefer live DB data, fallback to static samples) */}
-      {loadingAssigned ? (
-        <LargeChallengeCard.Skeleton />
-      ) : (
-        <LargeChallengeCard data={assignedChallenge} />
-      )}
+      {/* Render teacher-specific sections */}
+      {isTeacher ? (
+        <>
+          {loadingTeacherStats ? (
+            <TeacherStatsCard.Skeleton />
+          ) : (
+            <TeacherStatsCard data={teacherStats} />
+          )}
 
-      {loadingEcoActions ? (
-        <ActionsCarousel.Skeleton />
-      ) : (
-        <ActionsCarousel data={[...ecoActions]} />
-      )}
-      {/* 
-      {loadingFeed ? (
-        <ProgressCard.Skeleton />
-      ) : (
-        <ProgressCard data={{ user }} />
-      )} */}
+          {loadingPendingVerifications ? (
+            <PendingVerificationCard.Skeleton />
+          ) : (
+            <PendingVerificationCard data={pendingVerifications} />
+          )}
 
-      {loadingFeed ? (
-        <ActivityFeed.Skeleton />
+          <QuickActionsCard data={{}} />
+
+          {/* {loadingFeed ? (
+            <ActivityFeed.Skeleton />
+          ) : (
+            <ActivityFeed data={{ feedItems: feedItems || [] }} />
+          )} */}
+        </>
       ) : (
-        <ActivityFeed data={{ feedItems: feedItems || [] }} />
+        <>
+          {/* Render student-specific sections */}
+          {loadingAssigned ? (
+            <LargeChallengeCard.Skeleton />
+          ) : (
+            <LargeChallengeCard data={assignedChallenge} />
+          )}
+
+          {loadingEcoActions ? (
+            <ActionsCarousel.Skeleton />
+          ) : (
+            <ActionsCarousel data={[...ecoActions]} />
+          )}
+          {/* 
+          {loadingFeed ? (
+            <ProgressCard.Skeleton />
+          ) : (
+            <ProgressCard data={{ user }} />
+          )} */}
+
+          {/* {loadingFeed ? (
+            <ActivityFeed.Skeleton />
+          ) : (
+            <ActivityFeed data={{ feedItems: feedItems || [] }} />
+          )} */}
+        </>
       )}
     </>
   );
