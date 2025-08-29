@@ -13,3 +13,8 @@ export { default as DebugPage } from "./DebugPage";
 export { default as MySubmissionsPage } from "./MySubmissionsPage";
 export { default as EditPasswordPage } from "./EditPasswordPage";
 export { default as EditEmailPage } from "./EditEmailPage";
+export { default as StudentsPage } from "./StudentsPage";
+export { default as TeacherStatisticsPage } from "./TeacherStatisticsPage";
+export { default as TeacherSubmissionsPage } from "./TeacherSubmissionsPage";
+export { default as StudentDetailPage } from "./StudentDetailPage";
+export { default as SubmissionDetailPage } from "./SubmissionDetailPage";

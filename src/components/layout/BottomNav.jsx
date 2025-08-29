@@ -1,5 +1,13 @@
 /* eslint-disable no-unused-vars */
-import { Home, Plus, Trophy, User, BookOpen, CheckSquare } from "lucide-react";
+import {
+  Home,
+  Plus,
+  Trophy,
+  User,
+  BookOpen,
+  CheckSquare,
+  BarChart3,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink } from "react-router";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
@@ -10,15 +18,39 @@ export const BottomNav = () => {
   const { currentUser } = useAuth();
   const { mobileDeviceType } = useDeviceEnvironment();
 
-  const tabs = [
-    { id: "/", icon: Home, label: "Główna" },
+  console.log(currentUser?.role === "teacher");
+
+  const teacherTabs = [
+    {
+      id: "/teacher/submissions",
+      icon: CheckSquare,
+      label: "Sprawdź",
+    },
+    {
+      id: "/teacher/students",
+      icon: BookOpen,
+      label: "Uczniowie",
+    },
+    {
+      id: "/teacher/statistics",
+      icon: BarChart3,
+      label: "Statystyki",
+    },
+  ];
+
+  const studentTabs = [
     {
       id: "/submit",
-      icon: currentUser?.role === "teacher" ? CheckSquare : Plus,
-      label: currentUser?.role === "teacher" ? "Sprawdź" : "Dodaj",
+      icon: Plus,
+      label: "Dodaj",
     },
-    { id: "/profile", icon: User, label: "Profil" },
   ];
+
+  const tabs = [];
+
+  tabs.push({ id: "/", icon: Home, label: "Główna" });
+  tabs.push(...(currentUser?.role === "teacher" ? teacherTabs : studentTabs));
+  tabs.push({ id: "/profile", icon: User, label: "Profil" });
 
   return (
     <div

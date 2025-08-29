@@ -20,6 +20,11 @@ import {
   MySubmissionsPage,
   EditPasswordPage,
   EditEmailPage,
+  StudentsPage,
+  TeacherStatisticsPage,
+  TeacherSubmissionsPage,
+  StudentDetailPage,
+  SubmissionDetailPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -36,17 +41,53 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<AuthPage />} />
           <Route path="/selectSchool" element={<SelectSchoolPage />} />
-          <Route path="/" element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={<ProtectedRoute allowedRoles={["student", "teacher"]} />}
+          >
             <Route path="" element={<Layout />}>
               <Route index element={<DashboardPage />} />
-              <Route path="submit" element={<ActivityPage />} />
-              <Route path="submit/action" element={<SubmitEcoActionPage />} />
+
+              {/* Routes for students */}
               <Route
-                path="submit/challenge"
-                element={<SubmitChallengePage />}
-              />
-              <Route path="ranking" element={<RankingPage />} />
-              <Route path="challenges" element={<ChallengesPage />} />
+                path="submit"
+                element={<ProtectedRoute allowedRoles={["student"]} />}
+              >
+                <Route index element={<ActivityPage />} />
+                <Route path="action" element={<SubmitEcoActionPage />} />
+                <Route path="challenge" element={<SubmitChallengePage />} />
+              </Route>
+
+              {/* Routes for teachers */}
+              <Route
+                path="teacher"
+                element={<ProtectedRoute allowedRoles={["teacher"]} />}
+              >
+                <Route path="students" element={<StudentsPage />} />
+                <Route path="statistics" element={<TeacherStatisticsPage />} />
+                <Route
+                  path="submissions"
+                  element={<TeacherSubmissionsPage />}
+                />
+                <Route
+                  path="submission/:submissionId"
+                  element={<SubmissionDetailPage />}
+                />
+                <Route
+                  path="student/:studentId"
+                  element={<StudentDetailPage />}
+                />
+              </Route>
+
+              {/* Legacy route for students page (backward compatibility) */}
+              <Route
+                path="students"
+                element={<ProtectedRoute allowedRoles={["teacher"]} />}
+              >
+                <Route index element={<StudentsPage />} />
+              </Route>
+
+              {/* Profile Routes */}
               <Route path="profile" element={<ProfilePage />} />
               <Route path="profile/badges" element={<BadgesPage />} />
               <Route
@@ -60,6 +101,8 @@ export default function App() {
               />
               <Route path="profile/edit/email" element={<EditEmailPage />} />
               <Route path="profile/debug" element={<DebugPage />} />
+
+              {/* Redirect all unknown routes to the dashboard */}
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Route>

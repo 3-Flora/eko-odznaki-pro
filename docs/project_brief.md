@@ -225,6 +225,7 @@ classes/{classId}/
   - name: "Klasa 4a"
   - schoolId: "szkola_podstawowa_1_uid"
   - teacherId: "nauczyciel_xyz_uid"
+  - allowRegistration: true
 
 // Definicje EkoDziałań (szablony)
 ecoActions/{ecoActionId}/
@@ -249,6 +250,9 @@ submissions/{submissionId}/
   - status: "approved" | "rejected" // Domyślnie 'approved'
   - photoUrls: [] // Lista URLi zdjęć hostowanych na firebase storage
   - comment: "Zgasiłem światło w całej szkole!" // Opcjonalne
+  - reviewedBy: "nauczyciel_xyz_uid"
+  - reviewedAt: Timestamp
+  - rejectionReason: "Nieodpowiednie zdjęcie"
 
 // Szablony/biblioteka EkoWyzwań
 challengeTemplates/{templateId}/
