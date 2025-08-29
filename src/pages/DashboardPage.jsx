@@ -44,7 +44,7 @@ export default function DashboardPage() {
         const now = new Date();
         const q = query(
           collection(db, "assignedChallenges"),
-          where("classId", "==", currentUser.classId),
+          // where("classId", "==", currentUser.classId),
           orderBy("endDate", "desc"),
           limit(5),
         );
@@ -141,12 +141,12 @@ export default function DashboardPage() {
       ) : (
         <ActionsCarousel data={[...ecoActions]} />
       )}
-
+      {/* 
       {loadingFeed ? (
         <ProgressCard.Skeleton />
       ) : (
         <ProgressCard data={{ user }} />
-      )}
+      )} */}
 
       {loadingFeed ? (
         <ActivityFeed.Skeleton />

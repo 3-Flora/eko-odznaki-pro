@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
-import { Eye, RefreshCw, Database, FileText, Trophy, Zap } from "lucide-react";
+import {
+  Eye,
+  RefreshCw,
+  Database,
+  FileText,
+  Trophy,
+  Zap,
+  Target,
+} from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase";
+import { getAssignedChallenges } from "../../services/challengeService";
 import clsx from "clsx";
 
 export default function DatabaseViewer() {
@@ -9,6 +18,7 @@ export default function DatabaseViewer() {
   const [data, setData] = useState({
     ecoActions: [],
     challengeTemplates: [],
+    assignedChallenges: [],
     badgeTemplates: [],
   });
   const [activeTab, setActiveTab] = useState("ecoActions");
@@ -29,6 +39,13 @@ export default function DatabaseViewer() {
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
     },
     {
+      id: "assignedChallenges",
+      name: "Globalne Wyzwania",
+      icon: Target,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50 dark:bg-orange-900/20",
+    },
+    {
       id: "badgeTemplates",
       name: "Odznaki",
       icon: Trophy,
@@ -44,12 +61,17 @@ export default function DatabaseViewer() {
 
       // Pobierz dane z każdej kolekcji
       for (const tab of tabs) {
-        const collectionRef = collection(db, tab.id);
-        const snapshot = await getDocs(collectionRef);
-        newData[tab.id] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        if (tab.id === "assignedChallenges") {
+          // Użyj specjalnej funkcji dla assignedChallenges
+          newData[tab.id] = await getAssignedChallenges();
+        } else {
+          const collectionRef = collection(db, tab.id);
+          const snapshot = await getDocs(collectionRef);
+          newData[tab.id] = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+        }
       }
 
       setData(newData);
@@ -151,7 +173,7 @@ export default function DatabaseViewer() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {activeTabData.map((item, index) => (
+              {activeTabData.map((item) => (
                 <div
                   key={item.id}
                   className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
@@ -172,55 +194,63 @@ export default function DatabaseViewer() {
                   )}
 
                   <div className="space-y-2">
-                    {item.category && (
+                    {item.challengeName && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Kategoria:
+                          Nazwa wyzwania:
                         </span>
                         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                          {item.category}
+                          {item.challengeName}
                         </span>
                       </div>
                     )}
 
-                    {item.counterToCheck && (
+                    {item.challengeDescription && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Counter:
+                          Opis:
                         </span>
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
-                          {item.counterToCheck}
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {item.challengeDescription}
                         </span>
                       </div>
                     )}
 
-                    {item.counterToIncrement && (
+                    {item.startDate && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Increment:
+                          Data rozpoczęcia:
+                        </span>
+                        <span className="text-xs text-gray-700 dark:text-gray-300">
+                          {new Date(
+                            item.startDate.seconds * 1000,
+                          ).toLocaleDateString("pl-PL")}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.endDate && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Data zakończenia:
+                        </span>
+                        <span className="text-xs text-gray-700 dark:text-gray-300">
+                          {new Date(
+                            item.endDate.seconds * 1000,
+                          ).toLocaleDateString("pl-PL")}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.classProgress && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Globalny postęp:
                         </span>
                         <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                          {item.counterToIncrement}
+                          {item.classProgress.current}/
+                          {item.classProgress.total}
                         </span>
-                      </div>
-                    )}
-
-                    {item.levels && (
-                      <div className="mt-3">
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Poziomy ({item.levels.length}):
-                        </span>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {item.levels.map((level, idx) => (
-                            <span
-                              key={idx}
-                              className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                            >
-                              LV{level.level}: {level.requiredCount}{" "}
-                              {level.icon}
-                            </span>
-                          ))}
-                        </div>
                       </div>
                     )}
                   </div>

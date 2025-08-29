@@ -256,13 +256,11 @@ challengeTemplates/{templateId}/
   - description: "Zbieraj nakrętki przez cały tydzień."
   - category: "Recykling"
 
-// NOWA KOLEKCJA: Wyzwania przypisane przez nauczycieli do klas
+// NOWA KOLEKCJA: Wyzwania przypisane przez EkoSkop dla każdej klasy
 assignedChallenges/{assignmentId}/
   - templateId: "nakretkowy_challenge_id" // ID z kolekcji challengeTemplates
   - challengeName: "Nakrętkowy challenge"  // Denormalizacja dla łatwego wyświetlania
   - challengeDescription: "Zbieraj nakrętki przez cały tydzień."
-  - classId: "klasa_4a_uid"
-  - teacherId: "nauczyciel_xyz_uid"
   - startDate: Timestamp // Data rozpoczęcia (np. poniedziałek)
   - endDate: Timestamp   // Data zakończenia (np. niedziela)
   - classProgress: { // Informację o tym ile uczniów ukończyło zadanie

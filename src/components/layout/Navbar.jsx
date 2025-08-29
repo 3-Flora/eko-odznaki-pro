@@ -1,6 +1,4 @@
-import { useNavigate } from "react-router";
 import { useLocation } from "react-router";
-
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
 import ToggleTheme from "../ui/ToggleTheme";
@@ -16,7 +14,6 @@ export const Navbar = () => {
   // pokaż BackButton gdy jesteśmy na podstronie (ścieżka różna od "/", "/profile", "/submit")
   const showBackButton =
     pathname !== "/" && pathname !== "/profile" && pathname !== "/submit";
-  const navigate = useNavigate();
 
   return (
     <nav
@@ -30,8 +27,7 @@ export const Navbar = () => {
     >
       <div className="flex max-w-7xl flex-row items-center justify-center px-4 py-2 sm:px-6 lg:px-8">
         <div className="">{showBackButton && <BackButton />}</div>
-
-        <div className="ml-auto flex flex-row gap-4">
+        <div className="ml-auto flex flex-row gap-2">
           <DebugButton />
           <BadgesButton />
           <ToggleTheme />

@@ -19,6 +19,11 @@ import {
   addBadgeTemplatesToFirestore,
   clearBadgeTemplates,
 } from "../../data/badgeTemplates";
+import {
+  assignedChallengesData,
+  addAssignedChallengesToFirestore,
+  clearAssignedChallenges,
+} from "../../data/assignedChallengesData";
 import clsx from "clsx";
 
 export default function DatabaseManager() {
@@ -52,6 +57,14 @@ export default function DatabaseManager() {
       action: addBadgeTemplatesToFirestore,
     },
     {
+      id: "add-assigned-challenges",
+      title: "Dodaj Globalne Wyzwania",
+      description: `Dodaje ${Object.keys(assignedChallengesData || {}).length} wspólnych wyzwań dla wszystkich klas`,
+      icon: Upload,
+      color: "bg-orange-500 hover:bg-orange-600",
+      action: addAssignedChallengesToFirestore,
+    },
+    {
       id: "clear-eco-actions",
       title: "Usuń EkoDziałania",
       description: "Usuwa wszystkie EkoDziałania z bazy",
@@ -76,6 +89,15 @@ export default function DatabaseManager() {
       icon: Trash2,
       color: "bg-red-500 hover:bg-red-600",
       action: clearBadgeTemplates,
+      dangerous: true,
+    },
+    {
+      id: "clear-assigned-challenges",
+      title: "Usuń Globalne Wyzwania",
+      description: "Usuwa wszystkie wspólne wyzwania",
+      icon: Trash2,
+      color: "bg-red-500 hover:bg-red-600",
+      action: clearAssignedChallenges,
       dangerous: true,
     },
   ];
@@ -214,7 +236,7 @@ export default function DatabaseManager() {
         </div>
       )}
       {/* Data Preview */}
-      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
           <h4 className="mb-2 font-medium text-green-800 dark:text-green-200">
             EkoDziłania
@@ -239,6 +261,15 @@ export default function DatabaseManager() {
           </h4>
           <p className="text-sm text-purple-600 dark:text-purple-400">
             {Object.keys(badgeTemplatesData || {}).length} szablonów
+          </p>
+        </div>
+
+        <div className="rounded-lg bg-orange-50 p-4 dark:bg-orange-900/20">
+          <h4 className="mb-2 font-medium text-orange-800 dark:text-orange-200">
+            Globalne Wyzwania
+          </h4>
+          <p className="text-sm text-orange-600 dark:text-orange-400">
+            {Object.keys(assignedChallengesData || {}).length} wspólnych wyzwań
           </p>
         </div>
       </div>

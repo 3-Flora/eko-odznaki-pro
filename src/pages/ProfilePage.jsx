@@ -244,7 +244,7 @@ export default function ProfilePage() {
         </button>
       </div>
       {/* Badges Section */}
-      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+      <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">
             Ostatnie odznaki

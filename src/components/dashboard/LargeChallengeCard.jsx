@@ -1,11 +1,16 @@
 import { CalendarClockIcon } from "lucide-react";
 
 function LargeChallengeCard({ data }) {
-  if (!data) return null;
-  /* 
-  Jeśli nie ma żadnego EkoWyzwania,
-  nie wyświetlaj karty
-  */
+  if (!data) {
+    return (
+      <div className="rounded-3xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900 dark:text-white">
+        <h4 className="text-2xl font-bold">Brak aktywnego EkoWyzwania</h4>
+        <p className="mt-2 text-sm text-blue-100 dark:text-blue-200">
+          Obecnie nie ma żadnego aktywnego EkoWyzwania. Sprawdź później!
+        </p>
+      </div>
+    );
+  }
 
   const end = new Date(data.endDate.seconds * 1000);
   const now = new Date();

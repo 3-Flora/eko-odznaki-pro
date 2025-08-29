@@ -7,6 +7,7 @@ import ToastContainer from "./components/ui/ToastContainer";
 import {
   ActivityPage,
   SubmitEcoActionPage,
+  SubmitChallengePage,
   AuthPage,
   BadgesPage,
   ChallengesPage,
@@ -40,6 +41,10 @@ export default function App() {
               <Route index element={<DashboardPage />} />
               <Route path="submit" element={<ActivityPage />} />
               <Route path="submit/action" element={<SubmitEcoActionPage />} />
+              <Route
+                path="submit/challenge"
+                element={<SubmitChallengePage />}
+              />
               <Route path="ranking" element={<RankingPage />} />
               <Route path="challenges" element={<ChallengesPage />} />
               <Route path="profile" element={<ProfilePage />} />
