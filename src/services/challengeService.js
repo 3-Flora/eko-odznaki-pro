@@ -9,18 +9,12 @@ import {
 import { db } from "./firebase";
 
 /**
- * Pobiera przypisane wyzwania dla konkretnej klasy
+ * Pobiera wszystkie przypisane wyzwania (teraz wszystkie klasy mają takie same wyzwania)
  */
-export const getAssignedChallenges = async (classId) => {
+export const getAssignedChallenges = async () => {
   try {
-    if (!classId) {
-      console.warn("No classId provided to getAssignedChallenges");
-      return [];
-    }
-
     const assignedChallengesRef = collection(db, "assignedChallenges");
-    const q = query(assignedChallengesRef, where("classId", "==", classId));
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(assignedChallengesRef);
 
     const assignedChallenges = [];
     for (const docSnapshot of snapshot.docs) {
@@ -69,10 +63,11 @@ export const getAssignedChallenges = async (classId) => {
 
 /**
  * Pobiera aktywne wyzwania (między startDate a endDate)
+ * Wszystkie klasy mają teraz takie same aktywne wyzwania
  */
-export const getActiveChallenges = async (classId) => {
+export const getActiveChallenges = async () => {
   try {
-    const allChallenges = await getAssignedChallenges(classId);
+    const allChallenges = await getAssignedChallenges();
     const now = new Date();
 
     return allChallenges.filter((challenge) => {

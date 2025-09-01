@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { getEcoActions } from "../services/ecoActionService";
+import { getAssignedChallenges } from "../services/challengeService";
 import {
   CheckCircle,
   XCircle,
@@ -36,16 +37,21 @@ export default function TeacherSubmissionsPage() {
   const [searchParams] = useSearchParams();
 
   const [submissions, setSubmissions] = useState([]);
+  const [challengeSubmissions, setChallengeSubmissions] = useState([]);
   const [ecoActions, setEcoActions] = useState([]);
+  const [assignedChallenges, setAssignedChallenges] = useState([]);
   const [className, setClassName] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState("pending"); // Paginacja
+  const [selectedTab, setSelectedTab] = useState("pending");
+  const [selectedType, setSelectedType] = useState("actions"); // "actions" lub "challenges" // Paginacja
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   // Sprawdź czy filtrujemy po konkretnym uczniu
   const filterByStudent = searchParams.get("student");
+
+  console.log(submissions);
 
   // Załaduj zgłoszenia EkoDziałań
   useEffect(() => {
@@ -57,6 +63,10 @@ export default function TeacherSubmissionsPage() {
         // Pobierz dane EkoDziałań
         const ecoActionsData = await getEcoActions();
         setEcoActions(ecoActionsData);
+
+        // Pobierz dane EkoWyzwań
+        const challengesData = await getAssignedChallenges();
+        setAssignedChallenges(challengesData);
 
         // Pobierz informacje o klasie
         const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
@@ -98,9 +108,41 @@ export default function TeacherSubmissionsPage() {
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
+          reviewedAt: doc.data().reviewedAt?.toDate() || null,
         }));
 
         setSubmissions(submissionsData);
+
+        // Pobierz zgłoszenia EkoWyzwań z tej klasy
+        let challengeSubmissionsQuery = query(
+          collection(db, "challengeSubmissions"),
+          where("classId", "==", currentUser.classId),
+          orderBy("createdAt", "desc"),
+          limit(100),
+        );
+
+        // Jeśli filtrujemy po konkretnym uczniu
+        if (filterByStudent) {
+          challengeSubmissionsQuery = query(
+            collection(db, "challengeSubmissions"),
+            where("studentId", "==", filterByStudent),
+            orderBy("createdAt", "desc"),
+            limit(100),
+          );
+        }
+
+        const challengeSubmissionsSnapshot = await getDocs(
+          challengeSubmissionsQuery,
+        );
+        const challengeSubmissionsData = challengeSubmissionsSnapshot.docs.map(
+          (doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate() || new Date(),
+          }),
+        );
+
+        setChallengeSubmissions(challengeSubmissionsData);
       } catch (error) {
         console.error("Error loading submissions:", error);
         showError("Błąd podczas ładowania zgłoszeń");
@@ -115,6 +157,11 @@ export default function TeacherSubmissionsPage() {
   // Znajdź EkoDziałanie po ID
   const getEcoActionById = (ecoActionId) => {
     return ecoActions.find((action) => action.id === ecoActionId);
+  };
+
+  // Znajdź EkoWyzwanie po ID
+  const getChallengeById = (challengeId) => {
+    return assignedChallenges.find((challenge) => challenge.id === challengeId);
   };
 
   const getStatusInfo = (status) => {
@@ -144,6 +191,7 @@ export default function TeacherSubmissionsPage() {
   };
 
   const formatDate = (date) => {
+    console.log(date);
     return new Intl.DateTimeFormat("pl", {
       year: "numeric",
       month: "short",
@@ -153,7 +201,11 @@ export default function TeacherSubmissionsPage() {
     }).format(date);
   };
 
-  const filteredSubmissions = submissions.filter((submission) => {
+  const getCurrentSubmissions = () => {
+    return selectedType === "actions" ? submissions : challengeSubmissions;
+  };
+
+  const filteredSubmissions = getCurrentSubmissions().filter((submission) => {
     if (selectedTab === "pending")
       return !submission.status || submission.status === "pending";
     if (selectedTab === "approved") return submission.status === "approved";
@@ -167,18 +219,19 @@ export default function TeacherSubmissionsPage() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedSubmissions = filteredSubmissions.slice(startIndex, endIndex);
 
-  // Reset paginacji przy zmianie taba
+  // Reset paginacji przy zmianie taba lub typu
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTab]);
+  }, [selectedTab, selectedType]);
 
-  const pendingCount = submissions.filter(
+  const currentSubmissions = getCurrentSubmissions();
+  const pendingCount = currentSubmissions.filter(
     (s) => !s.status || s.status === "pending",
   ).length;
-  const approvedCount = submissions.filter(
+  const approvedCount = currentSubmissions.filter(
     (s) => s.status === "approved",
   ).length;
-  const rejectedCount = submissions.filter(
+  const rejectedCount = currentSubmissions.filter(
     (s) => s.status === "rejected",
   ).length;
 
@@ -194,9 +247,33 @@ export default function TeacherSubmissionsPage() {
     <>
       <PageHeader
         emoji="✅"
-        title={filterByStudent ? "Zgłoszenia ucznia" : "Weryfikacja EkoDziałań"}
+        title={filterByStudent ? "Zgłoszenia ucznia" : "Weryfikacja zgłoszeń"}
         subtitle={`${className} • ${schoolName}`}
       />
+
+      {/* Selector typu zgłoszeń */}
+      <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
+        <div className="flex">
+          {[
+            { id: "actions", label: "EkoDziałania", icon: "🌱" },
+            { id: "challenges", label: "EkoWyzwania", icon: "🏆" },
+          ].map(({ id, label, icon }) => (
+            <button
+              key={id}
+              onClick={() => setSelectedType(id)}
+              className={clsx(
+                "flex flex-1 items-center justify-center rounded-lg px-4 py-3 transition-all duration-200",
+                selectedType === id
+                  ? "bg-blue-500 text-white shadow-lg dark:bg-blue-700"
+                  : "text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
+              )}
+            >
+              <span className="mr-2">{icon}</span>
+              <span className="text-sm font-medium">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Tabs */}
       <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
@@ -210,7 +287,7 @@ export default function TeacherSubmissionsPage() {
               key={id}
               onClick={() => setSelectedTab(id)}
               className={clsx(
-                "flex flex-1 items-center justify-center rounded-lg px-4 py-3 transition-all duration-200",
+                "flex flex-1 items-center justify-center rounded-lg px-2 py-1 transition-all duration-200",
                 selectedTab === id
                   ? "bg-green-500 text-white shadow-lg dark:bg-green-700"
                   : "text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400",
@@ -231,8 +308,8 @@ export default function TeacherSubmissionsPage() {
             <Clock className="mx-auto mb-3 h-12 w-12 text-gray-400" />
             <p className="text-gray-600 dark:text-gray-400">
               {selectedTab === "pending"
-                ? "Brak nowych zgłoszeń do weryfikacji"
-                : `Brak ${selectedTab === "approved" ? "zatwierdzonych" : "odrzuconych"} zgłoszeń`}
+                ? `Brak nowych ${selectedType === "actions" ? "EkoDziałań" : "EkoWyzwań"} do weryfikacji`
+                : `Brak ${selectedTab === "approved" ? "zatwierdzonych" : "odrzuconych"} ${selectedType === "actions" ? "EkoDziałań" : "EkoWyzwań"}`}
             </p>
           </div>
         ) : (
@@ -244,7 +321,7 @@ export default function TeacherSubmissionsPage() {
               return (
                 <div
                   key={submission.id}
-                  className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800"
+                  className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800"
                 >
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -264,7 +341,7 @@ export default function TeacherSubmissionsPage() {
 
                     <div
                       className={clsx(
-                        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm",
+                        "inline-flex items-center gap-1 rounded-full p-2 text-sm",
                         statusInfo.bgColor,
                         statusInfo.color,
                       )}
@@ -273,69 +350,101 @@ export default function TeacherSubmissionsPage() {
                       {/* {statusInfo.text} */}
                     </div>
                   </div>
-
-                  {/* Szczegóły EkoDziałania */}
+                  {/* Szczegóły EkoDziałania lub EkoWyzwania */}
                   <div className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
                     <h4 className="mb-2 font-medium text-gray-800 dark:text-white">
-                      EkoDziałanie
+                      {selectedType === "actions"
+                        ? "EkoDziałanie"
+                        : "EkoWyzwanie"}
                     </h4>
-                    {(() => {
-                      const ecoAction = getEcoActionById(
-                        submission.ecoActionId,
-                      );
-                      if (ecoAction) {
-                        return (
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="flex h-10 w-10 items-center justify-center rounded-full text-white"
-                              style={{ backgroundColor: ecoAction.style.color }}
-                            >
-                              <span className="text-lg">
-                                {ecoAction.style.icon}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-800 dark:text-white">
-                                {ecoAction.name}
-                              </p>
+                    {selectedType === "actions"
+                      ? (() => {
+                          const ecoAction = getEcoActionById(
+                            submission.ecoActionId,
+                          );
+                          if (ecoAction) {
+                            return (
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="flex h-10 w-10 items-center justify-center rounded-full text-white"
+                                  style={{
+                                    backgroundColor: ecoAction.style.color,
+                                  }}
+                                >
+                                  <span className="text-lg">
+                                    {ecoAction.style.icon}
+                                  </span>
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-800 dark:text-white">
+                                    {ecoAction.name}
+                                  </p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    {ecoAction.category}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          } else {
+                            return (
                               <p className="text-sm text-gray-600 dark:text-gray-300">
-                                {ecoAction.category}
+                                ID: {submission.ecoActionId}
                               </p>
-                            </div>
-                          </div>
-                        );
-                      } else {
-                        return (
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            ID: {submission.ecoActionId}
-                          </p>
-                        );
-                      }
-                    })()}
+                            );
+                          }
+                        })()
+                      : (() => {
+                          const challenge = getChallengeById(
+                            submission.assignedChallengeId,
+                          );
+                          if (challenge) {
+                            return (
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white">
+                                  <span className="text-lg">🏆</span>
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-800 dark:text-white">
+                                    {challenge.challengeName || challenge.name}
+                                  </p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    {challenge.category || "EkoWyzwanie"}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
+                                ID: {submission.assignedChallengeId}
+                              </p>
+                            );
+                          }
+                        })()}
                   </div>
-
                   {/* Komentarz ucznia */}
                   {submission.comment && (
                     <div className="mb-4">
                       <div className="mb-2 flex items-center gap-2">
                         <MessageSquare className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
                           Komentarz ucznia:
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {submission.comment}
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {submission.comment.length > 256
+                          ? submission.comment.slice(0, 256) + "..."
+                          : submission.comment}
                       </p>
                     </div>
                   )}
-
                   {/* Zdjęcia */}
                   {submission.photoUrls && submission.photoUrls.length > 0 && (
                     <div className="mb-4">
                       <div className="mb-2 flex items-center gap-2">
                         <ImageIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Zdjęcia ({submission.photoUrls.length}):
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          Zdjęcia:
                         </span>
                       </div>
                       <div className="flex gap-2">
@@ -351,19 +460,17 @@ export default function TeacherSubmissionsPage() {
                       </div>
                     </div>
                   )}
-
                   {/* Przycisk do szczegółów */}
-                  <div className="pt-2">
+                  <div className="">
                     <Button
                       onClick={() =>
                         navigate(`/teacher/submission/${submission.id}`)
                       }
                       className="w-full rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600"
                     >
-                      Zobacz szczegóły i weryfikuj
+                      Zobacz szczegóły
                     </Button>
                   </div>
-
                   {/* Info o recenzji */}
                   {submission.reviewedAt && (
                     <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">

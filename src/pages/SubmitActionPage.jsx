@@ -18,10 +18,15 @@ import { useToast } from "../contexts/ToastContext";
 
 export default function SubmitEcoActionPage() {
   const { showError, showSuccess } = useToast();
-  const { submitEcoAction } = useAuth();
+  const { submitEcoAction, submitChallengeSubmission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const selectedAction = location.state?.action;
+  const selectedChallenge = location.state?.challenge;
+
+  // Ustal czy to jest EkoDziałanie czy EkoWyzwanie
+  const isChallenge = !!selectedChallenge;
+  const selectedItem = selectedChallenge || selectedAction;
 
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]); // Array zamiast pojedynczego photo
@@ -33,8 +38,8 @@ export default function SubmitEcoActionPage() {
 
   const MAX_PHOTOS = 4;
 
-  // Redirect if no action selected
-  if (!selectedAction) {
+  // Redirect if no action or challenge selected
+  if (!selectedItem) {
     navigate("/submit");
     return null;
   }
@@ -151,16 +156,24 @@ export default function SubmitEcoActionPage() {
         setUploadStatus(null);
       }
 
-      // Wyślij EkoDziałanie z URL'ami zdjęć
-      await submitEcoAction(selectedAction, {
-        photoUrls,
-        comment,
-      });
-
-      // Pokaż toast sukcesu i przekieruj
-      showSuccess(
-        "🎉 EkoDziałanie zostało wysłane! Oczekuje na zatwierdzenie przez nauczyciela.",
-      );
+      // Wyślij odpowiednie zgłoszenie w zależności od typu
+      if (isChallenge) {
+        await submitChallengeSubmission(selectedChallenge, {
+          photoUrls,
+          comment,
+        });
+        showSuccess(
+          "🎉 EkoWyzwanie zostało wysłane! Oczekuje na zatwierdzenie przez nauczyciela.",
+        );
+      } else {
+        await submitEcoAction(selectedAction, {
+          photoUrls,
+          comment,
+        });
+        showSuccess(
+          "🎉 EkoDziałanie zostało wysłane! Oczekuje na zatwierdzenie przez nauczyciela.",
+        );
+      }
 
       // Natychmiastowe przekierowanie
       navigate("/submit");
@@ -168,7 +181,7 @@ export default function SubmitEcoActionPage() {
       console.error("Error submitting eco action:", err);
       showError(
         err.message ||
-          "Wystąpił błąd podczas wysyłania EkoDziałania. Spróbuj ponownie.",
+          `Wystąpił błąd podczas wysyłania ${isChallenge ? "EkoWyzwania" : "EkoDziałania"}. Spróbuj ponownie.`,
       );
     } finally {
       setLoading(false);
@@ -181,36 +194,40 @@ export default function SubmitEcoActionPage() {
     <div>
       <div className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Selected Action Card */}
+          {/* Selected Action/Challenge Card */}
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div className="mb-4 flex items-center justify-center">
               <div
                 className={clsx(
                   "flex h-20 w-20 items-center justify-center rounded-2xl text-4xl",
-                  backgroundStyles[selectedAction.style?.color || "default"],
+                  isChallenge
+                    ? "bg-gradient-to-br from-green-400 to-green-600 text-white"
+                    : backgroundStyles[selectedItem.style?.color || "default"],
                 )}
               >
-                {selectedAction.style?.icon || "!!!"}
+                {isChallenge ? "🏆" : selectedItem.style?.icon || "!!!"}
               </div>
             </div>
 
             <div className="mb-4 text-center">
               <h3 className="mb-1 text-xl font-bold text-gray-800 dark:text-white">
-                {selectedAction.name}
+                {selectedItem.name || selectedItem.title}
               </h3>
               <span
                 className={clsx(
                   "inline-block rounded-full px-3 py-1 font-medium",
-                  backgroundStyles[selectedAction.style?.color || "default"],
+                  isChallenge
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                    : backgroundStyles[selectedItem.style?.color || "default"],
                 )}
               >
-                {selectedAction.category}
+                {isChallenge ? "EkoWyzwanie" : selectedItem.category}
               </span>
             </div>
 
             <div className="rounded-xl">
               <p className="text-center text-gray-600 dark:text-gray-400">
-                {selectedAction.description}
+                {selectedItem.description}
               </p>
             </div>
           </div>
@@ -218,12 +235,18 @@ export default function SubmitEcoActionPage() {
           {/* Comment Section */}
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <label className="mb-2 block font-medium text-gray-700 dark:text-gray-300">
-              Opisz jak wykonałeś to działanie
+              {isChallenge
+                ? "Opisz jak wykonałeś to wyzwanie"
+                : "Opisz jak wykonałeś to działanie"}
             </label>
             <TextareaAutosize
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Opisz szczegóły wykonania tego EkoDziałania..."
+              placeholder={
+                isChallenge
+                  ? "Opisz szczegóły wykonania tego EkoWyzwania..."
+                  : "Opisz szczegóły wykonania tego EkoDziałania..."
+              }
               minRows={4}
               className="w-full resize-none rounded-xl border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
@@ -334,7 +357,7 @@ export default function SubmitEcoActionPage() {
             ) : (
               <>
                 <Upload className="h-5 w-5" />
-                Wyślij działanie
+                {isChallenge ? "Wyślij wyzwanie" : "Wyślij działanie"}
               </>
             )}
           </button>

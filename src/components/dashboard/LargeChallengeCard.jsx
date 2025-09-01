@@ -1,6 +1,8 @@
 import { CalendarClockIcon } from "lucide-react";
+import { useNavigate } from "react-router";
 
 function LargeChallengeCard({ data }) {
+  const navigate = useNavigate();
   if (!data) {
     return (
       <div className="rounded-3xl bg-gradient-to-r from-blue-400 to-cyan-500 p-6 text-white dark:from-blue-800 dark:to-cyan-900 dark:text-white">
@@ -11,6 +13,20 @@ function LargeChallengeCard({ data }) {
       </div>
     );
   }
+
+  const handleSubmitChallenge = () => {
+    navigate("/submit/action", {
+      state: {
+        challenge: {
+          id: data.challengeId,
+          title: data.challengeName,
+          description: data.challengeDescription,
+          endDate: data.endDate,
+          icon: "🎯", // Domyślna ikona, można to rozszerzyć w przyszłości
+        },
+      },
+    });
+  };
 
   const end = new Date(data.endDate.seconds * 1000);
   const now = new Date();
@@ -61,7 +77,7 @@ function LargeChallengeCard({ data }) {
 
       <div className="mt-4 flex justify-end">
         <button
-          onClick={() => console.log("DO IT")}
+          onClick={handleSubmitChallenge}
           className="rounded-full bg-white/20 px-4 py-2 font-semibold hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
         >
           Wykonaj działanie

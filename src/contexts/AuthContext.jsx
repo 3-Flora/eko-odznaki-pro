@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
       ecoActionId: ecoAction.id,
       category: ecoAction.category, // Ważne dla Cloud Function liczącej punkty
       createdAt: serverTimestamp(),
-      status: "approved",
+      status: "pending",
       photoUrls: optionalData.photoUrls || [], // Zmiana z photoUrl na photoUrls (array)
       comment: optionalData.comment || "",
     };
@@ -116,11 +116,12 @@ export const AuthProvider = ({ children }) => {
 
     const submissionData = {
       studentId: currentUser.id,
+      studentName: currentUser.displayName,
       assignedChallengeId: assignedChallenge.id,
       classId: currentUser.classId,
       createdAt: serverTimestamp(),
-      status: "approved",
-      photoUrls: optionalData.photoUrls || [], // Zmiana z photoUrl na photoUrls (array)
+      status: "pending",
+      photoUrls: optionalData.photoUrls || [],
       comment: optionalData.comment || "",
     };
 

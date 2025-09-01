@@ -6,8 +6,7 @@ import { ToastProvider } from "./contexts/ToastContext";
 import ToastContainer from "./components/ui/ToastContainer";
 import {
   ActivityPage,
-  SubmitEcoActionPage,
-  SubmitChallengePage,
+  SubmitActionPage,
   AuthPage,
   BadgesPage,
   ChallengesPage,
@@ -54,9 +53,12 @@ export default function App() {
                 element={<ProtectedRoute allowedRoles={["student"]} />}
               >
                 <Route index element={<ActivityPage />} />
-                <Route path="action" element={<SubmitEcoActionPage />} />
-                <Route path="challenge" element={<SubmitChallengePage />} />
+                <Route path="action" element={<SubmitActionPage />} />
               </Route>
+
+              {/* General Routes for all users */}
+              <Route path="challenges" element={<ChallengesPage />} />
+              <Route path="ranking" element={<RankingPage />} />
 
               {/* Routes for teachers */}
               <Route

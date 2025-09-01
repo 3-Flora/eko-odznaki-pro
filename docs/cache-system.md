@@ -28,7 +28,7 @@ import cacheService, {
 
 **Funkcje pomocnicze:**
 
-- `getAssignedChallenges(classId)` - pobiera aktywne wyzwania dla klasy
+- `getAssignedChallenges()` - pobiera wszystkie aktywne wyzwania (wszystkie klasy mają takie same)
 - `getEcoActionsForDashboard()` - pobiera 3 EkoDziałania na dashboard
 - `getAllEcoActions()` - pobiera wszystkie EkoDziałania
 - `getActivityFeed(classId)` - pobiera feed aktywności

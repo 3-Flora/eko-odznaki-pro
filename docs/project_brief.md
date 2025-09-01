@@ -278,7 +278,7 @@ challengeSubmissions/{submissionId}/
   - assignedChallengeId: "assignmentId_123" // Link do przypisanego wyzwania
   - classId: "klasa_4a_uid"
   - createdAt: Timestamp
-  - status: "approved" | "rejected"
+  - status: "approved" | "rejected" | "pending"
 
 // Główna kolekcja przechowująca feedy wszystkich klas
 activityFeeds/{classId}/

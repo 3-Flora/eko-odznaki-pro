@@ -34,7 +34,7 @@ export default function QuickActionsCard({ data }) {
     <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
       <div className="mb-4 flex items-center gap-2">
         <Award className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Szybkie akcje
         </h3>
       </div>

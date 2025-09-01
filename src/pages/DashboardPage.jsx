@@ -284,7 +284,7 @@ export default function DashboardPage() {
         <h2 className="mb-2 text-2xl font-bold">
           Cześć, {user.displayName.split(" ")[0]}! 👋
         </h2>
-        <p className="text-sm text-white/90">
+        <p className="text-white/90">
           {isTeacher
             ? "Witaj w panelu nauczyciela — tutaj zobaczysz statystyki klasy, zgłoszenia do weryfikacji i szybkie akcje."
             : "Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie działania i swój postęp."}

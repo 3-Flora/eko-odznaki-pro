@@ -21,7 +21,7 @@ export default function PendingVerificationCard({ data }) {
     <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
       <div className="mb-4 flex items-center gap-2">
         <Clock className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Oczekują weryfikacji
         </h3>
       </div>
@@ -29,7 +29,9 @@ export default function PendingVerificationCard({ data }) {
       <div className="space-y-3">
         {/* EkoDziałania do weryfikacji */}
         <div
-          onClick={handleNavigateToSubmissions}
+          onClick={
+            pendingSubmissions > 0 ? handleNavigateToSubmissions : undefined
+          }
           className={clsx(
             "cursor-pointer rounded-xl p-4 transition-all duration-200",
             pendingSubmissions > 0
@@ -73,7 +75,7 @@ export default function PendingVerificationCard({ data }) {
 
         {/* Uczniowie do weryfikacji */}
         <div
-          onClick={handleNavigateToStudents}
+          onClick={pendingStudents > 0 ? handleNavigateToStudents : undefined}
           className={clsx(
             "cursor-pointer rounded-xl p-4 transition-all duration-200",
             pendingStudents > 0
@@ -116,14 +118,14 @@ export default function PendingVerificationCard({ data }) {
         </div>
       </div>
 
-      {pendingSubmissions === 0 && pendingStudents === 0 && (
+      {/* {pendingSubmissions === 0 && pendingStudents === 0 && (
         <div className="mt-4 text-center">
           <div className="text-4xl">✅</div>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Wszystko na bieżąco!
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
