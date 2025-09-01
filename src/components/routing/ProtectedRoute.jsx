@@ -13,7 +13,6 @@ export default function ProtectedRoute({ allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(currentUser?.role)) {
-    console.log("ZAKAZ");
     return <Navigate to="/" replace />;
   }
 

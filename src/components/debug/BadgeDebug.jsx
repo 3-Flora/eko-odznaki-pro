@@ -69,7 +69,6 @@ export default function BadgeDebug() {
         badgeTemplates,
       );
 
-      console.log("🧪 Postęp odznak:", progress);
       setMessage(
         `✅ Obliczono postęp dla ${progress.length} odznak. Sprawdź konsolę.`,
       );

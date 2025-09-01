@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { getEcoActions } from "../services/ecoActionService";
+import { getAssignedChallenges } from "../services/challengeService";
 import {
   CheckCircle,
   XCircle,
@@ -13,7 +14,6 @@ import {
   MessageSquare,
   Calendar,
   User,
-  ArrowLeft,
 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
@@ -27,6 +27,7 @@ export default function SubmissionDetailPage() {
 
   const [submission, setSubmission] = useState(null);
   const [ecoAction, setEcoAction] = useState(null);
+  const [challenge, setChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
@@ -40,8 +41,11 @@ export default function SubmissionDetailPage() {
       try {
         setLoading(true);
 
-        // Pobierz dane EkoDziałań
-        const ecoActionsData = await getEcoActions();
+        // Pobierz dane EkoDziałań i EkoWyzwań
+        const [ecoActionsData, challengesData] = await Promise.all([
+          getEcoActions(),
+          getAssignedChallenges(),
+        ]);
 
         // Pobierz szczegóły zgłoszenia
         const submissionDoc = await getDoc(
@@ -62,11 +66,20 @@ export default function SubmissionDetailPage() {
 
         setSubmission(submissionData);
 
-        // Znajdź odpowiednie EkoDziałanie
-        const foundEcoAction = ecoActionsData.find(
-          (action) => action.id === submissionData.ecoActionId,
-        );
-        setEcoAction(foundEcoAction);
+        // Sprawdź czy to zgłoszenie EkoDziałania czy EkoWyzwania
+        if (submissionData.ecoActionId) {
+          // Znajdź odpowiednie EkoDziałanie
+          const foundEcoAction = ecoActionsData.find(
+            (action) => action.id === submissionData.ecoActionId,
+          );
+          setEcoAction(foundEcoAction);
+        } else if (submissionData.assignedChallengeId) {
+          // Znajdź odpowiednie EkoWyzwanie
+          const foundChallenge = challengesData.find(
+            (challenge) => challenge.id === submissionData.assignedChallengeId,
+          );
+          setChallenge(foundChallenge);
+        }
       } catch (error) {
         console.error("Error loading submission details:", error);
         showError("Błąd podczas ładowania szczegółów zgłoszenia");
@@ -112,7 +125,9 @@ export default function SubmissionDetailPage() {
         rejectionReason: rejectionReason,
       }));
 
-      showSuccess("EkoDziałanie zostało odrzucone");
+      showSuccess(
+        `${submission?.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
+      );
 
       // Resetuj modal
       setShowRejectModal(false);
@@ -151,8 +166,8 @@ export default function SubmissionDetailPage() {
 
       showSuccess(
         status === "approved"
-          ? "EkoDziałanie zostało zatwierdzone"
-          : "EkoDziałanie zostało odrzucone",
+          ? `${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
+          : `${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
       );
     } catch (error) {
       console.error("Error updating submission:", error);
@@ -227,9 +242,9 @@ export default function SubmissionDetailPage() {
   return (
     <>
       <PageHeader
-        emoji="📄"
+        emoji={submission?.ecoActionId ? "📄" : "🏆"}
         title="Szczegóły zgłoszenia"
-        subtitle="Weryfikacja EkoDziałania"
+        subtitle={`Weryfikacja ${submission?.ecoActionId ? "EkoDziałania" : "EkoWyzwania"}`}
         showBackButton
       />
 
@@ -280,12 +295,14 @@ export default function SubmissionDetailPage() {
           </div>
         </div>
 
-        {/* Szczegóły EkoDziałania */}
+        {/* Szczegóły EkoDziałania lub EkoWyzwania */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-            EkoDziałanie
+            {submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}
           </h3>
-          {ecoAction ? (
+
+          {/* Wyświetl EkoDziałanie */}
+          {submission.ecoActionId && ecoAction ? (
             <div className="flex items-center gap-4">
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-full text-white"
@@ -305,13 +322,57 @@ export default function SubmissionDetailPage() {
                 </p>
               </div>
             </div>
-          ) : (
+          ) : submission.ecoActionId ? (
             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
               <p className="text-gray-600 dark:text-gray-300">
                 ID EkoDziałania: {submission.ecoActionId}
               </p>
             </div>
-          )}
+          ) : null}
+
+          {/* Wyświetl EkoWyzwanie */}
+          {submission.assignedChallengeId && challenge ? (
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white">
+                <span className="text-2xl">🏆</span>
+              </div>
+              <div>
+                <h4 className="text-xl font-semibold text-gray-800 dark:text-white">
+                  {challenge.challengeName || challenge.name}
+                </h4>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Kategoria: {challenge.category || "EkoWyzwanie"}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {challenge.challengeDescription || challenge.description}
+                </p>
+                {challenge.startDate && challenge.endDate && (
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <p>
+                      Okres:{" "}
+                      {formatDate(
+                        challenge.startDate.toDate
+                          ? challenge.startDate.toDate()
+                          : new Date(challenge.startDate),
+                      )}{" "}
+                      -{" "}
+                      {formatDate(
+                        challenge.endDate.toDate
+                          ? challenge.endDate.toDate()
+                          : new Date(challenge.endDate),
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : submission.assignedChallengeId ? (
+            <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
+              <p className="text-gray-600 dark:text-gray-300">
+                ID EkoWyzwania: {submission.assignedChallengeId}
+              </p>
+            </div>
+          ) : null}
         </div>
 
         {/* Komentarz ucznia */}
@@ -377,7 +438,9 @@ export default function SubmissionDetailPage() {
                 disabled={updating}
                 className="flex-1 rounded-lg bg-green-500 py-3 text-white hover:bg-green-600 disabled:opacity-50"
               >
-                {updating ? "Przetwarzanie..." : "Zatwierdź zgłoszenie"}
+                {updating
+                  ? "Przetwarzanie..."
+                  : `Zatwierdź ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}`}
               </Button>
             )}
 
@@ -388,7 +451,9 @@ export default function SubmissionDetailPage() {
                 disabled={updating}
                 className="flex-1 rounded-lg bg-red-500 py-3 text-white hover:bg-red-600 disabled:opacity-50"
               >
-                {updating ? "Przetwarzanie..." : "Odrzuć zgłoszenie"}
+                {updating
+                  ? "Przetwarzanie..."
+                  : `Odrzuć ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}`}
               </Button>
             )}
 
@@ -398,8 +463,8 @@ export default function SubmissionDetailPage() {
               <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-700">
                 <span className="text-center text-gray-600 dark:text-gray-300">
                   {submission.status === "approved"
-                    ? "✓ Zgłoszenie zostało zatwierdzone"
-                    : "✗ Zgłoszenie zostało odrzucone"}
+                    ? `✓ ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
+                    : `✗ ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`}
                 </span>
               </div>
             )}
@@ -412,7 +477,7 @@ export default function SubmissionDetailPage() {
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Odrzuć EkoDziałanie
+              Odrzuć {submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}
             </h3>
 
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">

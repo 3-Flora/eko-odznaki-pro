@@ -51,8 +51,6 @@ export default function TeacherSubmissionsPage() {
   // Sprawdź czy filtrujemy po konkretnym uczniu
   const filterByStudent = searchParams.get("student");
 
-  console.log(submissions);
-
   // Załaduj zgłoszenia EkoDziałań
   useEffect(() => {
     if (!currentUser?.classId) return;
@@ -191,7 +189,6 @@ export default function TeacherSubmissionsPage() {
   };
 
   const formatDate = (date) => {
-    console.log(date);
     return new Intl.DateTimeFormat("pl", {
       year: "numeric",
       month: "short",

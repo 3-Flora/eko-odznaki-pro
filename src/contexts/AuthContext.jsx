@@ -141,6 +141,54 @@ export const AuthProvider = ({ children }) => {
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   };
 
+  const getUserChallengeSubmissions = async () => {
+    if (!currentUser) return [];
+
+    const submissionsQuery = query(
+      collection(db, "challengeSubmissions"),
+      where("studentId", "==", currentUser.id),
+      orderBy("createdAt", "desc"),
+    );
+
+    const querySnapshot = await getDocs(submissionsQuery);
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  };
+
+  const getChallengeSubmissionStatus = async (challengeId) => {
+    if (!currentUser) return null;
+
+    const submissionsQuery = query(
+      collection(db, "challengeSubmissions"),
+      where("studentId", "==", currentUser.id),
+      where("assignedChallengeId", "==", challengeId),
+    );
+
+    const querySnapshot = await getDocs(submissionsQuery);
+
+    if (querySnapshot.empty) {
+      return null; // Brak zgłoszenia
+    }
+
+    // Znajdź najnowsze zgłoszenie dla tego wyzwania
+    const submissions = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Sortuj po dacie utworzenia (najnowsze najpierw)
+    submissions.sort((a, b) => {
+      const dateA = a.createdAt?.toDate
+        ? a.createdAt.toDate()
+        : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate
+        ? b.createdAt.toDate()
+        : new Date(b.createdAt);
+      return dateB - dateA;
+    });
+
+    return submissions[0]; // Zwróć najnowsze zgłoszenie
+  };
+
   const register = async (email, password, userData) => {
     const { user } = await createUserWithEmailAndPassword(
       auth,
@@ -290,6 +338,8 @@ export const AuthProvider = ({ children }) => {
     submitEcoAction,
     submitChallengeSubmission,
     getUserEcoActionSubmissions,
+    getUserChallengeSubmissions,
+    getChallengeSubmissionStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

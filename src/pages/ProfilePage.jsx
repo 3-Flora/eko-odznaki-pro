@@ -166,8 +166,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* <VerificationStatus currentUser={currentUser} /> */}
-
         <div className="mb-2 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <School className="mr-1 h-6 w-6" />
@@ -201,103 +199,109 @@ export default function ProfilePage() {
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        {stats.map((stat, index) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
-          >
-            <stat.icon className={clsx("mx-auto mb-2 h-8 w-8", stat.color)} />
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">
-              {stat.value}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {stat.label}
-            </p>
+      {currentUser.role === "teacher" ? null : (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            {stats.map((stat, index) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
+              >
+                <stat.icon
+                  className={clsx("mx-auto mb-2 h-8 w-8", stat.color)}
+                />
+                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
-        <button
-          onClick={() => navigate("/profile/submissions")}
-          className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
-        >
-          <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
-            <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => navigate("/profile/submissions")}
+              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
+                <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-left font-semibold text-gray-800 dark:text-white">
+                Moje zgłoszenia
+              </p>
+            </button>
+            {/*  */}
+            <button
+              onClick={() => navigate("/profile/badges")}
+              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div className="rounded-full bg-green-100 p-2 dark:bg-green-700">
+                <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <p className="text-left font-semibold text-gray-800 dark:text-white">
+                Moje Odznaki
+              </p>
+            </button>
           </div>
-          <p className="text-left font-semibold text-gray-800 dark:text-white">
-            Moje zgłoszenia
-          </p>
-        </button>
-        {/*  */}
-        <button
-          onClick={() => navigate("/profile/badges")}
-          className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
-        >
-          <div className="rounded-full bg-green-100 p-2 dark:bg-green-700">
-            <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
-          </div>
-          <p className="text-left font-semibold text-gray-800 dark:text-white">
-            Moje Odznaki
-          </p>
-        </button>
-      </div>
-      {/* Badges Section */}
-      <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-            Ostatnie odznaki
-          </h2>
-          <button
-            onClick={() => navigate("/profile/badges")}
-            className="flex items-center gap-2 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600"
-          >
-            Zobacz wszystkie
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+          {/* Badges Section */}
+          <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                Ostatnie odznaki
+              </h2>
+              <button
+                onClick={() => navigate("/profile/badges")}
+                className="flex items-center gap-2 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600"
+              >
+                Zobacz wszystkie
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
 
-        {!loading && recentBadges.length === 0 && (
-          <div className="py-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              Jeszcze nie zdobyłeś żadnych odznak. Zacznij wykonywać
-              EkoDziałania!
-            </p>
+            {!loading && recentBadges.length === 0 && (
+              <div className="py-8 text-center">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Jeszcze nie zdobyłeś żadnych odznak. Zacznij wykonywać
+                  EkoDziałania!
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recentBadges.map((badge, index) => {
+                // Dla zdobytych odznak, użyj ikony z aktualnego poziomu
+                const currentLevelIcon = badge.currentLevelData?.icon || "🏅";
+                // Dla niezdobytych, użyj ikony pierwszego poziomu
+                const nextLevelIcon = badge.nextLevelData?.icon || "🏅";
+                const displayIcon = badge.isEarned
+                  ? currentLevelIcon
+                  : nextLevelIcon;
+
+                return (
+                  <Badge
+                    key={badge.id}
+                    icon={displayIcon}
+                    name={badge.name}
+                    description={
+                      badge.isEarned
+                        ? badge.currentLevelData?.description
+                        : badge.nextLevelData?.description
+                    }
+                    color="bg-green-500"
+                    lvl={badge.currentLevel}
+                    progress={badge.progress}
+                    progressText={badge.progressText}
+                    nextLevelData={badge.nextLevelData}
+                    isEarned={badge.isEarned}
+                  />
+                );
+              })}
+            </div>
           </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {recentBadges.map((badge, index) => {
-            // Dla zdobytych odznak, użyj ikony z aktualnego poziomu
-            const currentLevelIcon = badge.currentLevelData?.icon || "🏅";
-            // Dla niezdobytych, użyj ikony pierwszego poziomu
-            const nextLevelIcon = badge.nextLevelData?.icon || "🏅";
-            const displayIcon = badge.isEarned
-              ? currentLevelIcon
-              : nextLevelIcon;
-
-            return (
-              <Badge
-                key={badge.id}
-                icon={displayIcon}
-                name={badge.name}
-                description={
-                  badge.isEarned
-                    ? badge.currentLevelData?.description
-                    : badge.nextLevelData?.description
-                }
-                color="bg-green-500"
-                lvl={badge.currentLevel}
-                progress={badge.progress}
-                progressText={badge.progressText}
-                nextLevelData={badge.nextLevelData}
-                isEarned={badge.isEarned}
-              />
-            );
-          })}
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 }

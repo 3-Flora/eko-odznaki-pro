@@ -16,15 +16,15 @@ import {
 import TextareaAutosize from "react-textarea-autosize";
 import { useToast } from "../contexts/ToastContext";
 
-export default function SubmitEcoActionPage() {
+export default function SubmitActivityPage() {
   const { showError, showSuccess } = useToast();
   const { submitEcoAction, submitChallengeSubmission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
   const selectedAction = location.state?.action;
   const selectedChallenge = location.state?.challenge;
 
-  // Ustal czy to jest EkoDziałanie czy EkoWyzwanie
   const isChallenge = !!selectedChallenge;
   const selectedItem = selectedChallenge || selectedAction;
 
@@ -49,7 +49,6 @@ export default function SubmitEcoActionPage() {
 
     if (files.length === 0) return;
 
-    console.log("photochange");
     // Sprawdź czy nie przekraczamy limitu zdjęć
     if (photos.length + files.length > MAX_PHOTOS) {
       showError(
@@ -117,7 +116,6 @@ export default function SubmitEcoActionPage() {
   };
 
   const openPhotoPreview = (index) => {
-    console.log(index);
     setSelectedPhotoIndex(index);
   };
 

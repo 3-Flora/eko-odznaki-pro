@@ -29,7 +29,6 @@ export const Navbar = () => {
         <div className="">{showBackButton && <BackButton />}</div>
         <div className="ml-auto flex flex-row gap-2">
           <DebugButton />
-          <BadgesButton />
           <ToggleTheme />
           <UserButton />
         </div>

@@ -1,5 +1,5 @@
 export { default as ActivityPage } from "./ActivityPage";
-export { default as SubmitActionPage } from "./SubmitActionPage";
+export { default as SubmitActivityPage } from "./SubmitActivityPage";
 export { default as AuthPage } from "./AuthPage";
 export { default as BadgesPage } from "./BadgesPage";
 export { default as ChallengesPage } from "./ChallengesPage";

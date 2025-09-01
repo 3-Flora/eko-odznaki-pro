@@ -18,8 +18,6 @@ export const BottomNav = () => {
   const { currentUser } = useAuth();
   const { mobileDeviceType } = useDeviceEnvironment();
 
-  console.log(currentUser?.role === "teacher");
-
   const teacherTabs = [
     {
       id: "/teacher/submissions",

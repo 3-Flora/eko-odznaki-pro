@@ -2,9 +2,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ===== FUNKCJE POMOCNICZE =====
+    
     // Funkcja pomocnicza do sprawdzania roli użytkownika
     function getUserRole(userId) {
       return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    // Sprawdza czy użytkownik jest zalogowany
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Sprawdza czy użytkownik jest zweryfikowany (dla uczniów)
+    function isUserVerified(userId) {
+      let userData = get(/databases/$(database)/documents/users/$(userId)).data;
+      return userData.isVerified == true;
     }
 
     // Funkcja sprawdzająca, czy nauczyciel zarządza daną klasą
@@ -13,83 +26,198 @@ service cloud.firestore {
       return request.auth.uid == teacherId;
     }
     
-    // Funkcja sprawdzająca, czy zalogowany użytkownik ma rolę 'ekoskop'.
+    // Funkcja sprawdzająca, czy zalogowany użytkownik ma rolę 'ekoskop'
     function isRequestUserEkoskop() {
-      // request.auth.uid to bezpieczna zmienna przechowująca ID
-      // użytkownika, który wysyła żądanie do bazy danych.
       return getUserRole(request.auth.uid) == 'ekoskop';
     }
 
-    // Każdy zalogowany użytkownik może odczytać dane o sobie, ale tylko on może je modyfikować
+    // Sprawdza czy użytkownik należy do konkretnej klasy
+    function isUserInClass(userId, classId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.classId == classId;
+    }
+
+    // Walidacja danych użytkownika przy tworzeniu/aktualizacji
+    function isValidUserData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['email', 'displayName', 'role']) &&
+             data.role in ['student', 'teacher', 'ekoskop'] &&
+             data.email is string &&
+             data.displayName is string;
+    }
+
+    // Walidacja zgłoszenia EkoDziałania
+    function isValidSubmission() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['studentId', 'classId', 'ecoActionId', 'createdAt']) &&
+             data.studentId is string &&
+             data.classId is string &&
+             data.ecoActionId is string &&
+             data.createdAt is timestamp &&
+             (data.status == null || data.status in ['approved', 'rejected', 'pending']);
+    }
+
+    // Walidacja zgłoszenia EkoWyzwania
+    function isValidChallengeSubmission() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['studentId', 'assignedChallengeId', 'classId', 'createdAt']) &&
+             data.studentId is string &&
+             data.assignedChallengeId is string &&
+             data.classId is string &&
+             data.createdAt is timestamp &&
+             data.status in ['approved', 'rejected', 'pending'];
+    }
+
+    // ===== REGUŁY BEZPIECZEŃSTWA =====
+
+    // KOLEKCJA: users
     match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == userId;
+      // Każdy zalogowany może czytać profile innych (potrzebne do rankingów, feed'ów)
+      allow read: if isAuthenticated();
+      
+      // Użytkownik może modyfikować tylko swoje dane
+      allow write: if isAuthenticated() && 
+                      request.auth.uid == userId;
+
+      // Nauczyciel może modyfikować weryfikację ucznia swojej klasy
+      allow update: if isAuthenticated() && 
+                       getUserRole(request.auth.uid) == 'teacher' &&
+                       isUserInClass(userId, get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId) &&
+                       // Nauczyciel może tylko zmieniać isVerified
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isVerified']);
     }
 
-    // Dane szkół i klas są publiczne do odczytu dla zalogowanych użytkowników
+    // KOLEKCJA: schools
     match /schools/{schoolId} {
-      allow read: if request.auth != null;
-      allow write: if isRequestUserEkoskop(); // Tylko EKOSKOP może dodawać/edytować szkoły
+      // Wszystkich zalogowani mogą przeglądać szkoły (potrzebne przy rejestracji)
+      allow read: if isAuthenticated();
+      
+      // Tylko EKOSKOP może zarządzać szkołami
+      allow write: if isAuthenticated() && isRequestUserEkoskop();
     }
 
+    // KOLEKCJA: classes
     match /classes/{classId} {
-      allow read: if request.auth != null;
-      // Nauczyciel może edytować swoją klasę (np. weryfikować uczniów - to by wymagało innej logiki)
-      // EKOSKOP może tworzyć klasy
-      allow write: if isTeacherOfClass(classId) || isRequestUserEkoskop();
+      // Wszyscy zalogowani mogą przeglądać klasy (potrzebne przy rejestracji)
+      allow read: if isAuthenticated();
+      
+      // Tylko nauczyciel klasy lub EKOSKOP może modyfikować
+      allow write: if isAuthenticated() && 
+                      (isTeacherOfClass(classId) || isRequestUserEkoskop());
     }
 
-    // Szablony EkoDziałań są publiczne do odczytu
+    // KOLEKCJA: ecoActions (szablony EkoDziałań)
     match /ecoActions/{ecoActionId} {
-        allow read: if request.auth != null;
-        allow write: if isRequestUserEkoskop(); // Tylko admini dodają globalne działania
+      // Wszyscy zalogowani mogą czytać szablony działań
+      allow read: if isAuthenticated();
+      
+      // Tylko EKOSKOP może zarządzać szablonami
+      allow write: if isAuthenticated() && isRequestUserEkoskop();
     }
 
-    // Zgłoszenia zadań
-    match /submissions/{submissionId} {
-        // Uczeń może stworzyć zgłoszenie tylko dla siebie i jeśli jest zweryfikowany
-        allow create: if request.resource.data.studentId == request.auth.uid &&
-                         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isVerified == true;
-
-        // Uczeń może czytać swoje zgłoszenia. Nauczyciel może czytać zgłoszenia swojej klasy.
-        allow read: if request.auth.uid == resource.data.studentId || isTeacherOfClass(resource.data.classId);
-
-        // Nauczyciel może zaktualizować status zgłoszenia w swojej klasie (np. odrzucić)
-        allow update: if isTeacherOfClass(request.resource.data.classId) &&
-                         request.resource.data.status == 'rejected';
+    // KOLEKCJA: badgeTemplates (szablony odznak)
+    match /badgeTemplates/{badgeId} {
+      // Wszyscy zalogowani mogą czytać definicje odznak
+      allow read: if isAuthenticated();
+      
+      // Tylko EKOSKOP może tworzyć i modyfikować odznaki
+      allow write: if isAuthenticated() && isRequestUserEkoskop();
     }
-    
-    // Szablony wyzwań (challengeTemplates)
+
+    // KOLEKCJA: challengeTemplates (szablony wyzwań)
     match /challengeTemplates/{templateId} {
-      // Każdy zalogowany użytkownik (uczeń, nauczyciel) może czytać szablony
-      allow read: if request.auth != null;
-      // Tylko administrator (EKOSKOP) może tworzyć, edytować i usuwać szablony
-      allow write: if isRequestUserEkoskop();
+      // Wszyscy zalogowani mogą czytać szablony wyzwań
+      allow read: if isAuthenticated();
+      
+      // Tylko EKOSKOP może zarządzać szablonami wyzwań
+      allow write: if isAuthenticated() && isRequestUserEkoskop();
     }
 
-    // Wyzwania przypisane do klas (assignedChallenges)
+    // KOLEKCJA: assignedChallenges (wyzwania przypisane do klas)
     match /assignedChallenges/{assignmentId} {
-      // Uczeń może odczytać tylko wyzwania przypisane do jego klasy
-      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId == resource.data.classId;
-
-      // Nauczyciel może TWORZYĆ nowe przypisania tylko dla SWOJEJ klasy
-      allow create: if isTeacherOfClass(request.resource.data.classId);
-
-      // Nauczyciel może edytować/usuwać tylko te przypisania, które sam stworzył
-      allow update, delete: if request.auth.uid == resource.data.teacherId;
+      // Użytkownicy mogą czytać przypisane wyzwania
+      allow read: if isAuthenticated();
     }
 
-    // Zgłoszenia EkoWyzwań (challengeSubmissions)
+    // KOLEKCJA: submissions (zgłoszenia EkoDziałań)
+    match /submissions/{submissionId} {
+      // Uczeń może tworzyć zgłoszenie tylko dla siebie, jeśli jest zweryfikowany
+      allow create: if isAuthenticated() && 
+                       request.resource.data.studentId == request.auth.uid &&
+                       isUserVerified(request.auth.uid) &&
+                       isValidSubmission() &&
+                       isUserInClass(request.auth.uid, request.resource.data.classId);
+
+      // Uczeń może czytać swoje zgłoszenia
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.studentId;
+
+      // Nauczyciel może czytać zgłoszenia ze swojej klasy
+      allow read: if isAuthenticated() && 
+                     getUserRole(request.auth.uid) == 'teacher' &&
+                     resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId;
+
+      // Tylko nauczyciel może zmieniać status zgłoszeń uczniów ze swojej klasy
+      allow update: if isAuthenticated() && 
+                       getUserRole(request.auth.uid) == 'teacher' &&
+                       resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId &&
+                       request.resource.data.status in ['approved', 'rejected', 'pending'] &&
+                       // Zabezpieczenie - można tylko zmienić pola związane z oceną
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'rejectionReason', 'reviewedBy', 'reviewedAt']);
+    }
+
+    // KOLEKCJA: challengeSubmissions (zgłoszenia EkoWyzwań)
     match /challengeSubmissions/{submissionId} {
-      // Uczeń może stworzyć zgłoszenie dla siebie i jeśli jest zweryfikowany
-      allow create: if request.resource.data.studentId == request.auth.uid &&
-                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isVerified == true;
+      // Uczeń może tworzyć zgłoszenie dla siebie, jeśli jest zweryfikowany
+      allow create: if isAuthenticated() && 
+                       request.resource.data.studentId == request.auth.uid &&
+                       isUserVerified(request.auth.uid) &&
+                       isValidChallengeSubmission() &&
+                       isUserInClass(request.auth.uid, request.resource.data.classId);
 
-      // Uczeń może czytać swoje zgłoszenia. Nauczyciel może czytać zgłoszenia swojej klasy.
-      allow read: if request.auth.uid == resource.data.studentId || isTeacherOfClass(resource.data.classId);
+      // Uczeń może czytać swoje zgłoszenia
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.studentId;
 
-      // Nauczyciel może zaktualizować status (odrzucić) zgłoszenie w swojej klasie.
-      allow update: if isTeacherOfClass(request.resource.data.classId);
+      // Nauczyciel może czytać zgłoszenia ze swojej klasy
+      allow read: if isAuthenticated() && 
+                     getUserRole(request.auth.uid) == 'teacher' &&
+                     resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId;
+
+      // Nauczyciel może zmieniać status zgłoszeń uczniów ze swojej klasy
+      allow update: if isAuthenticated() && 
+                       getUserRole(request.auth.uid) == 'teacher' &&
+                       resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId &&
+                       request.resource.data.status in ['approved', 'rejected', 'pending'] &&
+                       // Zabezpieczenie - można tylko zmienić pola związane z oceną
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'rejectionReason', 'reviewedBy', 'reviewedAt']);
+    }
+
+    // KOLEKCJA: activityFeeds (feed aktywności klas)
+    match /activityFeeds/{classId} {
+      // Użytkownik może czytać feed tylko swojej klasy
+      allow read: if isAuthenticated() && 
+                     isUserInClass(request.auth.uid, classId);
+      
+      // Nikt nie może zapisywać do feedu z poziomu aplikacji (tylko Cloud Functions)
+      allow write: if false;
+    }
+
+    // SUBKOLEKCJA: activityFeeds/{classId}/items (poszczególne wpisy w feedzie)
+    match /activityFeeds/{classId}/items/{itemId} {
+      // Użytkownik może czytać wpisy tylko z feedu swojej klasy
+      allow read: if isAuthenticated() && 
+                     isUserInClass(request.auth.uid, classId) &&
+                     resource.data.classId == classId;
+
+      // Nikt nie może zapisywać wpisów z poziomu aplikacji (tylko Cloud Functions)
+      allow write: if false;
+    }
+
+    // Domyślne odrzucenie wszystkich innych operacji (zero-trust)
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

@@ -56,7 +56,6 @@ export default function StudentDetailPage() {
   // Załaduj dane ucznia i jego zgłoszenia
   useEffect(() => {
     if (!currentUser?.classId || !studentId) return;
-
     const loadStudentData = async () => {
       setLoading(true);
       try {
@@ -76,7 +75,6 @@ export default function StudentDetailPage() {
           navigate("/teacher/statistics");
           return;
         }
-
         setStudent(studentData);
 
         // Pobierz informacje o klasie
@@ -104,6 +102,7 @@ export default function StudentDetailPage() {
           orderBy("createdAt", "desc"),
           limit(50),
         );
+        console.log(5);
 
         const submissionsSnapshot = await getDocs(submissionsQuery);
         const submissionsData = submissionsSnapshot.docs.map((doc) => ({
@@ -111,6 +110,7 @@ export default function StudentDetailPage() {
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
         }));
+        console.log(6);
 
         setSubmissions(submissionsData);
       } catch (error) {
