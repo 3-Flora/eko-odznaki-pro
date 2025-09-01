@@ -1,11 +1,5 @@
 import { Calendar, Users, Gift } from "lucide-react";
 
-import {
-  currentChallenge,
-  upcomingChallenges,
-  completedChallenges,
-} from "../data/data";
-
 export default function ChallengesPage() {
   return (
     <>

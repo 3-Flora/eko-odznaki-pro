@@ -197,6 +197,7 @@ badgeTemplates/{badgeId}/
     - name: "Eko Edukator",
     - category: "Edukacja",
     - counterToCheck: "educationActions",
+    - badgeImage: "path/to/eko-edukator.png", // Optional
     - levels: [
       {
         - level: 1,

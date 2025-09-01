@@ -10,40 +10,62 @@ export default function Badge({
   progressText,
   nextLevelData,
   isEarned = true,
+  badgeImage = "",
 }) {
   const getColorClasses = () => {
     if (!isEarned) {
       return "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 dark:from-gray-700 dark:to-gray-800 dark:text-gray-400";
     }
-    return "bg-gradient-to-br from-green-700 to-emerald-800 text-white shadow-lg shadow-green-500/25";
+    return "bg-gradient-to-br from-green-700 to-emerald-800 text-white";
   };
+
+  badgeImage ? console.log(badgeImage) : null;
 
   return (
     <div
       className={clsx(
-        "group relative overflow-hidden rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300",
+        "group relative overflow-hidden rounded-2xl",
         getColorClasses(),
       )}
     >
-      <div className="relative p-6">
+      <div className="relative p-4">
         <div className="mb-4 flex flex-row justify-between">
           {/* Badge Icon */}
-          <div className="flex">
-            <div
-              className={clsx(
-                "flex h-16 w-16 items-center justify-center rounded-2xl text-3xl transition-all duration-300",
-                isEarned
-                  ? "bg-white/20 shadow-lg backdrop-blur-sm"
-                  : "bg-gray-300 dark:bg-gray-600",
-              )}
-            >
-              {/* Glow effect for earned badges */}
-              {isEarned && (
-                <div className="absolute -inset-2 rounded-2xl bg-white/20 blur-md"></div>
-              )}
-              <span className="relative z-10">{icon}</span>
-            </div>
-          </div>
+          {badgeImage ? (
+            <>
+              <img
+                src={`/badges/${badgeImage}`}
+                className={clsx(
+                  "h-18 w-18 object-cover",
+                  lvl === 0 && "grayscale filter",
+                  lvl === 1 &&
+                    "brightness-100 contrast-110 saturate-150 sepia filter",
+                  lvl === 2 && "brightness-125 contrast-150 grayscale filter",
+                  lvl === 3 &&
+                    "brightness-110 contrast-125 saturate-150 sepia filter",
+                  lvl === 4 &&
+                    "brightness-110 contrast-125 hue-rotate-180 saturate-150 filter",
+                )}
+              />
+            </>
+          ) : (
+            <>
+              <div className="mr-4 flex">
+                <div
+                  className={clsx(
+                    "flex h-16 w-16 items-center justify-center rounded-2xl text-3xl transition-all duration-300",
+                    isEarned ? "bg-white/20" : "bg-gray-300 dark:bg-gray-600",
+                  )}
+                >
+                  {/* Glow effect for earned badges */}
+                  {isEarned && (
+                    <div className="absolute rounded-2xl bg-white/20"></div>
+                  )}
+                  <span className="relative z-10">{icon}</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Badge Info */}
           <div className="text-right">
@@ -63,10 +85,6 @@ export default function Badge({
           {nextLevelData && isEarned && (
             <div>
               <div className="mb-2 flex items-center justify-between text-xs font-medium">
-                {/* <span className="flex items-center gap-1">
-                  <span className="text-yellow-300">🎯</span>
-                  <span>Do LVL {nextLevelData.level}</span>
-                </span> */}
                 <span>
                   <span
                     className={clsx(
@@ -91,14 +109,8 @@ export default function Badge({
                     "h-full rounded-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-700 ease-out",
                   )}
                   style={{ width: `${Math.min(progress, 100)}%` }}
-                >
-                  <div className="h-full w-full animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                </div>
+                ></div>
               </div>
-
-              <p className="mt-2 line-clamp-2 text-xs opacity-70">
-                {nextLevelData.description}
-              </p>
             </div>
           )}
 
@@ -123,10 +135,6 @@ export default function Badge({
                   <div className="h-full w-full animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
                 </div>
               </div>
-
-              <p className="mt-2 line-clamp-2 text-xs opacity-70">
-                {nextLevelData.description}
-              </p>
             </div>
           )}
 

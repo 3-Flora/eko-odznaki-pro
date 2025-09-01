@@ -7,12 +7,13 @@ import PageHeader from "../components/ui/PageHeader";
 
 export default function BadgesPage() {
   const { currentUser } = useAuth();
-  const { badgeProgress, loading, stats, filterBadges } =
-    useBadges(currentUser);
+  const { loading, stats, filterBadges } = useBadges(currentUser);
   const [filter, setFilter] = useState("all");
 
   // Filtrowanie odznak
   const filteredBadges = filterBadges(filter);
+
+  console.log("FilteredBadges: ", filteredBadges);
 
   const getFilterTitle = () => {
     switch (filter) {
@@ -55,7 +56,7 @@ export default function BadgesPage() {
         />
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+      <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
         <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
           {getFilterTitle()}
           {loading && " (Ładowanie...)"}

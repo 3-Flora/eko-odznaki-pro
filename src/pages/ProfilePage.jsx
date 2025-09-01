@@ -25,8 +25,7 @@ import Button from "../components/ui/Button";
 import clsx from "clsx";
 
 export default function ProfilePage() {
-  const { currentUser, logout, deleteAccount } = useAuth();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { currentUser, logout } = useAuth();
   const [schoolName, setSchoolName] = useState("");
   const [classNameState, setClassNameState] = useState("");
   const [badgeProgress, setBadgeProgress] = useState([]);
@@ -41,11 +40,6 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Error logging out:", error);
     }
-  };
-
-  const handleDeleteAccount = async () => {
-    setShowDeleteModal(false);
-    deleteAccount();
   };
 
   // Pobierz postęp odznak z bazy danych

@@ -25,12 +25,15 @@ export function useBadges(user) {
       try {
         setLoading(true);
         setError(null);
+        // Pobiera szablony odznak
         const badgeTemplates = await getBadgeTemplates();
+        // Oblicza postęp odznak
         const progress = calculateBadgeProgress(
           user.counters || {},
           user.earnedBadges || {},
           badgeTemplates,
         );
+        // Zwraca postęp odznak
         setBadgeProgress(progress);
       } catch (err) {
         console.error("Error loading badge progress:", err);

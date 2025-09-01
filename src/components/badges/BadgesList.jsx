@@ -63,6 +63,7 @@ export default function BadgesList({
             progressText={badge.progressText}
             nextLevelData={badge.nextLevelData}
             isEarned={badge.isEarned}
+            badgeImage={badge.badgeImage || ""}
           />
         );
       })}

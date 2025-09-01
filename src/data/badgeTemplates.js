@@ -88,6 +88,7 @@ export const badgeTemplatesData = {
     name: "Eko Aktywista",
     category: "Ogólne",
     counterToCheck: "totalActions",
+    badgeImage: "eco_aktywista.png", // Optional
     levels: [
       {
         level: 1,
@@ -119,6 +120,7 @@ export const badgeTemplatesData = {
     name: "Mistrz Wyzwań",
     category: "Wyzwania",
     counterToCheck: "totalChallenges",
+    badgeImage: "mistrz_wyzwan.png", // Optional
     levels: [
       {
         level: 1,
