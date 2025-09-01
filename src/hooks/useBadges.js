@@ -33,8 +33,12 @@ export function useBadges(user) {
           user.earnedBadges || {},
           badgeTemplates,
         );
+        // Sortuje odznaki od najwyższego poziomu do najniższego
+        const sortedProgress = progress.sort(
+          (a, b) => b.currentLevel - a.currentLevel,
+        );
         // Zwraca postęp odznak
-        setBadgeProgress(progress);
+        setBadgeProgress(sortedProgress);
       } catch (err) {
         console.error("Error loading badge progress:", err);
         setError(err);

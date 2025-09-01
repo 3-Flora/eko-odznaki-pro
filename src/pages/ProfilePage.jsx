@@ -19,7 +19,7 @@ import {
   calculateBadgeProgress,
   getRecentBadgesForProfile,
 } from "../services/badgeService";
-import Badge from "../components/ui/Badge";
+import Badge, { BadgeModal } from "../components/ui/Badge";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
 import Button from "../components/ui/Button";
 import clsx from "clsx";
@@ -31,8 +31,20 @@ export default function ProfilePage() {
   const [badgeProgress, setBadgeProgress] = useState([]);
   const [recentBadges, setRecentBadges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleBadgeClick = (badge) => {
+    setSelectedBadge(badge);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBadge(null);
+  };
 
   const handleLogout = async () => {
     try {
@@ -263,32 +275,13 @@ export default function ProfilePage() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
               {recentBadges.map((badge, index) => {
-                // Dla zdobytych odznak, użyj ikony z aktualnego poziomu
-                const currentLevelIcon = badge.currentLevelData?.icon || "🏅";
-                // Dla niezdobytych, użyj ikony pierwszego poziomu
-                const nextLevelIcon = badge.nextLevelData?.icon || "🏅";
-                const displayIcon = badge.isEarned
-                  ? currentLevelIcon
-                  : nextLevelIcon;
-
                 return (
                   <Badge
+                    {...badge}
                     key={badge.id}
-                    icon={displayIcon}
-                    name={badge.name}
-                    description={
-                      badge.isEarned
-                        ? badge.currentLevelData?.description
-                        : badge.nextLevelData?.description
-                    }
-                    color="bg-green-500"
-                    lvl={badge.currentLevel}
-                    progress={badge.progress}
-                    progressText={badge.progressText}
-                    nextLevelData={badge.nextLevelData}
-                    isEarned={badge.isEarned}
+                    onClick={() => handleBadgeClick(badge)}
                   />
                 );
               })}
@@ -296,6 +289,13 @@ export default function ProfilePage() {
           </div>
         </>
       )}
+
+      {/* Modal szczegółów odznaki */}
+      <BadgeModal
+        {...selectedBadge}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </>
   );
 }

@@ -28,7 +28,7 @@ import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import { useBadges } from "../hooks/useBadges";
 import BadgesStats from "../components/badges/BadgesStats";
-import BadgesList from "../components/badges/BadgesList";
+import Badge, { BadgeModal } from "../components/ui/Badge";
 import EcoCategoriesStats from "../components/badges/EcoCategoriesStats";
 import clsx from "clsx";
 
@@ -44,6 +44,8 @@ export default function StudentDetailPage() {
   const [schoolName, setSchoolName] = useState("");
   const [loading, setLoading] = useState(true);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Hook do zarządzania odznakamii ucznia
   const {
@@ -52,6 +54,16 @@ export default function StudentDetailPage() {
     stats: badgeStats,
     earnedBadges,
   } = useBadges(student);
+
+  const handleBadgeClick = (badge) => {
+    setSelectedBadge(badge);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBadge(null);
+  };
 
   // Załaduj dane ucznia i jego zgłoszenia
   useEffect(() => {
@@ -102,7 +114,6 @@ export default function StudentDetailPage() {
           orderBy("createdAt", "desc"),
           limit(50),
         );
-        console.log(5);
 
         const submissionsSnapshot = await getDocs(submissionsQuery);
         const submissionsData = submissionsSnapshot.docs.map((doc) => ({
@@ -110,7 +121,6 @@ export default function StudentDetailPage() {
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
         }));
-        console.log(6);
 
         setSubmissions(submissionsData);
       } catch (error) {
@@ -278,13 +288,61 @@ export default function StudentDetailPage() {
         <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
           Zdobyte odznaki ({badgeStats.earned})
         </h3>
-        <BadgesList
-          badges={earnedBadges}
-          loading={badgesLoading}
-          showAll={false}
-          maxDisplay={6}
-          emptyMessage="Uczeń nie zdobył jeszcze żadnych odznak"
-        />
+        {!badgesLoading && earnedBadges.length === 0 && (
+          <div className="py-8 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              Uczeń nie zdobył jeszcze żadnych odznak
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {earnedBadges.slice(0, 6).map((badge, index) => {
+            const maxLvl = badge.template?.levels
+              ? Object.keys(badge.template.levels).length
+              : null;
+
+            return (
+              <Badge
+                key={badge.id || index}
+                icon={
+                  badge.currentLevelData?.icon ||
+                  badge.nextLevelData?.icon ||
+                  "🏅"
+                }
+                name={badge.name}
+                description={badge.description}
+                lvl={badge.currentLevel}
+                maxLvl={maxLvl}
+                progress={badge.progress}
+                progressText={badge.progressText}
+                nextLevelData={badge.nextLevelData}
+                isEarned={badge.isEarned}
+                badgeImage={
+                  badge.currentLevelData?.image || badge.nextLevelData?.image
+                }
+                onClick={() => handleBadgeClick(badge)}
+              />
+            );
+          })}
+        </div>
+
+        {badgesLoading && (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-2xl bg-gray-200 p-4 dark:bg-gray-600"
+              >
+                <div className="mb-3 flex justify-center">
+                  <div className="h-12 w-12 rounded-xl bg-gray-300 dark:bg-gray-500" />
+                </div>
+                <div className="h-4 rounded bg-gray-300 dark:bg-gray-500" />
+                <div className="mt-2 h-3 rounded bg-gray-300 dark:bg-gray-500" />
+              </div>
+            ))}
+          </div>
+        )}
         {earnedBadges.length > 6 && (
           <div className="mt-4 text-center">
             <Button
@@ -402,6 +460,13 @@ export default function StudentDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Modal szczegółów odznaki */}
+      <BadgeModal
+        badge={selectedBadge}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </>
   );
 }

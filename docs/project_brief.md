@@ -178,18 +178,17 @@ badgeTemplates/{badgeId}/
         - name: "Mistrz recyklingu",
         - category: "Recykling",
         - counterToCheck: "recyclingActions",
+        - badgeImage: "/badges/mistrz-recyklingu.png",
         - levels: [
         {
-                - level: 1,
+            - level: 1,
             - description: "Wykonaj 10 EkoDziałań z kategorii Recykling",
             - requiredCount: 10,
-            - icon: "♻️"
         },
         {
             - level: 2,
             - description: "Wykonaj 25 EkoDziałań z kategorii Recykling",
             - requiredCount: 25,
-            - icon: "🌍"
         }
         ]
     }
@@ -197,19 +196,17 @@ badgeTemplates/{badgeId}/
     - name: "Eko Edukator",
     - category: "Edukacja",
     - counterToCheck: "educationActions",
-    - badgeImage: "path/to/eko-edukator.png", // Optional
+    - badgeImage: "badges/eko-edukator.png",
     - levels: [
       {
         - level: 1,
         - description: "Wykonaj 5 EkoDziałań z kategorii Edukacja",
         - requiredCount: 5,
-        - icon: "📚"
       },
       {
         - level: 2,
         - description: "Wykonaj 15 EkoDziałań z kategorii Edukacja",
         - requiredCount: 15,
-        - icon: "🎓"
       }
     ]
 }
