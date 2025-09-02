@@ -10,7 +10,7 @@ function ActionsCarousel({ data }) {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+    <div className="z-1 rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Szybkie Działania

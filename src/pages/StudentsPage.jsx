@@ -190,7 +190,7 @@ export default function StudentsPage() {
           <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white">
             Oczekują na weryfikację ({pendingStudents.length})
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
             {pendingStudents.map((student) => {
               const verification = getVerificationStatus(student);
               const StatusIcon = verification.icon;
@@ -198,7 +198,7 @@ export default function StudentsPage() {
               return (
                 <div
                   key={student.id}
-                  className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700"
                   onClick={() => navigate(`/teacher/student/${student.id}`)}
                 >
                   <div className="flex items-center justify-between">
@@ -266,7 +266,7 @@ export default function StudentsPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
             {verifiedStudents.map((student) => {
               const verification = getVerificationStatus(student);
               const StatusIcon = verification.icon;
@@ -274,7 +274,7 @@ export default function StudentsPage() {
               return (
                 <div
                   key={student.id}
-                  className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700"
                   onClick={() => navigate(`/teacher/student/${student.id}`)}
                 >
                   <div className="flex items-center justify-between">

@@ -134,7 +134,7 @@ export default function RankingPage() {
                     "bg-white",
                     "bg-white dark:bg-gray-900",
                   ),
-                  "rounded-2xl p-4 shadow-lg",
+                  "rounded-2xl p-4 shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]",
                   user.rank <= 3 ? "text-white" : "bg-white dark:bg-gray-900",
                 )}
               >

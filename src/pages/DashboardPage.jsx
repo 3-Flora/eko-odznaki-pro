@@ -138,17 +138,23 @@ export default function DashboardPage() {
             text="Witaj w panelu nauczyciela — tutaj zobaczysz statystyki klasy, zgłoszenia do weryfikacji i szybkie akcje."
           />
           {/* Teacher View */}
-          {loadingTeacherStats ? (
-            <TeacherStatsCard.Skeleton />
-          ) : (
-            <TeacherStatsCard data={teacherStats} />
-          )}
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+            <div className="mb-6 lg:mb-0">
+              {loadingTeacherStats ? (
+                <TeacherStatsCard.Skeleton />
+              ) : (
+                <TeacherStatsCard data={teacherStats} />
+              )}
+            </div>
 
-          {loadingPendingVerifications ? (
-            <PendingVerificationCard.Skeleton />
-          ) : (
-            <PendingVerificationCard data={pendingVerifications} />
-          )}
+            <div className="mb-6 lg:mb-0">
+              {loadingPendingVerifications ? (
+                <PendingVerificationCard.Skeleton />
+              ) : (
+                <PendingVerificationCard data={pendingVerifications} />
+              )}
+            </div>
+          </div>
 
           <QuickActionsCard data={{}} />
         </>
@@ -159,17 +165,24 @@ export default function DashboardPage() {
             name={currentUser.displayName}
             text="Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie działania i swój postęp."
           />
-          {loadingAssigned ? (
-            <LargeChallengeCard.Skeleton />
-          ) : (
-            <LargeChallengeCard data={ecoChallenge} />
-          )}
 
-          {loadingEcoActions ? (
-            <ActionsCarousel.Skeleton />
-          ) : (
-            <ActionsCarousel data={[...ecoActions]} />
-          )}
+          <div className="lg:grid lg:grid-cols-3 lg:gap-6">
+            <div className="mb-6 lg:col-span-2 lg:mb-0">
+              {loadingAssigned ? (
+                <LargeChallengeCard.Skeleton />
+              ) : (
+                <LargeChallengeCard data={ecoChallenge} />
+              )}
+            </div>
+
+            <div className="lg:col-span-1">
+              {loadingEcoActions ? (
+                <ActionsCarousel.Skeleton />
+              ) : (
+                <ActionsCarousel data={[...ecoActions]} />
+              )}
+            </div>
+          </div>
         </>
       )}
     </>

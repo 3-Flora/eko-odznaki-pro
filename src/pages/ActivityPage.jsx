@@ -165,7 +165,7 @@ export default function ActivityPage() {
                       className={clsx(
                         "flex items-center rounded-2xl border p-4 shadow-sm transition-all duration-200",
                         challengeStatus.canSubmit
-                          ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 dark:border-green-700 dark:from-green-900/30 dark:to-emerald-900/30"
+                          ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:border-green-700 dark:from-green-900/30 dark:to-emerald-900/30"
                           : "cursor-not-allowed border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50",
                       )}
                     >
@@ -248,7 +248,7 @@ export default function ActivityPage() {
                   >
                     <div className="relative w-full pt-[100%]">
                       {/* square wrapper */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition-all duration-200 dark:border-gray-700 dark:bg-gray-800">
+                      <div className="absolute inset-0 flex flex-col items-center justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 dark:border-gray-700 dark:bg-gray-800">
                         <div className="mb-2 flex flex-col items-center">
                           <div
                             className={clsx(

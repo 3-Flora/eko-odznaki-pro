@@ -74,6 +74,7 @@ export default function AuthPage() {
         subtitle={
           isLogin ? "Zaloguj się do swojego konta" : "Stwórz nowe konto"
         }
+        className="block! text-center!"
       />
 
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -53,7 +53,7 @@ export const BottomNav = () => {
   return (
     <div
       className={clsx(
-        "z-10 flex justify-between border-t border-gray-200 bg-white px-2 py-1 dark:border-gray-700 dark:bg-gray-900",
+        "z-10 flex justify-between border-t border-gray-200 bg-white px-2 py-1 lg:hidden dark:border-gray-700 dark:bg-gray-900",
         {
           "pb-6": mobileDeviceType === "Android",
           "pb-safe": mobileDeviceType === "iPhone",

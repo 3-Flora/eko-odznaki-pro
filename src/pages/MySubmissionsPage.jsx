@@ -242,7 +242,7 @@ export default function MySubmissionsPage() {
             return (
               <div
                 key={submission.id}
-                className="overflow-hidden rounded-xl bg-white shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800"
+                className="overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:bg-gray-800"
               >
                 <div className="p-6">
                   {/* Header z statusem */}

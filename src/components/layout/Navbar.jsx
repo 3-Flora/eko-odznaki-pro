@@ -8,14 +8,25 @@ import DebugButton from "../debug/DebugButton";
 import BackButton from "../ui/BackButton";
 import { NotificationBell, SimpleNotificationBell } from "../notifications";
 import CreateNotificationButton from "../ui/CreateNotificationButton";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const Navbar = () => {
   const { mobileDeviceType } = useDeviceEnvironment();
   const { pathname } = useLocation();
+  const { currentUser } = useAuth();
 
   // pokaż BackButton gdy jesteśmy na podstronie (ścieżka różna od "/", "/profile", "/submit")
-  const showBackButton =
-    pathname !== "/" && pathname !== "/profile" && pathname !== "/submit";
+  const excluded = new Set([
+    "/",
+    "/profile",
+    "/submit",
+    "/teacher/submissions",
+    "/teacher/students",
+    "/teacher/statistics",
+  ]);
+  const normalizedPath =
+    (pathname || "/").split(/[?#]/)[0].replace(/\/+$/, "") || "/";
+  const showBackButton = !excluded.has(normalizedPath);
 
   return (
     <nav
@@ -27,10 +38,22 @@ export const Navbar = () => {
         },
       )}
     >
-      <div className="flex max-w-7xl flex-row items-center justify-center px-4 py-2 sm:px-6 lg:px-8">
-        <div className="">{showBackButton && <BackButton />}</div>
-        <div className="ml-auto flex flex-row gap-2">
-          <CreateNotificationButton />
+      <div className="mx-auto flex max-w-7xl flex-row items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+        <div className="flex items-center">
+          {showBackButton && <BackButton />}
+          {/* Logo/title visible on desktop when no back button */}
+          {!showBackButton && (
+            <object
+              data="/logo.svg"
+              type="image/svg+xml"
+              className="h-8 w-8 text-green-600 dark:text-green-400"
+            >
+              Logo
+            </object>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
+          {currentUser.role === "teacher" && <CreateNotificationButton />}
           <SimpleNotificationBell />
           <DebugButton />
           <ToggleTheme />

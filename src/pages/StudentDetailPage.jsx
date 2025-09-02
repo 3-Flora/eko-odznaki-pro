@@ -210,7 +210,7 @@ export default function StudentDetailPage() {
 
       {/* Podstawowe statystyki ucznia */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/20">
               <Leaf className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -226,7 +226,7 @@ export default function StudentDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/20">
               <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -242,7 +242,7 @@ export default function StudentDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/20">
               <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -258,7 +258,7 @@ export default function StudentDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-yellow-100 p-2 dark:bg-yellow-900/20">
               <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />

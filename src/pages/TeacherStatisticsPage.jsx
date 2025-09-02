@@ -183,7 +183,7 @@ export default function TeacherStatisticsPage() {
 
       {/* Ogólne statystyki klasy */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/20">
               <Leaf className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -199,7 +199,7 @@ export default function TeacherStatisticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/20">
               <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -215,7 +215,7 @@ export default function TeacherStatisticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/20">
               <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -231,7 +231,7 @@ export default function TeacherStatisticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-900/20">
               <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -259,7 +259,10 @@ export default function TeacherStatisticsPage() {
           {categoryStats.map((category) => (
             <div
               key={category.name}
-              className={clsx("rounded-lg p-3", category.bgColor)}
+              className={clsx(
+                "rounded-lg p-3 transition-all duration-200 hover:scale-105",
+                category.bgColor,
+              )}
             >
               <div className="flex items-center gap-2">
                 <span className="text-lg">{category.icon}</span>
@@ -300,7 +303,7 @@ export default function TeacherStatisticsPage() {
               .map((student, index) => (
                 <div
                   key={student.id}
-                  className="cursor-pointer rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] dark:border-gray-700 dark:hover:bg-gray-700"
                   onClick={() => navigate(`/teacher/student/${student.id}`)}
                 >
                   <div className="flex items-center justify-between">

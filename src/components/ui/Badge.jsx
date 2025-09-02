@@ -70,7 +70,7 @@ export default function Badge({
     <button
       onClick={onClick}
       className={clsx(
-        "group relative flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl p-4 text-left transition-all duration-200",
+        "group relative flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl p-4 text-left transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95",
         getColorClasses(lvl),
       )}
     >

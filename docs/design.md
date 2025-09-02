@@ -1136,9 +1136,367 @@ function DashboardStats({ stats }) {
 
 ---
 
+## 💻 Adaptacja Desktop
+
+Aplikacja została dostosowana do pracy na komputerach stacjonarnych z zachowaniem pełnej funkcjonalności mobilnej. Desktop wprowadza nowe wzorce nawigacji i lepsze wykorzystanie przestrzeni ekranu.
+
+### Layout Desktop
+
+#### Sidebar Navigation (≥1024px)
+
+```jsx
+// Boczna nawigacja zastępująca dolną na desktop
+<div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+  <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4 dark:border-gray-700 dark:bg-gray-900">
+    {/* Logo/Title */}
+    <div className="flex h-16 shrink-0 items-center">
+      <h1 className="text-xl font-bold text-green-600 dark:text-green-400">
+        Eko Odznaki
+      </h1>
+    </div>
+
+    {/* Navigation Items */}
+    <nav className="flex flex-1 flex-col">
+      <ul role="list" className="flex flex-1 flex-col gap-y-7">
+        <li>
+          <ul role="list" className="-mx-2 space-y-1">
+            {/* NavLink items */}
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+```
+
+#### Main Content Area
+
+```jsx
+// Główna obszar treści z marginesem dla sidebar
+<div className="lg:pl-64">
+  <div className="flex h-svh max-w-lg flex-col lg:max-w-none">
+    <Navbar />
+    <main className="h-full flex-1 overflow-auto">
+      <div className="flex flex-col justify-normal gap-6 p-4 lg:mx-auto lg:max-w-7xl lg:px-8">
+        <Outlet />
+      </div>
+    </main>
+    <BottomNav /> {/* Hidden on lg+ */}
+  </div>
+</div>
+```
+
+### Responsywne Komponenty
+
+#### Layout Breakpoints Desktop
+
+```css
+/* Kluczowe klasy dla przełączania mobile/desktop */
+.lg:hidden        /* Ukryj na desktop (bottom nav) */
+.hidden lg:flex   /* Pokaż tylko na desktop (sidebar) */
+.lg:pl-64         /* Margines dla sidebar */
+.lg:max-w-none    /* Usuń ograniczenia szerokości */
+.lg:max-w-7xl     /* Maksymalna szerokość treści */
+.lg:mx-auto       /* Centrowanie treści */
+.lg:px-8          /* Większy padding na desktop */
+```
+
+#### Grid Layouts Desktop
+
+```css
+/* Dashboard - układ 2/3 kolumnowy */
+.lg:grid .lg:grid-cols-2     /* Statystyki nauczyciela */
+.lg:grid .lg:grid-cols-3     /* Dashboard ucznia */
+.lg:col-span-2               /* Główne wyzwanie - 2 kolumny */
+.lg:col-span-1               /* Akcje - 1 kolumna */
+
+/* Listy i karty - 2 kolumnowy */
+.lg:grid .lg:grid-cols-2 .lg:gap-4 .lg:space-y-0
+
+/* Przykłady zastosowania */
+/* StudentsPage */
+<div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+
+/* ChallengesPage */
+<div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+
+/* TeacherStatistics */
+<div className="lg:grid lg:grid-cols-2 lg:gap-6">
+```
+
+### Navbar Desktop Adaptacje
+
+```jsx
+// Logo widoczne na desktop gdy brak BackButton
+{!showBackButton && (
+  <h1 className="hidden lg:block text-xl font-bold text-green-600 dark:text-green-400">
+    Eko Odznaki Pro
+  </h1>
+)}
+
+// Zmiana układu navbar na justify-between
+<div className="flex max-w-7xl flex-row items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+```
+
+### PageHeader Desktop Layout
+
+```jsx
+// Poziomy układ na desktop zamiast pionowego
+<div className="relative mt-2 mb-4 text-center lg:flex lg:items-center lg:gap-6 lg:text-left">
+  <div className="mb-4 text-6xl lg:mb-0 lg:text-8xl">{emoji}</div>
+  <div>
+    <h1 className="mb-2 text-3xl font-bold text-gray-800 lg:text-4xl dark:text-white">
+      {title}
+    </h1>
+    <p className="text-gray-600 lg:text-lg dark:text-gray-300">{subtitle}</p>
+  </div>
+</div>
+```
+
+### Hover Effects Desktop
+
+#### Karty i przyciski
+
+```css
+/* Standardowe hover effects */
+.hover:scale-105        /* Lekkie powiększenie */
+.hover:scale-[1.02]     /* Bardzo subtelne powiększenie */
+.hover:shadow-lg        /* Głębszy cień */
+.hover:shadow-xl        /* Bardzo głęboki cień */
+
+/* Active states */
+.active:scale-95        /* Zmniejszenie przy kliknięciu */
+.active:scale-[0.98]    /* Subtelne zmniejszenie */
+
+/* Transitions */
+.transition-all .duration-200   /* Płynne animacje 200ms */
+
+/* Przykłady zastosowania */
+/* Karty */
+.transition-all .duration-200 .hover:shadow-lg .hover:scale-[1.02] .active:scale-[0.98]
+
+/* Przyciski */
+.transition-all .duration-200 .hover:shadow-xl .hover:scale-105 .active:scale-95
+
+/* Odznaki */
+.transition-all .duration-200 .hover:scale-105 .hover:shadow-lg .active:scale-95
+```
+
+#### Cursor States
+
+```css
+.cursor-pointer     /* Ręka dla klikalnych elementów */
+.cursor-not-allowed /* Zakaz dla disabled elementów */
+```
+
+### Formularze Desktop
+
+#### Maksymalna szerokość dla czytelności
+
+```jsx
+// SubmitActivityPage - ograniczona szerokość na desktop
+<div className="lg:max-w-2xl lg:mx-auto">
+  <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+```
+
+#### Grid systemy dla formularzy
+
+```css
+/* Responsive form grids */
+.grid .grid-cols-1 .sm:grid-cols-2 .lg:grid-cols-3
+.gap-4 .sm:gap-6 .lg:gap-8
+
+/* Form elements spacing */
+.space-y-4 .sm:space-y-6 .lg:space-y-8
+```
+
+### Dashboard Desktop Layouts
+
+#### Teacher Dashboard
+
+```jsx
+// Statystyki w 2 kolumnach
+<div className="lg:grid lg:grid-cols-2 lg:gap-6">
+  <div className="mb-6 lg:mb-0">
+    <TeacherStatsCard data={teacherStats} />
+  </div>
+  <div className="mb-6 lg:mb-0">
+    <PendingVerificationCard data={pendingVerifications} />
+  </div>
+</div>
+```
+
+#### Student Dashboard
+
+```jsx
+// 3-kolumnowy układ: główne wyzwanie (2 kol) + akcje (1 kol)
+<div className="lg:grid lg:grid-cols-3 lg:gap-6">
+  <div className="mb-6 lg:col-span-2 lg:mb-0">
+    <LargeChallengeCard data={ecoChallenge} />
+  </div>
+  <div className="lg:col-span-1">
+    <ActionsCarousel data={ecoActions} />
+  </div>
+</div>
+```
+
+### Statystyki Desktop
+
+#### Enhanced Stats Cards
+
+```jsx
+// Hover effects dla kart statystyk
+<div className="rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800">
+  <div className="flex items-center gap-3">
+    <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/20">
+      <Icon className="h-5 w-5 text-green-600 dark:text-green-400" />
+    </div>
+    <div>
+      <p className="text-2xl font-bold text-gray-800 dark:text-white">
+        {value}
+      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">{label}</p>
+    </div>
+  </div>
+</div>
+```
+
+### Navigation States Desktop
+
+#### SideNav Active States
+
+```jsx
+// Active link styling
+className={({ isActive }) =>
+  clsx(
+    "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-all duration-200",
+    isActive
+      ? "bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-300"
+      : "text-gray-700 hover:text-green-600 hover:bg-green-50 dark:text-gray-300 dark:hover:text-green-400 dark:hover:bg-green-900"
+  )
+}
+```
+
+### Content Width Management
+
+#### Responsive Max Widths
+
+```css
+/* Mobile constrained, desktop expanded */
+.max-w-lg .lg:max-w-none         /* Layout container */
+.lg:max-w-7xl .lg:mx-auto        /* Content container */
+.lg:max-w-2xl .lg:mx-auto        /* Form container */
+
+/* Specific use cases */
+/* Main layout */
+.flex .h-svh .max-w-lg .lg:max-w-none .flex-col
+
+/* Content area */
+.flex .flex-col .justify-normal .gap-6 .p-4 .lg:max-w-7xl .lg:mx-auto .lg:px-8
+
+/* Forms */
+.lg:max-w-2xl .lg:mx-auto
+```
+
+### Performance Optimizations Desktop
+
+#### GPU Accelerated Animations
+
+```css
+/* Transform animations dla lepszej wydajności */
+.transform .transition-transform .duration-200
+.hover:scale-105
+.active:scale-95
+
+/* Combined transforms */
+.transition-all .duration-200 .hover:shadow-lg .hover:scale-[1.02]
+```
+
+#### Efficient Layouts
+
+```css
+/* Flexbox dla nawigacji */
+.hidden .lg:flex .lg:w-64 .lg:flex-col
+
+/* Grid dla treści */
+.lg:grid .lg:grid-cols-2 .lg:gap-6
+
+/* Sticky positioning dla sidebar */
+.lg:fixed .lg:inset-y-0 .lg:z-50
+```
+
+### Desktop-Specific Utilities
+
+```css
+/* Show/Hide patterns */
+.lg:hidden          /* Hide on desktop */
+.hidden .lg:block   /* Show only on desktop */
+.hidden .lg:flex    /* Flex only on desktop */
+
+/* Spacing adjustments */
+.lg:space-y-0      /* Remove mobile spacing */
+.lg:gap-6          /* Add desktop spacing */
+.lg:px-8           /* Desktop padding */
+
+/* Text adjustments */
+.lg:text-left      /* Left align on desktop */
+.lg:text-4xl       /* Larger text on desktop */
+
+/* Layout adjustments */
+.lg:flex-row       /* Horizontal on desktop */
+.lg:items-center   /* Center items on desktop */
+```
+
+### Przykład kompletu desktop komponentu
+
+```jsx
+// Complete desktop-optimized component example
+function DesktopOptimizedCard({ data, onClick }) {
+  return (
+    <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+      {data.map((item) => (
+        <div
+          key={item.id}
+          onClick={() => onClick(item.id)}
+          className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:bg-gray-800"
+        >
+          {/* Desktop: horizontal layout, Mobile: vertical */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-4">
+            <div className="mb-2 lg:mb-0 lg:flex-shrink-0">
+              <Icon className="h-6 w-6 text-green-600 lg:h-8 lg:w-8" />
+            </div>
+            <div className="lg:flex-1">
+              <h3 className="text-lg font-semibold text-gray-800 lg:text-xl dark:text-white">
+                {item.title}
+              </h3>
+              <p className="text-sm text-gray-600 lg:text-base dark:text-gray-300">
+                {item.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Zasady Desktop Design
+
+1. **Progressive Enhancement** - mobile first, desktop enhanced
+2. **Efektywne wykorzystanie przestrzeni** - gridy i sidebar
+3. **Hover feedback** - subtelne animacje tylko na desktop
+4. **Typografia skalowana** - większe rozmiary na desktop
+5. **Navigation patterns** - sidebar zamiast bottom nav
+6. **Content width** - ograniczenia dla czytelności
+7. **Performance** - GPU-accelerated animations
+
+---
+
 ## 🎨 Podsumowanie
 
-**EKO Odznaki Pro** wykorzystuje nowoczesny, spójny design system oparty na:
+**EKO Odznaki** wykorzystuje nowoczesny, spójny design system oparty na:
 
 ### 🌱 **Filozofia**
 
@@ -1169,5 +1527,5 @@ Ten design system można łatwo adaptować do innych projektów edukacyjnych lub
 
 **Wersja:** 1.0  
 **Data:** Sierpień 2025  
-**Aplikacja:** EKO Odznaki Pro  
-**Framework:** React + Tailwind CSS + Ionic
+**Aplikacja:** EKO Odznaki  
+**Framework:** React + Tailwind CSS

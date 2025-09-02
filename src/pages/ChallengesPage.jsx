@@ -65,11 +65,11 @@ export default function ChallengesPage() {
         <h3 className="mb-4 text-lg font-bold text-gray-800 dark:text-white">
           Nadchodzące wyzwania
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
           {upcomingChallenges.map((challenge, index) => (
             <div
               key={challenge.id}
-              className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 transition-colors hover:bg-green-50 dark:bg-gray-900 dark:hover:bg-green-900"
+              className="flex cursor-pointer items-center rounded-xl bg-gray-50 p-4 transition-all duration-200 hover:scale-[1.02] hover:bg-green-50 hover:shadow-lg active:scale-[0.98] dark:bg-gray-900 dark:hover:bg-green-900"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
               <div className="flex-1">
@@ -103,11 +103,11 @@ export default function ChallengesPage() {
         <h3 className="mb-4 text-lg font-bold text-gray-800 dark:text-white">
           Ukończone wyzwania
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
           {completedChallenges.map((challenge, index) => (
             <div
               key={challenge.id}
-              className="flex items-center rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-700 dark:bg-green-900"
+              className="flex items-center rounded-xl border border-green-200 bg-green-50 p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:border-green-700 dark:bg-green-900"
             >
               <div className="mr-4 text-2xl">{challenge.icon}</div>
               <div className="flex-1">

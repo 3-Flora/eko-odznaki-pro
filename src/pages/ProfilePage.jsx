@@ -211,7 +211,7 @@ export default function ProfilePage() {
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-white p-4 text-center shadow-lg dark:bg-gray-800"
+                className="rounded-2xl bg-white p-4 text-center shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl dark:bg-gray-800"
               >
                 <stat.icon
                   className={clsx("mx-auto mb-2 h-8 w-8", stat.color)}
@@ -229,7 +229,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => navigate("/profile/submissions")}
-              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50 hover:shadow-xl active:scale-95 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
                 <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -241,7 +241,7 @@ export default function ProfilePage() {
             {/*  */}
             <button
               onClick={() => navigate("/profile/badges")}
-              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-colors hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+              className="flex items-center justify-center gap-3 rounded-xl bg-white p-4 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50 hover:shadow-xl active:scale-95 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <div className="rounded-full bg-green-100 p-2 dark:bg-green-700">
                 <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
