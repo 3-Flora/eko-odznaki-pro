@@ -9,7 +9,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  orderBy,
   limit,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
@@ -37,7 +36,6 @@ export default function TeacherSubmissionsPage() {
   const [searchParams] = useSearchParams();
 
   const [submissions, setSubmissions] = useState([]);
-  const [challengeSubmissions, setChallengeSubmissions] = useState([]);
   const [ecoActions, setEcoActions] = useState([]);
   const [ecoChallenges, setEcoChallenges] = useState([]);
   const [className, setClassName] = useState("");
@@ -83,64 +81,38 @@ export default function TeacherSubmissionsPage() {
           }
         }
 
-        // Pobierz zgłoszenia z tej klasy
-        let submissionsQuery = query(
+        // Pobierz wszystkie zgłoszenia z tej klasy (zarówno EkoDziałania jak i EkoWyzwania)
+        let allSubmissionsQuery = query(
           collection(db, "submissions"),
           where("classId", "==", currentUser.classId),
-          orderBy("createdAt", "desc"),
           limit(100),
         );
 
         // Jeśli filtrujemy po konkretnym uczniu
         if (filterByStudent) {
-          submissionsQuery = query(
+          allSubmissionsQuery = query(
             collection(db, "submissions"),
             where("studentId", "==", filterByStudent),
-            orderBy("createdAt", "desc"),
             limit(100),
           );
         }
 
-        const submissionsSnapshot = await getDocs(submissionsQuery);
-        const submissionsData = submissionsSnapshot.docs.map((doc) => ({
+        const allSubmissionsSnapshot = await getDocs(allSubmissionsQuery);
+        const allSubmissionsData = allSubmissionsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
           reviewedAt: doc.data().reviewedAt?.toDate() || null,
         }));
 
-        setSubmissions(submissionsData);
+        // Sortowanie po stronie klienta
+        allSubmissionsData.sort((a, b) => {
+          const dateA = a.createdAt || new Date(0);
+          const dateB = b.createdAt || new Date(0);
+          return dateB - dateA;
+        });
 
-        // Pobierz zgłoszenia EkoWyzwań z tej klasy
-        let challengeSubmissionsQuery = query(
-          collection(db, "challengeSubmissions"),
-          where("classId", "==", currentUser.classId),
-          orderBy("createdAt", "desc"),
-          limit(100),
-        );
-
-        // Jeśli filtrujemy po konkretnym uczniu
-        if (filterByStudent) {
-          challengeSubmissionsQuery = query(
-            collection(db, "challengeSubmissions"),
-            where("studentId", "==", filterByStudent),
-            orderBy("createdAt", "desc"),
-            limit(100),
-          );
-        }
-
-        const challengeSubmissionsSnapshot = await getDocs(
-          challengeSubmissionsQuery,
-        );
-        const challengeSubmissionsData = challengeSubmissionsSnapshot.docs.map(
-          (doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate() || new Date(),
-          }),
-        );
-
-        setChallengeSubmissions(challengeSubmissionsData);
+        setSubmissions(allSubmissionsData);
       } catch (error) {
         console.error("Error loading submissions:", error);
         showError("Błąd podczas ładowania zgłoszeń");
@@ -153,8 +125,8 @@ export default function TeacherSubmissionsPage() {
   }, [currentUser?.classId, filterByStudent, showError]);
 
   // Znajdź EkoDziałanie po ID
-  const getEcoActionById = (ecoActionId) => {
-    return ecoActions.find((action) => action.id === ecoActionId);
+  const getEcoActionById = (ecoActivityId) => {
+    return ecoActions.find((action) => action.id === ecoActivityId);
   };
 
   // Znajdź EkoWyzwanie po ID
@@ -199,7 +171,13 @@ export default function TeacherSubmissionsPage() {
   };
 
   const getCurrentSubmissions = () => {
-    return selectedType === "actions" ? submissions : challengeSubmissions;
+    return submissions.filter((submission) => {
+      if (selectedType === "actions") {
+        return submission.type === "eco_action";
+      } else {
+        return submission.type === "challenge";
+      }
+    });
   };
 
   const filteredSubmissions = getCurrentSubmissions().filter((submission) => {
@@ -357,7 +335,7 @@ export default function TeacherSubmissionsPage() {
                     {selectedType === "actions"
                       ? (() => {
                           const ecoAction = getEcoActionById(
-                            submission.ecoActionId,
+                            submission.ecoActivityId,
                           );
                           if (ecoAction) {
                             return (
@@ -385,14 +363,14 @@ export default function TeacherSubmissionsPage() {
                           } else {
                             return (
                               <p className="text-sm text-gray-600 dark:text-gray-300">
-                                ID: {submission.ecoActionId}
+                                ID: {submission.ecoActivityId}
                               </p>
                             );
                           }
                         })()
                       : (() => {
                           const challenge = getChallengeById(
-                            submission.ecoChallengeId,
+                            submission.ecoActivityId,
                           );
                           if (challenge) {
                             return (
@@ -413,7 +391,7 @@ export default function TeacherSubmissionsPage() {
                           } else {
                             return (
                               <p className="text-sm text-gray-600 dark:text-gray-300">
-                                ID: {submission.ecoChallengeId}
+                                ID: {submission.ecoActivityId}
                               </p>
                             );
                           }

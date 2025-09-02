@@ -9,7 +9,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  orderBy,
   limit,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
@@ -111,7 +110,6 @@ export default function StudentDetailPage() {
         const submissionsQuery = query(
           collection(db, "submissions"),
           where("studentId", "==", studentId),
-          orderBy("createdAt", "desc"),
           limit(50),
         );
 
@@ -121,6 +119,13 @@ export default function StudentDetailPage() {
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
         }));
+
+        // Sortowanie po stronie klienta
+        submissionsData.sort((a, b) => {
+          const dateA = a.createdAt || new Date(0);
+          const dateB = b.createdAt || new Date(0);
+          return dateB - dateA;
+        });
 
         setSubmissions(submissionsData);
       } catch (error) {

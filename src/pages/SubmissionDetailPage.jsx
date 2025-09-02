@@ -67,16 +67,16 @@ export default function SubmissionDetailPage() {
         setSubmission(submissionData);
 
         // Sprawdź czy to zgłoszenie EkoDziałania czy EkoWyzwania
-        if (submissionData.ecoActionId) {
+        if (submissionData.type === "eco_action") {
           // Znajdź odpowiednie EkoDziałanie
           const foundEcoAction = ecoActionsData.find(
-            (action) => action.id === submissionData.ecoActionId,
+            (action) => action.id === submissionData.ecoActivityId,
           );
           setEcoAction(foundEcoAction);
-        } else if (submissionData.ecoChallengeId) {
+        } else if (submissionData.type === "challenge") {
           // Znajdź odpowiednie EkoWyzwanie
           const foundChallenge = challengesData.find(
-            (challenge) => challenge.id === submissionData.ecoChallengeId,
+            (challenge) => challenge.id === submissionData.ecoActivityId,
           );
           setChallenge(foundChallenge);
         }
@@ -126,7 +126,7 @@ export default function SubmissionDetailPage() {
       }));
 
       showSuccess(
-        `${submission?.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
+        `${submission?.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
       );
 
       // Resetuj modal
@@ -166,8 +166,8 @@ export default function SubmissionDetailPage() {
 
       showSuccess(
         status === "approved"
-          ? `${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
-          : `${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
+          ? `${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
+          : `${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
       );
     } catch (error) {
       console.error("Error updating submission:", error);
@@ -242,9 +242,9 @@ export default function SubmissionDetailPage() {
   return (
     <>
       <PageHeader
-        emoji={submission?.ecoActionId ? "📄" : "🏆"}
+        emoji={submission?.type === "eco_action" ? "📄" : "🏆"}
         title="Szczegóły zgłoszenia"
-        subtitle={`Weryfikacja ${submission?.ecoActionId ? "EkoDziałania" : "EkoWyzwania"}`}
+        subtitle={`Weryfikacja ${submission?.type === "eco_action" ? "EkoDziałania" : "EkoWyzwania"}`}
         showBackButton
       />
 
@@ -298,11 +298,11 @@ export default function SubmissionDetailPage() {
         {/* Szczegóły EkoDziałania lub EkoWyzwania */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-            {submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}
+            {submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"}
           </h3>
 
           {/* Wyświetl EkoDziałanie */}
-          {submission.ecoActionId && ecoAction ? (
+          {submission.type === "eco_action" && ecoAction ? (
             <div className="flex items-center gap-4">
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-full text-white"
@@ -322,16 +322,16 @@ export default function SubmissionDetailPage() {
                 </p>
               </div>
             </div>
-          ) : submission.ecoActionId ? (
+          ) : submission.type === "eco_action" ? (
             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
               <p className="text-gray-600 dark:text-gray-300">
-                ID EkoDziałania: {submission.ecoActionId}
+                ID EkoDziałania: {submission.ecoActivityId}
               </p>
             </div>
           ) : null}
 
           {/* Wyświetl EkoWyzwanie */}
-          {submission.ecoChallengeId && challenge ? (
+          {submission.type === "challenge" && challenge ? (
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white">
                 <span className="text-2xl">🏆</span>
@@ -366,10 +366,10 @@ export default function SubmissionDetailPage() {
                 )}
               </div>
             </div>
-          ) : submission.ecoChallengeId ? (
+          ) : submission.type === "challenge" ? (
             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
               <p className="text-gray-600 dark:text-gray-300">
-                ID EkoWyzwania: {submission.ecoChallengeId}
+                ID EkoWyzwania: {submission.ecoActivityId}
               </p>
             </div>
           ) : null}
@@ -440,7 +440,7 @@ export default function SubmissionDetailPage() {
               >
                 {updating
                   ? "Przetwarzanie..."
-                  : `Zatwierdź ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}`}
+                  : `Zatwierdź ${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"}`}
               </Button>
             )}
 
@@ -453,7 +453,7 @@ export default function SubmissionDetailPage() {
               >
                 {updating
                   ? "Przetwarzanie..."
-                  : `Odrzuć ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}`}
+                  : `Odrzuć ${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"}`}
               </Button>
             )}
 
@@ -463,8 +463,8 @@ export default function SubmissionDetailPage() {
               <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-700">
                 <span className="text-center text-gray-600 dark:text-gray-300">
                   {submission.status === "approved"
-                    ? `✓ ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
-                    : `✗ ${submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`}
+                    ? `✓ ${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
+                    : `✗ ${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`}
                 </span>
               </div>
             )}
@@ -477,7 +477,10 @@ export default function SubmissionDetailPage() {
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Odrzuć {submission.ecoActionId ? "EkoDziałanie" : "EkoWyzwanie"}
+              Odrzuć{" "}
+              {submission.type === "eco_action"
+                ? "EkoDziałanie"
+                : "EkoWyzwanie"}
             </h3>
 
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">

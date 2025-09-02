@@ -22,7 +22,6 @@ import {
   addDoc,
   query,
   where,
-  orderBy,
   getDocs,
   serverTimestamp,
   deleteDoc,
@@ -90,14 +89,14 @@ export const AuthProvider = ({ children }) => {
     }
 
     const submissionData = {
+      type: "eco_action",
+      ecoActivityId: ecoAction.id,
       studentId: currentUser.id,
       studentName: currentUser.displayName,
       classId: currentUser.classId,
-      ecoActionId: ecoAction.id,
-      category: ecoAction.category, // Ważne dla Cloud Function liczącej punkty
       createdAt: serverTimestamp(),
       status: "pending",
-      photoUrls: optionalData.photoUrls || [], // Zmiana z photoUrl na photoUrls (array)
+      photoUrls: optionalData.photoUrls || [],
       comment: optionalData.comment || "",
     };
 
@@ -112,9 +111,10 @@ export const AuthProvider = ({ children }) => {
     }
 
     const submissionData = {
+      type: "challenge",
+      ecoActivityId: ecoChallenge.id,
       studentId: currentUser.id,
       studentName: currentUser.displayName,
-      ecoChallengeId: ecoChallenge.id,
       classId: currentUser.classId,
       createdAt: serverTimestamp(),
       status: "pending",
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       comment: optionalData.comment || "",
     };
 
-    await addDoc(collection(db, "challengeSubmissions"), submissionData);
+    await addDoc(collection(db, "submissions"), submissionData);
   };
 
   const getUserEcoActionSubmissions = async () => {
@@ -131,33 +131,88 @@ export const AuthProvider = ({ children }) => {
     const submissionsQuery = query(
       collection(db, "submissions"),
       where("studentId", "==", currentUser.id),
-      orderBy("createdAt", "desc"),
+      where("type", "==", "eco_action"),
     );
 
     const querySnapshot = await getDocs(submissionsQuery);
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const submissions = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Sortowanie po stronie klienta
+    return submissions.sort((a, b) => {
+      const dateA = a.createdAt?.toDate
+        ? a.createdAt.toDate()
+        : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate
+        ? b.createdAt.toDate()
+        : new Date(b.createdAt);
+      return dateB - dateA;
+    });
   };
 
   const getUserChallengeSubmissions = async () => {
     if (!currentUser) return [];
 
     const submissionsQuery = query(
-      collection(db, "challengeSubmissions"),
+      collection(db, "submissions"),
       where("studentId", "==", currentUser.id),
-      orderBy("createdAt", "desc"),
+      where("type", "==", "challenge"),
     );
 
     const querySnapshot = await getDocs(submissionsQuery);
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const submissions = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Sortowanie po stronie klienta
+    return submissions.sort((a, b) => {
+      const dateA = a.createdAt?.toDate
+        ? a.createdAt.toDate()
+        : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate
+        ? b.createdAt.toDate()
+        : new Date(b.createdAt);
+      return dateB - dateA;
+    });
+  };
+
+  const getAllUserSubmissions = async () => {
+    if (!currentUser) return [];
+
+    const submissionsQuery = query(
+      collection(db, "submissions"),
+      where("studentId", "==", currentUser.id),
+    );
+
+    const querySnapshot = await getDocs(submissionsQuery);
+    const submissions = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Sortowanie po stronie klienta
+    return submissions.sort((a, b) => {
+      const dateA = a.createdAt?.toDate
+        ? a.createdAt.toDate()
+        : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate
+        ? b.createdAt.toDate()
+        : new Date(b.createdAt);
+      return dateB - dateA;
+    });
   };
 
   const getChallengeSubmissionStatus = async (challengeId) => {
     if (!currentUser) return null;
 
     const submissionsQuery = query(
-      collection(db, "challengeSubmissions"),
+      collection(db, "submissions"),
       where("studentId", "==", currentUser.id),
-      where("ecoChallengeId", "==", challengeId),
+      where("type", "==", "challenge"),
+      where("ecoActivityId", "==", challengeId),
     );
 
     const querySnapshot = await getDocs(submissionsQuery);
@@ -336,6 +391,7 @@ export const AuthProvider = ({ children }) => {
     submitChallengeSubmission,
     getUserEcoActionSubmissions,
     getUserChallengeSubmissions,
+    getAllUserSubmissions,
     getChallengeSubmissionStatus,
   };
 

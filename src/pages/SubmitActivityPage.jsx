@@ -189,7 +189,7 @@ export default function SubmitActivityPage() {
   };
 
   return (
-    <div className="lg:mx-auto lg:max-w-2xl">
+    <div className="lg:mx-auto lg:w-full lg:max-w-2xl">
       <div className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Selected Action/Challenge Card */}
