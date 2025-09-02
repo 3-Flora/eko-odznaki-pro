@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo, useEffect } from "react";
 import { Preferences } from "@capacitor/preferences";
+import { StatusBar, Style } from "@capacitor/status-bar";
 
 export const ThemeContext = createContext({
   theme: "light",
@@ -43,6 +44,8 @@ export const ThemeProvider = ({ children }) => {
     // Add theme class to body
     document.body.classList.remove("light", "dark");
     document.body.classList.add(theme);
+
+    StatusBar.setStyle({ style: theme === "dark" ? Style.Dark : Style.Light });
   }, [theme]);
 
   const toggleTheme = () => {
