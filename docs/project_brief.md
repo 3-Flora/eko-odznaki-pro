@@ -238,45 +238,34 @@ ecoActions/{ecoActionId}/
   - maxDaily: 3
   - maxWeekly: 3
 
+// NOWA KOLEKCJA: Wyzwania przypisane przez EkoSkop dla każdej klasy
+ecoChallenges/{assignmentId}/
+  - name: "Nakrętkowy challenge"
+  - description: "Zbieraj nakrętki przez cały tydzień."
+  - category: "Recykling"
+  - startDate: Timestamp // Data rozpoczęcia (np. poniedziałek)
+  - endDate: Timestamp   // Data zakończenia (np. niedziela)
+  - style: {
+    - color: "green",
+    - icon: "♻️",
+  }
+  - maxDaily: 1
+  - maxWeekly: 1
+
 // Zgłoszenia wykonanych EkoDziałań przez uczniów
 submissions/{submissionId}/
+  - type: "eco_action" | "challenge"
+  - ecoActivityId: "gaszenie_swiatla_id"
   - studentId: "uczen_abc_uid"
   - studentName: "Jan Kowalski" // Duplikacja dla łatwiejszego wyświetlania
   - classId: "klasa_4a_uid" // Oczywiście ID będzie losowe niż w przykładzie
-  - ecoActionId: "gaszenie_swiatla_id"
   - createdAt: Timestamp // Data zgłoszenia
-  - status: "approved" | "rejected" // Domyślnie 'approved'
+  - status: "approved" | "rejected" | "pending" // Domyślnie 'pending'
   - photoUrls: [] // Lista URLi zdjęć hostowanych na firebase storage
   - comment: "Zgasiłem światło w całej szkole!" // Opcjonalne
   - reviewedBy: "nauczyciel_xyz_uid"
   - reviewedAt: Timestamp
   - rejectionReason: "Nieodpowiednie zdjęcie"
-
-// Szablony/biblioteka EkoWyzwań
-challengeTemplates/{templateId}/
-  - name: "Nakrętkowy challenge"
-  - description: "Zbieraj nakrętki przez cały tydzień."
-  - category: "Recykling"
-
-// NOWA KOLEKCJA: Wyzwania przypisane przez EkoSkop dla każdej klasy
-assignedChallenges/{assignmentId}/
-  - templateId: "nakretkowy_challenge_id" // ID z kolekcji challengeTemplates
-  - challengeName: "Nakrętkowy challenge"  // Denormalizacja dla łatwego wyświetlania
-  - challengeDescription: "Zbieraj nakrętki przez cały tydzień."
-  - startDate: Timestamp // Data rozpoczęcia (np. poniedziałek)
-  - endDate: Timestamp   // Data zakończenia (np. niedziela)
-  - classProgress: { // Informację o tym ile uczniów ukończyło zadanie
-    - current: 15,
-    - total: 25,
-  },
-
-// Zgłoszenia wykonanych EkoWyzwań (drobna zmiana)
-challengeSubmissions/{submissionId}/
-  - studentId: "uczen_abc_uid"
-  - assignedChallengeId: "assignmentId_123" // Link do przypisanego wyzwania
-  - classId: "klasa_4a_uid"
-  - createdAt: Timestamp
-  - status: "approved" | "rejected" | "pending"
 
 // Główna kolekcja przechowująca feedy wszystkich klas
 activityFeeds/{classId}/

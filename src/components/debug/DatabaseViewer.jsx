@@ -10,15 +10,17 @@ import {
 } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import { getAssignedChallenges } from "../../services/challengeService";
+import {
+  getEcoChallenges,
+  getAllEcoChallenges,
+} from "../../services/ecoChallengeService";
 import clsx from "clsx";
 
 export default function DatabaseViewer() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     ecoActions: [],
-    challengeTemplates: [],
-    assignedChallenges: [],
+    ecoChallenges: [],
     badgeTemplates: [],
   });
   const [activeTab, setActiveTab] = useState("ecoActions");
@@ -32,17 +34,17 @@ export default function DatabaseViewer() {
       bgColor: "bg-green-50 dark:bg-green-900/20",
     },
     {
-      id: "challengeTemplates",
+      id: "ecoChallenges",
       name: "EkoWyzwania",
-      icon: Trophy,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-    },
-    {
-      id: "assignedChallenges",
-      name: "Globalne Wyzwania",
       icon: Target,
       color: "text-orange-600",
+      bgColor: "bg-orange-50 dark:bg-orange-900/20",
+    },
+    {
+      id: "allEcoChallenges",
+      name: "Wszystkie EkoWyzwania",
+      icon: Target,
+      color: "text-orange-200",
       bgColor: "bg-orange-50 dark:bg-orange-900/20",
     },
     {
@@ -61,16 +63,12 @@ export default function DatabaseViewer() {
 
       // Pobierz dane z każdej kolekcji
       for (const tab of tabs) {
-        if (tab.id === "assignedChallenges") {
-          // Użyj specjalnej funkcji dla assignedChallenges
-          newData[tab.id] = await getAssignedChallenges();
-        } else {
-          const collectionRef = collection(db, tab.id);
-          const snapshot = await getDocs(collectionRef);
-          newData[tab.id] = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+        if (tab.id === "ecoChallenges") {
+          // Użyj specjalnej funkcji dla ecoChallenges
+          newData[tab.id] = await getEcoChallenges();
+        }
+        if (tab.id === "allEcoChallenges") {
+          newData[tab.id] = await getAllEcoChallenges();
         }
       }
 

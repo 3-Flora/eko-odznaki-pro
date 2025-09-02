@@ -104,10 +104,7 @@ export const AuthProvider = ({ children }) => {
     await addDoc(collection(db, "submissions"), submissionData);
   };
 
-  const submitChallengeSubmission = async (
-    assignedChallenge,
-    optionalData = {},
-  ) => {
+  const submitChallengeSubmission = async (ecoChallenge, optionalData = {}) => {
     if (!currentUser || !currentUser.isVerified) {
       throw new Error(
         "Użytkownik musi być zweryfikowany, aby zgłaszać wyzwania.",
@@ -117,7 +114,7 @@ export const AuthProvider = ({ children }) => {
     const submissionData = {
       studentId: currentUser.id,
       studentName: currentUser.displayName,
-      assignedChallengeId: assignedChallenge.id,
+      ecoChallengeId: ecoChallenge.id,
       classId: currentUser.classId,
       createdAt: serverTimestamp(),
       status: "pending",
@@ -160,7 +157,7 @@ export const AuthProvider = ({ children }) => {
     const submissionsQuery = query(
       collection(db, "challengeSubmissions"),
       where("studentId", "==", currentUser.id),
-      where("assignedChallengeId", "==", challengeId),
+      where("ecoChallengeId", "==", challengeId),
     );
 
     const querySnapshot = await getDocs(submissionsQuery);

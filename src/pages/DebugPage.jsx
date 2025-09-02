@@ -42,9 +42,9 @@ export default function DebugPage() {
   return (
     <>
       <CountersEditor onCountersUpdate={handleCountersUpdate} />
-      <ClassFeedDebug />
       <DatabaseManager />
       <DatabaseViewer />
+      <ClassFeedDebug />
       <BadgeDebug />
     </>
   );

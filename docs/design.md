@@ -1,16 +1,16 @@
-# Design System Guide - EKO Odznaki Pro
+# Design System Guide - EkoOdznaki
 
-Kompletny przewodnik stylistyczny aplikacji **EKO Odznaki Pro** - systemu gamifikacji edukacji ekologicznej.
+Kompletny przewodnik stylistyczny aplikacji **EkoOdznaki** - systemu gamifikacji edukacji ekologicznej.
 
 ## 📱 O aplikacji
 
-**EKO Odznaki Pro** to innowacyjna aplikacja edukacyjna, która motywuje uczniów do podejmowania działań proekologicznych poprzez system odznak, punktów i wyzwań. Aplikacja łączy edukację ekologiczną z elementami gamifikacji, tworząc angażujące środowisko nauki.
+**EkoOdznaki** to innowacyjna aplikacja edukacyjna, która motywuje uczniów do podejmowania działań proekologicznych poprzez system odznak i wyzwań. Aplikacja łączy edukację ekologiczną z elementami gamifikacji, tworząc angażujące środowisko nauki.
 
-### Główne funkcjonalności:
+### Główne funkcjonalności
 
-- 🌱 **EkoDziałania** - zgłaszanie i weryfikacja działań ekologicznych
+- 🌱 **EkoDziałania** - zgłaszanie i weryfikacja przez nauczyciela działań ekologicznych
 - 🏆 **System odznak** - wielopoziomowe osiągnięcia za różne aktywności
-- 🎯 **EkoWyzwania** - czasowe wyzwania dla klas
+- 🎯 **EkoWyzwania** - czasowe wyzwania dla uczniów
 - 👥 **Zarządzanie użytkownikami** - struktura Szkoła → Klasa → Uczniowie
 - 📊 **Śledzenie postępu** - ranking i statystyki
 - 🔧 **Panel administracyjny** - zarządzanie systemem
@@ -118,10 +118,7 @@ dark:from-green-700 dark:to-blue-900
 /* Body - tekst podstawowy */
 .text-base /* 16px - tekst standardowy */
 .text-sm   /* 14px - tekst pomocniczy */
-.text-xs   /* 12px - metadane, czas */
 
-/* Tiny - bardzo małe elementy */
-.text-xs   /* 12px - statusy, liczniki */
 ```
 
 ### Wagi i style
@@ -160,7 +157,7 @@ dark:from-green-700 dark:to-blue-900
 </p>
 
 /* Metadane */
-<span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+<span className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">
   2 dni temu
 </span>
 ```
@@ -683,7 +680,7 @@ xl: 1280px  /* Large desktop */
 .text-lg font-medium    /* Podtytuły */
 .text-base font-normal  /* Tekst podstawowy */
 .text-sm text-gray-600  /* Tekst pomocniczy */
-.text-xs text-gray-500  /* Metadane */
+.text-sm text-gray-500  /* Metadane */
 ```
 
 ### Stany interaktywne

@@ -99,37 +99,6 @@ export const ecoActionsData = {
   },
 };
 
-// Przykładowe szablony EkoWyzwań
-export const challengeTemplatesData = {
-  "nakretkowy-challenge": {
-    name: "Nakrętkowy Challenge",
-    description: "Zbieraj nakrętki przez cały tydzień",
-    category: "Recykling",
-  },
-  "tydzien-bez-plastiku": {
-    name: "Tydzień bez plastiku",
-    description:
-      "Spróbuj przez tydzień unikać produktów w plastikowych opakowaniach",
-    category: "Oszczędzanie",
-  },
-  "eko-lunch-challenge": {
-    name: "EkoLunch Challenge",
-    description: "Przynoś ekologiczny lunch bez jednorazowych opakowań",
-    category: "Oszczędzanie",
-  },
-  "quiz-ekologiczny": {
-    name: "Quiz ekologiczny",
-    description: "Rozwiąż quiz o ekologii i środowisku",
-    category: "Edukacja",
-  },
-  "zielony-transport": {
-    name: "Zielony transport",
-    description:
-      "Przez tydzień korzystaj tylko z ekologicznych środków transportu",
-    category: "Oszczędzanie",
-  },
-};
-
 /**
  * Funkcje do masowego dodawania danych do Firestore
  */
@@ -145,21 +114,6 @@ export const addEcoActionsToFirestore = async () => {
     return results;
   } catch (error) {
     console.error("Error adding eco actions:", error);
-    throw error;
-  }
-};
-
-export const addChallengeTemplatesToFirestore = async () => {
-  try {
-    const results = [];
-    for (const [id, data] of Object.entries(challengeTemplatesData)) {
-      const docRef = doc(db, "challengeTemplates", id);
-      await setDoc(docRef, data);
-      results.push(`✅ Dodano EkoWyzwanie: ${data.name}`);
-    }
-    return results;
-  } catch (error) {
-    console.error("Error adding challenge templates:", error);
     throw error;
   }
 };

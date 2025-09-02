@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { getEcoActions } from "../services/ecoActionService";
-import { getAssignedChallenges } from "../services/challengeService";
+import { getEcoChallenges } from "../services/ecoChallengeService";
 import {
   CheckCircle,
   XCircle,
@@ -39,7 +39,7 @@ export default function TeacherSubmissionsPage() {
   const [submissions, setSubmissions] = useState([]);
   const [challengeSubmissions, setChallengeSubmissions] = useState([]);
   const [ecoActions, setEcoActions] = useState([]);
-  const [assignedChallenges, setAssignedChallenges] = useState([]);
+  const [ecoChallenges, setEcoChallenges] = useState([]);
   const [className, setClassName] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -63,8 +63,8 @@ export default function TeacherSubmissionsPage() {
         setEcoActions(ecoActionsData);
 
         // Pobierz dane EkoWyzwań
-        const challengesData = await getAssignedChallenges();
-        setAssignedChallenges(challengesData);
+        const challengesData = await getEcoChallenges();
+        setEcoChallenges(challengesData);
 
         // Pobierz informacje o klasie
         const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
@@ -159,7 +159,7 @@ export default function TeacherSubmissionsPage() {
 
   // Znajdź EkoWyzwanie po ID
   const getChallengeById = (challengeId) => {
-    return assignedChallenges.find((challenge) => challenge.id === challengeId);
+    return ecoChallenges.find((challenge) => challenge.id === challengeId);
   };
 
   const getStatusInfo = (status) => {
@@ -392,7 +392,7 @@ export default function TeacherSubmissionsPage() {
                         })()
                       : (() => {
                           const challenge = getChallengeById(
-                            submission.assignedChallengeId,
+                            submission.ecoChallengeId,
                           );
                           if (challenge) {
                             return (
@@ -413,7 +413,7 @@ export default function TeacherSubmissionsPage() {
                           } else {
                             return (
                               <p className="text-sm text-gray-600 dark:text-gray-300">
-                                ID: {submission.assignedChallengeId}
+                                ID: {submission.ecoChallengeId}
                               </p>
                             );
                           }

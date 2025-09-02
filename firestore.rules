@@ -59,9 +59,9 @@ service cloud.firestore {
     // Walidacja zgłoszenia EkoWyzwania
     function isValidChallengeSubmission() {
       let data = request.resource.data;
-      return data.keys().hasAll(['studentId', 'assignedChallengeId', 'classId', 'createdAt']) &&
+      return data.keys().hasAll(['studentId', 'ecoChallengeId', 'classId', 'createdAt']) &&
              data.studentId is string &&
-             data.assignedChallengeId is string &&
+             data.ecoChallengeId is string &&
              data.classId is string &&
              data.createdAt is timestamp &&
              data.status in ['approved', 'rejected', 'pending'];
@@ -123,17 +123,8 @@ service cloud.firestore {
       allow write: if isAuthenticated() && isRequestUserEkoskop();
     }
 
-    // KOLEKCJA: challengeTemplates (szablony wyzwań)
-    match /challengeTemplates/{templateId} {
-      // Wszyscy zalogowani mogą czytać szablony wyzwań
-      allow read: if isAuthenticated();
-      
-      // Tylko EKOSKOP może zarządzać szablonami wyzwań
-      allow write: if isAuthenticated() && isRequestUserEkoskop();
-    }
-
-    // KOLEKCJA: assignedChallenges (wyzwania przypisane do klas)
-    match /assignedChallenges/{assignmentId} {
+    // KOLEKCJA: ecoChallenges (wyzwania przypisane do klas)
+    match /ecoChallenges/{assignmentId} {
       // Użytkownicy mogą czytać przypisane wyzwania
       allow read: if isAuthenticated();
     }

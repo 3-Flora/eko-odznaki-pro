@@ -1,4 +1,4 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db } from "./firebase";
 
 /**
@@ -91,4 +91,23 @@ const getCategoryColor = (category) => {
     Woda: "text-cyan-600",
   };
   return colors[category] || "text-gray-600";
+};
+
+/**
+ * Pobiera ograniczoną liczbę EkoDziałań dla dashboardu
+ * @param {number} limitCount - Maksymalna liczba EkoDziałań do pobrania
+ * @returns {Promise<Array>} - Lista EkoDziałań
+ */
+export const getLimitedEcoActions = async (limitCount = 3) => {
+  try {
+    const q = query(collection(db, "ecoActions"), orderBy("name"), limit(10));
+
+    const snap = await getDocs(q);
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    return items.slice(0, limitCount);
+  } catch (error) {
+    console.error("Error fetching limited eco actions:", error);
+    return [];
+  }
 };

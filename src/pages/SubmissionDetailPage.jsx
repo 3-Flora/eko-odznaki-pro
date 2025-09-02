@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { getEcoActions } from "../services/ecoActionService";
-import { getAssignedChallenges } from "../services/challengeService";
+import { getEcoChallenges } from "../services/ecoChallengeService";
 import {
   CheckCircle,
   XCircle,
@@ -44,7 +44,7 @@ export default function SubmissionDetailPage() {
         // Pobierz dane EkoDziałań i EkoWyzwań
         const [ecoActionsData, challengesData] = await Promise.all([
           getEcoActions(),
-          getAssignedChallenges(),
+          getEcoChallenges(),
         ]);
 
         // Pobierz szczegóły zgłoszenia
@@ -73,10 +73,10 @@ export default function SubmissionDetailPage() {
             (action) => action.id === submissionData.ecoActionId,
           );
           setEcoAction(foundEcoAction);
-        } else if (submissionData.assignedChallengeId) {
+        } else if (submissionData.ecoChallengeId) {
           // Znajdź odpowiednie EkoWyzwanie
           const foundChallenge = challengesData.find(
-            (challenge) => challenge.id === submissionData.assignedChallengeId,
+            (challenge) => challenge.id === submissionData.ecoChallengeId,
           );
           setChallenge(foundChallenge);
         }
@@ -331,7 +331,7 @@ export default function SubmissionDetailPage() {
           ) : null}
 
           {/* Wyświetl EkoWyzwanie */}
-          {submission.assignedChallengeId && challenge ? (
+          {submission.ecoChallengeId && challenge ? (
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white">
                 <span className="text-2xl">🏆</span>
@@ -366,10 +366,10 @@ export default function SubmissionDetailPage() {
                 )}
               </div>
             </div>
-          ) : submission.assignedChallengeId ? (
+          ) : submission.ecoChallengeId ? (
             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
               <p className="text-gray-600 dark:text-gray-300">
-                ID EkoWyzwania: {submission.assignedChallengeId}
+                ID EkoWyzwania: {submission.ecoChallengeId}
               </p>
             </div>
           ) : null}

@@ -9,10 +9,8 @@ import {
 } from "lucide-react";
 import {
   addEcoActionsToFirestore,
-  addChallengeTemplatesToFirestore,
   clearCollection,
   ecoActionsData,
-  challengeTemplatesData,
 } from "../../data/ecoActionsData";
 import {
   badgeTemplatesData,
@@ -20,10 +18,10 @@ import {
   clearBadgeTemplates,
 } from "../../data/badgeTemplates";
 import {
-  assignedChallengesData,
-  addAssignedChallengesToFirestore,
-  clearAssignedChallenges,
-} from "../../data/assignedChallengesData";
+  ecoChallengesData,
+  addEcoChallengesToFirestore,
+  clearEcoChallenges,
+} from "../../data/ecoChallengesData";
 import clsx from "clsx";
 
 export default function DatabaseManager() {
@@ -41,14 +39,6 @@ export default function DatabaseManager() {
       action: addEcoActionsToFirestore,
     },
     {
-      id: "add-challenge-templates",
-      title: "Dodaj EkoWyzwania",
-      description: `Dodaje ${Object.keys(challengeTemplatesData || {}).length} szablonów EkoWyzwań`,
-      icon: Upload,
-      color: "bg-blue-500 hover:bg-blue-600",
-      action: addChallengeTemplatesToFirestore,
-    },
-    {
       id: "add-badge-templates",
       title: "Dodaj Odznaki",
       description: `Dodaje ${Object.keys(badgeTemplatesData || {}).length} szablonów odznak`,
@@ -57,12 +47,12 @@ export default function DatabaseManager() {
       action: addBadgeTemplatesToFirestore,
     },
     {
-      id: "add-assigned-challenges",
+      id: "add-eco-challenges",
       title: "Dodaj Globalne Wyzwania",
-      description: `Dodaje ${Object.keys(assignedChallengesData || {}).length} wspólnych wyzwań dla wszystkich klas`,
+      description: `Dodaje ${Object.keys(ecoChallengesData || {}).length} wspólnych wyzwań dla wszystkich klas`,
       icon: Upload,
       color: "bg-orange-500 hover:bg-orange-600",
-      action: addAssignedChallengesToFirestore,
+      action: addEcoChallengesToFirestore,
     },
     {
       id: "clear-eco-actions",
@@ -71,15 +61,6 @@ export default function DatabaseManager() {
       icon: Trash2,
       color: "bg-red-500 hover:bg-red-600",
       action: () => clearCollection("ecoActions"),
-      dangerous: true,
-    },
-    {
-      id: "clear-challenge-templates",
-      title: "Usuń EkoWyzwania",
-      description: "Usuwa wszystkie szablony EkoWyzwań",
-      icon: Trash2,
-      color: "bg-red-500 hover:bg-red-600",
-      action: () => clearCollection("challengeTemplates"),
       dangerous: true,
     },
     {
@@ -97,7 +78,7 @@ export default function DatabaseManager() {
       description: "Usuwa wszystkie wspólne wyzwania",
       icon: Trash2,
       color: "bg-red-500 hover:bg-red-600",
-      action: clearAssignedChallenges,
+      action: clearEcoChallenges,
       dangerous: true,
     },
   ];
@@ -131,7 +112,7 @@ export default function DatabaseManager() {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+    <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
       {/* Header */}
       <div className="mb-6 flex items-center gap-3">
         <div className="rounded-full bg-indigo-100 p-3 dark:bg-indigo-900">
@@ -144,21 +125,6 @@ export default function DatabaseManager() {
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Masowe operacje na danych aplikacji
           </p>
-        </div>
-      </div>
-      {/* Warning */}
-      <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-          <div>
-            <h3 className="font-medium text-yellow-800 dark:text-yellow-200">
-              Uwaga - Funkcje deweloperskie
-            </h3>
-            <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-              Te funkcje są przeznaczone do rozwoju aplikacji. Operacje usuwania
-              są nieodwracalne!
-            </p>
-          </div>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -239,19 +205,10 @@ export default function DatabaseManager() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
           <h4 className="mb-2 font-medium text-green-800 dark:text-green-200">
-            EkoDziłania
+            EkoDziałania
           </h4>
           <p className="text-sm text-green-600 dark:text-green-400">
             {Object.keys(ecoActionsData || {}).length} szablonów
-          </p>
-        </div>
-
-        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-          <h4 className="mb-2 font-medium text-blue-800 dark:text-blue-200">
-            EkoWyzwania
-          </h4>
-          <p className="text-sm text-blue-600 dark:text-blue-400">
-            {Object.keys(challengeTemplatesData || {}).length} szablonów
           </p>
         </div>
 
@@ -269,7 +226,7 @@ export default function DatabaseManager() {
             Globalne Wyzwania
           </h4>
           <p className="text-sm text-orange-600 dark:text-orange-400">
-            {Object.keys(assignedChallengesData || {}).length} wspólnych wyzwań
+            {Object.keys(ecoChallengesData || {}).length} wspólnych wyzwań
           </p>
         </div>
       </div>

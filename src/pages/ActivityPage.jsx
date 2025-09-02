@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 import { useNavigate } from "react-router";
 import { getEcoActions } from "../services/ecoActionService";
-import { getActiveChallenges } from "../services/challengeService";
+import { getEcoChallenges } from "../services/ecoChallengeService";
 import PageHeader from "../components/ui/PageHeader";
 import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
 import clsx from "clsx";
@@ -26,22 +26,26 @@ export default function ActivityPage() {
       try {
         setLoading(true);
         const actions = await getEcoActions();
-        const activeChallenges = await getActiveChallenges();
+        const challenges = await getEcoChallenges();
+
+        console.log("fetched challenges:", challenges);
 
         // Sprawdź status zgłoszeń dla każdego wyzwania
-        if (currentUser && activeChallenges.length > 0) {
-          const submissions = {};
-          for (const challenge of activeChallenges) {
-            const submission = await getChallengeSubmissionStatus(challenge.id);
-            if (submission) {
-              submissions[challenge.id] = submission;
-            }
-          }
-          setChallengeSubmissions(submissions);
-        }
+        // if (currentUser && activeChallenges.length > 0) {
+        //   const submissions = {};
+        //   for (const challenge of activeChallenges) {
+        //     const submission = await getChallengeSubmissionStatus(challenge.id);
+        //     if (submission) {
+        //       submissions[challenge.id] = submission;
+        //     }
+        //   }
+        //   setChallengeSubmissions(submissions);
+        // }
 
-        setChallenges(activeChallenges);
+        setChallenges(challenges);
         setEcoActions(actions);
+
+        console.log();
       } catch (error) {
         console.error("Error loading data:", error);
         showError("Nie udało się załadować EkoDziałań/EkoWyzwań");
@@ -194,16 +198,6 @@ export default function ActivityPage() {
                         >
                           {challenge.name}
                         </h3>
-                        {/* <p
-                          className={clsx(
-                            "text-sm",
-                            challengeStatus.canSubmit
-                              ? "text-gray-600 dark:text-gray-400"
-                              : "text-gray-400 dark:text-gray-500",
-                          )}
-                        >
-                          {challenge.description}
-                        </p> */}
                       </div>
                     </button>
                   );
