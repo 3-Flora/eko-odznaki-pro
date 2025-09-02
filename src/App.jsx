@@ -24,8 +24,11 @@ import {
   TeacherSubmissionsPage,
   StudentDetailPage,
   SubmissionDetailPage,
+  NotificationsPage,
+  CreateNotificationPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 export default function App() {
   const { loading } = useAuth();
@@ -35,82 +38,98 @@ export default function App() {
   }
 
   return (
-    <ToastProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<AuthPage />} />
-          <Route path="/selectSchool" element={<SelectSchoolPage />} />
-          <Route
-            path="/"
-            element={<ProtectedRoute allowedRoles={["student", "teacher"]} />}
-          >
-            <Route path="" element={<Layout />}>
-              <Route index element={<DashboardPage />} />
+    <NotificationProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/selectSchool" element={<SelectSchoolPage />} />
+            <Route
+              path="/"
+              element={<ProtectedRoute allowedRoles={["student", "teacher"]} />}
+            >
+              <Route path="" element={<Layout />}>
+                <Route index element={<DashboardPage />} />
 
-              {/* Routes for students */}
-              <Route
-                path="submit"
-                element={<ProtectedRoute allowedRoles={["student"]} />}
-              >
-                <Route index element={<ActivityPage />} />
-                <Route path="action" element={<SubmitActivityPage />} />
-              </Route>
-
-              {/* General Routes for all users */}
-              <Route path="challenges" element={<ChallengesPage />} />
-              <Route path="ranking" element={<RankingPage />} />
-
-              {/* Routes for teachers */}
-              <Route
-                path="teacher"
-                element={<ProtectedRoute allowedRoles={["teacher"]} />}
-              >
-                <Route path="students" element={<StudentsPage />} />
-                <Route path="statistics" element={<TeacherStatisticsPage />} />
+                {/* Routes for students */}
                 <Route
-                  path="submissions"
-                  element={<TeacherSubmissionsPage />}
-                />
+                  path="submit"
+                  element={<ProtectedRoute allowedRoles={["student"]} />}
+                >
+                  <Route index element={<ActivityPage />} />
+                  <Route path="action" element={<SubmitActivityPage />} />
+                </Route>
+
+                {/* General Routes for all users */}
+                <Route path="challenges" element={<ChallengesPage />} />
+                <Route path="ranking" element={<RankingPage />} />
+                <Route path="notifications" element={<NotificationsPage />} />
+
+                {/* Routes for teachers and ekoskop */}
                 <Route
-                  path="submission/:submissionId"
-                  element={<SubmissionDetailPage />}
-                />
+                  path="create-notification"
+                  element={
+                    <ProtectedRoute allowedRoles={["teacher", "ekoskop"]} />
+                  }
+                >
+                  <Route index element={<CreateNotificationPage />} />
+                </Route>
+
+                {/* Routes for teachers */}
                 <Route
-                  path="student/:studentId"
-                  element={<StudentDetailPage />}
+                  path="teacher"
+                  element={<ProtectedRoute allowedRoles={["teacher"]} />}
+                >
+                  <Route path="students" element={<StudentsPage />} />
+                  <Route
+                    path="statistics"
+                    element={<TeacherStatisticsPage />}
+                  />
+                  <Route
+                    path="submissions"
+                    element={<TeacherSubmissionsPage />}
+                  />
+                  <Route
+                    path="submission/:submissionId"
+                    element={<SubmissionDetailPage />}
+                  />
+                  <Route
+                    path="student/:studentId"
+                    element={<StudentDetailPage />}
+                  />
+                </Route>
+
+                {/* Legacy route for students page (backward compatibility) */}
+                <Route
+                  path="students"
+                  element={<ProtectedRoute allowedRoles={["teacher"]} />}
+                >
+                  <Route index element={<StudentsPage />} />
+                </Route>
+
+                {/* Profile Routes */}
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="profile/badges" element={<BadgesPage />} />
+                <Route
+                  path="profile/submissions"
+                  element={<MySubmissionsPage />}
                 />
+                <Route path="profile/edit" element={<EditProfilePage />} />
+                <Route
+                  path="profile/edit/password"
+                  element={<EditPasswordPage />}
+                />
+                <Route path="profile/edit/email" element={<EditEmailPage />} />
+                <Route path="profile/debug" element={<DebugPage />} />
+
+                {/* Redirect all unknown routes to the dashboard */}
+                <Route path="*" element={<Navigate to="/" />} />
               </Route>
-
-              {/* Legacy route for students page (backward compatibility) */}
-              <Route
-                path="students"
-                element={<ProtectedRoute allowedRoles={["teacher"]} />}
-              >
-                <Route index element={<StudentsPage />} />
-              </Route>
-
-              {/* Profile Routes */}
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="profile/badges" element={<BadgesPage />} />
-              <Route
-                path="profile/submissions"
-                element={<MySubmissionsPage />}
-              />
-              <Route path="profile/edit" element={<EditProfilePage />} />
-              <Route
-                path="profile/edit/password"
-                element={<EditPasswordPage />}
-              />
-              <Route path="profile/edit/email" element={<EditEmailPage />} />
-              <Route path="profile/debug" element={<DebugPage />} />
-
-              {/* Redirect all unknown routes to the dashboard */}
-              <Route path="*" element={<Navigate to="/" />} />
             </Route>
-          </Route>
-        </Routes>
-        <ToastContainer />
-      </BrowserRouter>
-    </ToastProvider>
+          </Routes>
+          <ToastContainer />
+        </BrowserRouter>
+      </ToastProvider>
+    </NotificationProvider>
   );
 }

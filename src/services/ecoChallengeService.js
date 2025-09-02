@@ -63,7 +63,6 @@ export const getAllEcoChallenges = async () => {
     //   });
     // }
 
-    console.log(ecoChallenges);
     return ecoChallenges;
   } catch (error) {
     console.error("Error fetching eco challenges:", error);

@@ -6,6 +6,8 @@ import BadgesButton from "../ui/Badgesbutton";
 import UserButton from "../ui/UserButton";
 import DebugButton from "../debug/DebugButton";
 import BackButton from "../ui/BackButton";
+import { NotificationBell, SimpleNotificationBell } from "../notifications";
+import CreateNotificationButton from "../ui/CreateNotificationButton";
 
 export const Navbar = () => {
   const { mobileDeviceType } = useDeviceEnvironment();
@@ -28,6 +30,8 @@ export const Navbar = () => {
       <div className="flex max-w-7xl flex-row items-center justify-center px-4 py-2 sm:px-6 lg:px-8">
         <div className="">{showBackButton && <BackButton />}</div>
         <div className="ml-auto flex flex-row gap-2">
+          <CreateNotificationButton />
+          <SimpleNotificationBell />
           <DebugButton />
           <ToggleTheme />
           <UserButton />

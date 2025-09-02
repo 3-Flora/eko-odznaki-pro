@@ -206,6 +206,43 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // KOLEKCJA: notifications (powiadomienia)
+    match /notifications/{notificationId} {
+      // Każdy zalogowany może czytać powiadomienia (filtrowanie odbywa się w aplikacji)
+      allow read: if isAuthenticated();
+
+      // Tylko nauczyciele i EkoSkop mogą tworzyć powiadomienia
+      allow create: if isAuthenticated() && 
+                       (getUserRole(request.auth.uid) == 'teacher' || 
+                        getUserRole(request.auth.uid) == 'ekoskop') &&
+                       isValidNotification();
+
+      // Tylko autor powiadomienia może je aktualizować (np. dodawać do readBy)
+      allow update: if isAuthenticated() && 
+                       (request.auth.uid == resource.data.createdBy ||
+                        // Użytkownicy mogą dodawać siebie do readBy
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']) &&
+                         request.resource.data.readBy.hasAll(resource.data.readBy)));
+
+      // Tylko autor lub EkoSkop może usuwać powiadomienia
+      allow delete: if isAuthenticated() && 
+                       (request.auth.uid == resource.data.createdBy ||
+                        getUserRole(request.auth.uid) == 'ekoskop');
+    }
+
+    // Walidacja danych powiadomienia
+    function isValidNotification() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['title', 'message', 'createdAt', 'createdBy', 'type', 'isGlobal']) &&
+             data.title is string &&
+             data.message is string &&
+             data.createdAt is timestamp &&
+             data.createdBy is string &&
+             data.type in ['info', 'alert', 'reminder'] &&
+             data.isGlobal is bool &&
+             (data.readBy == null || data.readBy is list);
+    }
+
     // Domyślne odrzucenie wszystkich innych operacji (zero-trust)
     match /{document=**} {
       allow read, write: if false;

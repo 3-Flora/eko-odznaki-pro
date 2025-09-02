@@ -3,6 +3,7 @@ import CountersEditor from "../components/debug/CountersEditor";
 import DatabaseManager from "../components/debug/DatabaseManager";
 import DatabaseViewer from "../components/debug/DatabaseViewer";
 import ClassFeedDebug from "../components/debug/ClassFeedDebug";
+import NotificationDebug from "../components/debug/NotificationDebug";
 
 import {
   calculateBadgeProgress,
@@ -46,6 +47,7 @@ export default function DebugPage() {
       <DatabaseViewer />
       <ClassFeedDebug />
       <BadgeDebug />
+      <NotificationDebug />
     </>
   );
 }

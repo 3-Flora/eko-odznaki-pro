@@ -12,6 +12,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
+import { createStudentVerifiedNotification } from "../services/notificationAutomationService";
 import { Users, CheckCircle, XCircle, Clock, School } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
@@ -86,6 +87,29 @@ export default function StudentsPage() {
       await updateDoc(studentRef, {
         isVerified: isVerified,
       });
+
+      // Pobierz dane o klasie dla powiadomienia
+      if (isVerified && currentUser?.classId) {
+        try {
+          const classDoc = await getDoc(
+            doc(db, "classes", currentUser.classId),
+          );
+          const className = classDoc.exists() ? classDoc.data().name : "klasa";
+
+          // Utwórz powiadomienie dla ucznia
+          await createStudentVerifiedNotification(
+            studentId,
+            currentUser.id,
+            className,
+          );
+        } catch (notificationError) {
+          console.warn(
+            "Nie udało się wysłać powiadomienia:",
+            notificationError,
+          );
+          // Nie przerywamy procesu weryfikacji z powodu błędu powiadomienia
+        }
+      }
 
       // Aktualizuj lokalny stan
       setStudents((prev) =>

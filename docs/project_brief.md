@@ -289,6 +289,28 @@ activityFeeds/{classId}/
         // badgeName: "Eko-Aktywista",
         // level: 1
     }
+
+    // POWIADOMIENIA (globalne lub skierowane do konkretnej grupy/użytkownika)
+    notifications/{notificationId}/
+      - title: "Nowy challenge dla Twojej klasy!"
+      - message: "Od jutra zaczynamy zbieranie nakrętek 🚀"
+      - createdAt: Timestamp
+      - createdBy: "ekoskop_uid" // UID nadawcy
+      - type: "info" | "alert" | "reminder" // dla UI
+      - isGlobal: true | false // jeśli true → widzą wszyscy
+      - target: {
+          role: "student" | "teacher" | "all", // jeśli null i isGlobal=true → wszyscy
+          schoolId: "szkola_podstawowa_1_uid", // opcjonalne
+          classId: "klasa_4a_uid",              // opcjonalne
+          userId: "uczen_abc_uid"              // opcjonalne
+      }
+      - readBy: [ "uczen_abc_uid", "uczen_xyz_uid" ] // kto już odczytał
+
+    // Opcjonalnie możesz dodać subkolekcję do śledzenia statusu użytkownika
+    notifications/{notificationId}/userStatus/{userId}/
+      - readAt: Timestamp
+      - dismissed: true | false
+
 ```
 
 ### Jak Twoja Logika Idealnie Pasuje do Rekomendowanej Struktury

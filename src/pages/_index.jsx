@@ -17,3 +17,5 @@ export { default as TeacherStatisticsPage } from "./TeacherStatisticsPage";
 export { default as TeacherSubmissionsPage } from "./TeacherSubmissionsPage";
 export { default as StudentDetailPage } from "./StudentDetailPage";
 export { default as SubmissionDetailPage } from "./SubmissionDetailPage";
+export { default as NotificationsPage } from "./NotificationsPage";
+export { default as CreateNotificationPage } from "./CreateNotificationPage";

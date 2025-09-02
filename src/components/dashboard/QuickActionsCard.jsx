@@ -1,8 +1,18 @@
-import { BarChart3, TrendingUp, Users, Award } from "lucide-react";
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  Award,
+  MessageSquare,
+  Bell,
+} from "lucide-react";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../contexts/AuthContext";
+import { SimpleNotificationBell } from "../notifications";
 
 export default function QuickActionsCard({ data }) {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   if (!data) return <QuickActionsCard.Skeleton />;
 
@@ -30,13 +40,31 @@ export default function QuickActionsCard({ data }) {
     },
   ];
 
+  // Dodaj akcję tworzenia powiadomień dla nauczycieli i EkoSkopu
+  if (currentUser?.role === "teacher" || currentUser?.role === "ekoskop") {
+    actions.push({
+      title: "Wyślij powiadomienie",
+      description:
+        currentUser?.role === "teacher"
+          ? "Powiadom klasę"
+          : "Powiadom użytkowników",
+      icon: MessageSquare,
+      color: "bg-orange-500 hover:bg-orange-600",
+      onClick: () => navigate("/create-notification"),
+    });
+  }
+
   return (
     <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
-      <div className="mb-4 flex items-center gap-2">
-        <Award className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
-          Szybkie akcje
-        </h3>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Award className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
+            Szybkie akcje
+          </h3>
+        </div>
+        {/* Przykład użycia SimpleNotificationBell */}
+        <SimpleNotificationBell size="small" />
       </div>
 
       <div className="grid gap-3">
@@ -74,7 +102,7 @@ QuickActionsCard.Skeleton = function QuickActionsCardSkeleton() {
       </div>
 
       <div className="grid gap-3">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700">
             <div className="flex items-center gap-3">
               <div className="h-6 w-6 animate-pulse rounded bg-gray-300 dark:bg-gray-600" />
