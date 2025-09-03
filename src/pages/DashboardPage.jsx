@@ -1,13 +1,13 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useMemo } from "react";
-import useActiveEcoChallenge from "../hooks/useActiveEcoChallenge";
-import useLimitedEcoActions from "../hooks/useLimitedEcoActions";
-import useTeacherDashboard from "../hooks/useTeacherDashboard";
+import useDashboardData from "../hooks/useDashboardData";
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import LargeChallengeCard from "../components/dashboard/LargeChallengeCard";
 import ActionsCarousel from "../components/dashboard/ActionsCarousel";
 import TeacherStatsCard from "../components/dashboard/TeacherStatsCard";
 import PendingVerificationCard from "../components/dashboard/PendingVerificationCard";
 import QuickActionsCard from "../components/dashboard/QuickActionsCard";
+import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
 import { useToast } from "../contexts/ToastContext";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 
@@ -15,61 +15,60 @@ export default function DashboardPage() {
   const { currentUser } = useAuth();
   const toast = useToast();
 
-  const isTeacher = useMemo(
-    () => currentUser?.role === "teacher",
-    [currentUser?.role],
+  // Używamy nowego hook-a do zarządzania danymi dashboardu z cache
+  const {
+    data,
+    loading,
+    errors,
+    isAnyLoading,
+    lastRefresh,
+    refreshAll,
+    isTeacher,
+  } = useDashboardData(currentUser);
+
+  // Pull-to-refresh
+  const { isPulling, isRefreshing, progress, containerRef } = usePullToRefresh(
+    refreshAll,
+    {
+      threshold: 80,
+      enabled: true,
+    },
   );
 
-  const {
-    data: ecoChallenge,
-    loading: loadingAssigned,
-    error: ecoChallengeError,
-  } = useActiveEcoChallenge(!!currentUser?.classId && !isTeacher);
-
-  const {
-    data: ecoActions,
-    loading: loadingEcoActions,
-    error: ecoActionsError,
-  } = useLimitedEcoActions(!isTeacher, 3);
-
-  const {
-    stats: teacherStats,
-    pendingVerifications,
-    loading: loadingTeacher,
-    error: teacherError,
-  } = useTeacherDashboard(isTeacher, currentUser?.classId);
-
+  // Wyświetlanie błędów jako toast
   useEffect(() => {
-    if (ecoChallengeError) {
+    if (errors.ecoChallenge) {
       toast.show?.({
         title: "Błąd",
         description: "Nie udało się pobrać aktywnego wyzwania",
       });
     }
-  }, [ecoChallengeError, toast]);
+  }, [errors.ecoChallenge, toast]);
 
   useEffect(() => {
-    if (ecoActionsError) {
+    if (errors.ecoActions) {
       toast.show?.({
         title: "Błąd",
         description: "Nie udało się pobrać szybkich akcji",
       });
     }
-  }, [ecoActionsError, toast]);
+  }, [errors.ecoActions, toast]);
 
   useEffect(() => {
-    if (teacherError) {
+    if (errors.teacher) {
       toast.show?.({
         title: "Błąd",
         description: "Nie udało się pobrać danych nauczyciela",
       });
     }
-  }, [teacherError, toast]);
+  }, [errors.teacher, toast]);
+
   const headerText = isTeacher
     ? "Witaj w panelu nauczyciela — tutaj zobaczysz statystyki klasy, zgłoszenia do weryfikacji i szybkie akcje."
     : "Witaj na stronie głównej — tutaj zobaczysz aktualne wyzwania, szybkie działania i swój postęp.";
 
   const challengeCardData = useMemo(() => {
+    const ecoChallenge = data.ecoChallenge;
     if (!ecoChallenge) return undefined;
 
     const {
@@ -91,57 +90,74 @@ export default function DashboardPage() {
       endDate,
       icon: icon ?? "🎯",
     };
-  }, [ecoChallenge]);
+  }, [data.ecoChallenge]);
 
   return (
     <>
-      <DashboardHeader name={currentUser?.displayName} text={headerText} />
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        isPulling={isPulling}
+        isRefreshing={isRefreshing}
+        progress={progress}
+        threshold={80}
+        onRefresh={refreshAll}
+      />
 
-      {/* Teacher-only section */}
-      {isTeacher && (
-        <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
-          <div className="lg:col-span-2">
-            {loadingTeacher ? (
-              <TeacherStatsCard.Skeleton />
-            ) : (
-              <TeacherStatsCard data={teacherStats} />
-            )}
-          </div>
+      <div ref={containerRef}>
+        <DashboardHeader
+          name={currentUser?.displayName}
+          text={headerText}
+          isRefreshing={isRefreshing}
+          lastRefresh={lastRefresh}
+          onRefresh={refreshAll}
+        />
 
-          <div className="lg:col-span-1">
-            {loadingTeacher ? (
-              <PendingVerificationCard.Skeleton />
-            ) : (
-              <PendingVerificationCard data={pendingVerifications} />
-            )}
-          </div>
+        {/* Teacher-only section */}
+        {isTeacher && (
+          <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
+            <div className="lg:col-span-2">
+              {loading.teacher ? (
+                <TeacherStatsCard.Skeleton />
+              ) : (
+                <TeacherStatsCard data={data.teacherStats} />
+              )}
+            </div>
 
-          <div className="lg:col-span-3 lg:col-start-1">
-            <QuickActionsCard data={{}} />
-          </div>
-        </div>
-      )}
+            <div className="lg:col-span-1">
+              {loading.teacher ? (
+                <PendingVerificationCard.Skeleton />
+              ) : (
+                <PendingVerificationCard data={data.pendingVerifications} />
+              )}
+            </div>
 
-      {/* Student section (visible for non-teachers) */}
-      {!isTeacher && (
-        <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
-          <div className="lg:col-span-2">
-            {loadingAssigned ? (
-              <LargeChallengeCard.Skeleton />
-            ) : (
-              <LargeChallengeCard data={challengeCardData} />
-            )}
+            <div className="lg:col-span-3 lg:col-start-1">
+              <QuickActionsCard data={{}} />
+            </div>
           </div>
+        )}
 
-          <div className="lg:col-span-2">
-            {loadingEcoActions ? (
-              <ActionsCarousel.Skeleton />
-            ) : (
-              <ActionsCarousel data={ecoActions ?? []} />
-            )}
+        {/* Student section (visible for non-teachers) */}
+        {!isTeacher && (
+          <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
+            <div className="lg:col-span-2">
+              {loading.ecoChallenge ? (
+                <LargeChallengeCard.Skeleton />
+              ) : (
+                <LargeChallengeCard data={challengeCardData} />
+              )}
+            </div>
+
+            <div className="lg:col-span-2">
+              {loading.ecoActions ? (
+                <ActionsCarousel.Skeleton />
+              ) : (
+                <ActionsCarousel data={data.ecoActions ?? []} />
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }
