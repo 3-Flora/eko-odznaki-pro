@@ -282,6 +282,56 @@ classes/{classId}/
   - teacherId: "nauczyciel_xyz_uid"
   - allowRegistration: true
 
+// 🆕 WNIOSKI NAUCZYCIELI O UTWORZENIE KONTA
+teacherApplications/{applicationId}/
+  - email: "jan.nowak@email.com"
+  - displayName: "Jan Nowak"
+  - schoolId: "szkola_podstawowa_1_uid"
+  - schoolName: "Szkoła Podstawowa nr 1 w Warszawie" // Denormalizacja dla łatwego wyświetlania
+  - proposedClassName: "Klasa 5b"
+  - phone: "+48 123 456 789" // Opcjonalne
+  - additionalInfo: "Jestem nauczycielem od 5 lat..." // Opcjonalne
+  - status: "pending" | "approved" | "rejected" // Domyślnie 'pending'
+  - createdAt: Timestamp
+  - reviewedAt: Timestamp // Kiedy ekoskop dokonał oceny
+  - reviewedBy: "ekoskop_user_uid" // Który ekoskop dokonał oceny
+  - rejectionReason: "Niepełne dokumenty" // Tylko przy statusie 'rejected'
+  - approvedTeacherId: "utworzony_nauczyciel_uid" // Tylko przy statusie 'approved'
+  // 🔒 BEZPIECZEŃSTWO: Dokumenty przechowywane w FireStorage
+  - documents: {
+    - idCard: {
+      - fileName: "legitymacja_jan_nowak.jpg"
+      - storagePath: "teacher-applications/{applicationId}/id-card.jpg" // Ścieżka w FireStorage
+      - uploadedAt: Timestamp
+      - fileSize: 1024567 // bytes
+      - mimeType: "image/jpeg"
+      - verified: false // Czy ekoskop zweryfikował dokument
+    }
+    - employmentCertificate: {
+      - fileName: "zaswiadczenie_zatrudnienie.pdf"
+      - storagePath: "teacher-applications/{applicationId}/employment-cert.pdf"
+      - uploadedAt: Timestamp
+      - fileSize: 2048123 // bytes
+      - mimeType: "application/pdf"
+      - verified: false
+    }
+  }
+  // 🔒 METADATA DLA AUDYTU I BEZPIECZEŃSTWA
+  - auditLog: [
+    {
+      - action: "created" | "reviewed" | "approved" | "rejected" | "document_uploaded"
+      - timestamp: Timestamp
+      - performedBy: "user_uid" // Kto wykonał akcję
+      - details: "Uploaded ID card document" // Dodatkowe szczegóły
+      - ipAddress: "192.168.1.1" // Opcjonalne dla bezpieczeństwa
+    }
+  ]
+  - metadata: {
+    - clientIP: "192.168.1.1" // IP z którego złożono wniosek
+    - userAgent: "Mozilla/5.0..." // Informacje o przeglądarce
+    - submissionSource: "web" | "mobile" // Skąd złożono wniosek
+  }
+
 // Definicje EkoDziałań (szablony)
 ecoActions/{ecoActionId}/
   - name: "Gaszenie światła"
@@ -369,6 +419,148 @@ activityFeeds/{classId}/
       - dismissed: true | false
 
 ```
+
+## 🔒 Firebase Storage - Struktura i Bezpieczeństwo
+
+### Struktura folderów w Firebase Storage:
+
+```
+teacher-applications/
+  {applicationId}/
+    id-card.{extension}        // Skan legitymacji (jpg, png, pdf)
+    employment-cert.{extension} // Zaświadczenie o zatrudnieniu (pdf, jpg, png)
+    
+user-submissions/
+  {submissionId}/
+    photo-1.{extension}        // Zdjęcia do EkoDziałań/EkoWyzwań
+    photo-2.{extension}
+    
+profile-images/
+  {userId}/
+    avatar.{extension}         // Zdjęcia profilowe użytkowników
+```
+
+### 🛡️ Reguły bezpieczeństwa Firebase Storage:
+
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 🔒 WNIOSKI NAUCZYCIELI - tylko właściciel może uploadować, ekoskop może czytać
+    match /teacher-applications/{applicationId}/{document} {
+      // Pozwól na upload tylko jeśli użytkownik to właściciel wniosku
+      allow write: if request.auth != null 
+        && isOwnerOfApplication(applicationId)
+        && isValidTeacherDocument(document)
+        && request.resource.size < 10 * 1024 * 1024; // Max 10MB
+      
+      // Pozwól na odczyt tylko ekoskopowi lub właścicielowi
+      allow read: if request.auth != null 
+        && (isEkoskop() || isOwnerOfApplication(applicationId));
+    }
+    
+    // 🔒 ZGŁOSZENIA UCZNIÓW - tylko właściciel może uploadować, nauczyciel i ekoskop mogą czytać
+    match /user-submissions/{submissionId}/{file} {
+      allow write: if request.auth != null 
+        && isOwnerOfSubmission(submissionId)
+        && request.resource.size < 5 * 1024 * 1024; // Max 5MB
+      
+      allow read: if request.auth != null 
+        && (isEkoskop() || isTeacherOfSubmission(submissionId) || isOwnerOfSubmission(submissionId));
+    }
+    
+    // 🔒 ZDJĘCIA PROFILOWE - tylko właściciel
+    match /profile-images/{userId}/{file} {
+      allow read, write: if request.auth != null 
+        && request.auth.uid == userId
+        && request.resource.size < 2 * 1024 * 1024; // Max 2MB
+    }
+    
+    // Pomocnicze funkcje bezpieczeństwa
+    function isEkoskop() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ekoskop";
+    }
+    
+    function isOwnerOfApplication(applicationId) {
+      return get(/databases/$(database)/documents/teacherApplications/$(applicationId)).data.createdBy == request.auth.uid;
+    }
+    
+    function isOwnerOfSubmission(submissionId) {
+      return get(/databases/$(database)/documents/submissions/$(submissionId)).data.studentId == request.auth.uid;
+    }
+    
+    function isTeacherOfSubmission(submissionId) {
+      let submission = get(/databases/$(database)/documents/submissions/$(submissionId)).data;
+      let userClass = get(/databases/$(database)/documents/classes/$(submission.classId)).data;
+      return userClass.teacherId == request.auth.uid;
+    }
+    
+    function isValidTeacherDocument(document) {
+      return document in ['id-card.jpg', 'id-card.png', 'id-card.pdf', 
+                         'employment-cert.jpg', 'employment-cert.png', 'employment-cert.pdf'];
+    }
+  }
+}
+```
+
+### 🛡️ Reguły bezpieczeństwa Firestore dla wniosków:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔒 WNIOSKI NAUCZYCIELI
+    match /teacherApplications/{applicationId} {
+      // Każdy może utworzyć wniosek (do rejestracji)
+      allow create: if request.auth != null 
+        && isValidTeacherApplication()
+        && resource == null; // Upewnij się, że dokument nie istnieje
+      
+      // Tylko właściciel może czytać swój wniosek
+      allow read: if request.auth != null 
+        && (resource.data.createdBy == request.auth.uid || isEkoskop());
+      
+      // Tylko ekoskop może aktualizować status wniosku
+      allow update: if request.auth != null 
+        && isEkoskop()
+        && isValidStatusUpdate();
+      
+      // Nikt nie może usuwać wniosków (dla audytu)
+      allow delete: if false;
+    }
+    
+    // Pomocnicze funkcje walidacji
+    function isValidTeacherApplication() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['email', 'displayName', 'schoolId', 'proposedClassName', 'status'])
+        && data.status == 'pending'
+        && data.createdBy == request.auth.uid
+        && data.email is string
+        && data.displayName is string;
+    }
+    
+    function isValidStatusUpdate() {
+      let before = resource.data;
+      let after = request.resource.data;
+      
+      // Można zmieniać tylko status, reviewedAt, reviewedBy i powód odrzucenia
+      return before.createdBy == after.createdBy
+        && before.email == after.email
+        && before.schoolId == after.schoolId
+        && after.status in ['pending', 'approved', 'rejected']
+        && (before.status == 'pending') // Można zmieniać tylko z pending
+        && after.reviewedBy == request.auth.uid
+        && after.reviewedAt is timestamp;
+    }
+    
+    function isEkoskop() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ekoskop";
+    }
+  }
+}
+```
+
 
 ### Jak Twoja Logika Idealnie Pasuje do Rekomendowanej Struktury
 

@@ -40,7 +40,11 @@ import {
   CreateBadgePage,
   EditBadgePage,
   EkoskopUsersPage,
+  CreateTeacherPage,
+  TeacherApplicationsPage,
   SchoolDetailPage,
+  // Other pages
+  TeacherApplicationPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -57,6 +61,10 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<AuthPage />} />
           <Route path="/selectSchool" element={<SelectSchoolPage />} />
+          <Route
+            path="/teacher-application"
+            element={<TeacherApplicationPage />}
+          />
           <Route
             path="/"
             element={
@@ -143,6 +151,14 @@ export default function App() {
                   element={<EditBadgePage />}
                 />
                 <Route path="users" element={<EkoskopUsersPage />} />
+                <Route
+                  path="users/create-teacher"
+                  element={<CreateTeacherPage />}
+                />
+                <Route
+                  path="users/teacher-applications"
+                  element={<TeacherApplicationsPage />}
+                />
                 <Route path="school/:schoolId" element={<SchoolDetailPage />} />
               </Route>
 

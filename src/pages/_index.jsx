@@ -34,4 +34,9 @@ export { default as EkoskopBadgesPage } from "./ekoskop/EkoskopBadgesPage";
 export { default as CreateBadgePage } from "./ekoskop/CreateBadgePage";
 export { default as EditBadgePage } from "./ekoskop/EditBadgePage";
 export { default as EkoskopUsersPage } from "./ekoskop/EkoskopUsersPage";
+export { default as CreateTeacherPage } from "./ekoskop/CreateTeacherPage";
+export { default as TeacherApplicationsPage } from "./ekoskop/TeacherApplicationsPage";
 export { default as SchoolDetailPage } from "./ekoskop/SchoolDetailPage";
+
+// Other pages
+export { default as TeacherApplicationPage } from "./TeacherApplicationPage";

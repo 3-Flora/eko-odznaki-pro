@@ -142,6 +142,15 @@ export default function AuthPage() {
             : "Masz już konto? Zaloguj się"}
         </button>
       </div>
+
+      <div className="mt-4 text-center">
+        <a
+          href="/teacher-application"
+          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          Jesteś nauczycielem? Złóż wniosek o konto →
+        </a>
+      </div>
     </div>
   );
 }

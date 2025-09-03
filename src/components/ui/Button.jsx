@@ -40,6 +40,18 @@ export default function Button({
       dark: "dark:bg-gray-800 dark:hover:bg-gray-700",
       text: "text-gray-800 dark:text-gray-200",
     },
+    outline: {
+      background: "bg-transparent border border-gray-300",
+      hover: "hover:bg-gray-50 hover:border-gray-400",
+      dark: "dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:border-gray-500",
+      text: "text-gray-700 dark:text-gray-300",
+    },
+    success: {
+      background: "bg-gradient-to-r from-green-500 to-green-600",
+      hover: "hover:from-green-600 hover:to-green-700",
+      dark: "dark:from-green-700 dark:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900",
+      text: "text-white",
+    },
   };
 
   const buttonSizes = {
