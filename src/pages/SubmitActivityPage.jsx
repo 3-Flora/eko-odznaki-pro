@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, X, Plus, Eye, Trash2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router";
@@ -15,10 +15,12 @@ import {
 } from "../utils/imageUtils";
 import TextareaAutosize from "react-textarea-autosize";
 import { useToast } from "../contexts/ToastContext";
+import useSubmissionLimits from "../hooks/useSubmissionLimits";
+import SubmissionLimitsInfo from "../components/ui/SubmissionLimitsInfo";
 
 export default function SubmitActivityPage() {
   const { showError, showSuccess } = useToast();
-  const { submitEcoAction, submitChallengeSubmission } = useAuth();
+  const { submitEcoAction, submitChallengeSubmission, currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,6 +39,13 @@ export default function SubmitActivityPage() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null); // Stan dla otwartego podglądu zdjęcia
 
   const MAX_PHOTOS = 4;
+
+  // Hook do sprawdzania limitów
+  const { limitData, stats, canSubmit, refresh } = useSubmissionLimits(
+    selectedItem,
+    isChallenge ? "challenge" : "eco_action",
+    !!currentUser && !!selectedItem,
+  );
 
   // Redirect if no action or challenge selected
   if (!selectedItem) {
@@ -125,6 +134,14 @@ export default function SubmitActivityPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Sprawdź limity przed wysłaniem
+    if (!canSubmit) {
+      showError(
+        "Nie możesz zgłosić tej aktywności z powodu osiągniętego limitu",
+      );
+      return;
+    }
 
     setLoading(true);
     setUploadProgress("");
@@ -228,6 +245,15 @@ export default function SubmitActivityPage() {
                 {selectedItem.description}
               </p>
             </div>
+
+            {/* Informacje o limitach */}
+            {limitData && (
+              <SubmissionLimitsInfo
+                limitData={limitData}
+                stats={stats}
+                type={isChallenge ? "challenge" : "eco_action"}
+              />
+            )}
           </div>
 
           {/* Comment Section */}
@@ -325,8 +351,13 @@ export default function SubmitActivityPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className="bottom-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 py-4 font-semibold text-white shadow-lg transition duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50"
+            disabled={loading || !canSubmit}
+            className={clsx(
+              "bottom-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 font-semibold text-white shadow-lg transition duration-200",
+              canSubmit && !loading
+                ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                : "cursor-not-allowed bg-gray-400",
+            )}
           >
             {loading ? (
               <div className="flex flex-col items-center space-y-1">
@@ -355,7 +386,11 @@ export default function SubmitActivityPage() {
             ) : (
               <>
                 <Upload className="h-5 w-5" />
-                {isChallenge ? "Wyślij wyzwanie" : "Wyślij działanie"}
+                {!canSubmit
+                  ? "Limit osiągnięty"
+                  : isChallenge
+                    ? "Wyślij wyzwanie"
+                    : "Wyślij działanie"}
               </>
             )}
           </button>

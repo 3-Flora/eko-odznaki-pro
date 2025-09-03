@@ -14,6 +14,8 @@ export const ecoActionsData = {
     description: "Pamiętaj, aby gasić światło wychodząc z pokoju",
     category: "Oszczędzanie",
     counterToIncrement: "savingActions",
+    maxDaily: 3,
+    maxWeekly: 10,
     style: {
       color: "yellow",
       shape: "circle",
@@ -25,6 +27,8 @@ export const ecoActionsData = {
     description: "Prawidłowo segreguj odpady w domu i szkole",
     category: "Recykling",
     counterToIncrement: "recyclingActions",
+    maxDaily: 2,
+    maxWeekly: 7,
     style: {
       color: "green",
       shape: "square",
@@ -36,6 +40,8 @@ export const ecoActionsData = {
     description: "Zamykaj kran podczas mycia zębów",
     category: "Oszczędzanie",
     counterToIncrement: "savingActions",
+    maxDaily: 5,
+    maxWeekly: 15,
     style: {
       color: "blue",
       shape: "circle",
@@ -47,6 +53,8 @@ export const ecoActionsData = {
     description: "Przeczytaj artykuł o ochronie środowiska",
     category: "Edukacja",
     counterToIncrement: "educationActions",
+    maxDaily: 1,
+    maxWeekly: 3,
     style: {
       color: "purple",
       shape: "triangle",
@@ -58,6 +66,8 @@ export const ecoActionsData = {
     description: "Jedź autobusem lub tramwajem zamiast samochodem",
     category: "Oszczędzanie",
     counterToIncrement: "savingActions",
+    maxDaily: 1,
+    maxWeekly: 5,
     style: {
       color: "orange",
       shape: "circle",
@@ -69,6 +79,8 @@ export const ecoActionsData = {
     description: "Posadź roślinę w domu lub ogrodzie",
     category: "Edukacja",
     counterToIncrement: "educationActions",
+    maxDaily: 1,
+    maxWeekly: 5,
     style: {
       color: "green",
       shape: "square",
@@ -80,6 +92,8 @@ export const ecoActionsData = {
     description: "Zbierz starą papier do recyklingu",
     category: "Recykling",
     counterToIncrement: "recyclingActions",
+    maxDaily: 1,
+    maxWeekly: 5,
     style: {
       color: "brown",
       shape: "square",
@@ -91,6 +105,8 @@ export const ecoActionsData = {
     description: "Weź udział w warsztatach ekologicznych",
     category: "Edukacja",
     counterToIncrement: "educationActions",
+    maxDaily: 1,
+    maxWeekly: 5,
     style: {
       color: "teal",
       shape: "circle",
@@ -102,7 +118,6 @@ export const ecoActionsData = {
 /**
  * Funkcje do masowego dodawania danych do Firestore
  */
-
 export const addEcoActionsToFirestore = async () => {
   try {
     const results = [];

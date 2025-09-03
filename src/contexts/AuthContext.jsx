@@ -27,6 +27,11 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../services/firebase";
+import {
+  validateSubmissionLimits,
+  validateWeeklyChallengeLimit,
+} from "../services/submissionLimitService";
+import { useLimitsRefresh } from "./LimitsRefreshContext";
 
 const AuthContext = createContext(null);
 
@@ -41,6 +46,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { triggerLimitsRefresh } = useLimitsRefresh();
 
   // Tworzenie konta
   const createUserDocument = async (firebaseUser, additionalData) => {
@@ -88,6 +94,18 @@ export const AuthProvider = ({ children }) => {
       );
     }
 
+    // Walidacja limitów przed zgłoszeniem
+    const limitValidation = await validateSubmissionLimits(
+      currentUser.id,
+      ecoAction.id,
+      "eco_action",
+      ecoAction,
+    );
+
+    if (!limitValidation.canSubmit) {
+      throw new Error(limitValidation.reason);
+    }
+
     const submissionData = {
       type: "eco_action",
       ecoActivityId: ecoAction.id,
@@ -101,6 +119,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     await addDoc(collection(db, "submissions"), submissionData);
+
+    // Wyzwól odświeżenie limitów po zgłoszeniu aktywności
+    triggerLimitsRefresh();
   };
 
   const submitChallengeSubmission = async (ecoChallenge, optionalData = {}) => {
@@ -108,6 +129,27 @@ export const AuthProvider = ({ children }) => {
       throw new Error(
         "Użytkownik musi być zweryfikowany, aby zgłaszać wyzwania.",
       );
+    }
+
+    // Sprawdź ogólny limit EkoWyzwań (jedno na tydzień)
+    const weeklyLimitValidation = await validateWeeklyChallengeLimit(
+      currentUser.id,
+    );
+
+    if (!weeklyLimitValidation.canSubmit) {
+      throw new Error(weeklyLimitValidation.reason);
+    }
+
+    // Sprawdź limity konkretnego wyzwania
+    const limitValidation = await validateSubmissionLimits(
+      currentUser.id,
+      ecoChallenge.id,
+      "challenge",
+      ecoChallenge,
+    );
+
+    if (!limitValidation.canSubmit) {
+      throw new Error(limitValidation.reason);
     }
 
     const submissionData = {
@@ -123,6 +165,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     await addDoc(collection(db, "submissions"), submissionData);
+
+    // Wyzwól odświeżenie limitów po zgłoszeniu wyzwania
+    triggerLimitsRefresh();
   };
 
   const getUserEcoActionSubmissions = async () => {

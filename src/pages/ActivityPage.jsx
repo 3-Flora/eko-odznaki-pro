@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
@@ -14,6 +14,15 @@ import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
 import clsx from "clsx";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useLimitsRefresh } from "../contexts/LimitsRefreshContext";
+import {
+  useSubmissionLimits,
+  useWeeklyChallengeLimit,
+} from "../hooks/useSubmissionLimits";
+import {
+  SubmissionLimitsBadge,
+  ActivityLimitsOverview,
+} from "../components/ui/SubmissionLimitsInfo";
 
 export default function ActivityPage() {
   const navigate = useNavigate();
@@ -24,6 +33,13 @@ export default function ActivityPage() {
 
   const { showError } = useToast();
   const { currentUser, getChallengeSubmissionStatus } = useAuth();
+  const { triggerLimitsRefresh } = useLimitsRefresh();
+
+  // Hook do sprawdzania limitów EkoWyzwań
+  // Pobieramy też funkcję `refresh`, aby odświeżyć tylko ogólny limit tygodniowy
+  // zamiast triggerować globalne odświeżenie dla wszystkich hooków.
+  const { limitData: weeklyLimitData, refresh: refreshWeeklyLimit } =
+    useWeeklyChallengeLimit(!!currentUser);
 
   // Funkcja do ładowania danych
   const loadData = useCallback(async () => {
@@ -47,7 +63,14 @@ export default function ActivityPage() {
     invalidateCachedEcoActions();
     invalidateCachedEcoChallenges();
     await loadData();
-  }, [loadData]);
+    // Odśwież tylko tygodniowy limit (unikamy masowych fetchów dla każdej karty)
+    if (typeof refreshWeeklyLimit === "function") {
+      await refreshWeeklyLimit();
+    } else {
+      // fallback: jeśli z jakiegoś powodu nie ma tej funkcji, zachowaj dotychczasowe zachowanie
+      await triggerLimitsRefresh();
+    }
+  }, [loadData, triggerLimitsRefresh, refreshWeeklyLimit]);
 
   // Pull-to-refresh hook
   const pullToRefresh = usePullToRefresh(handleRefresh, {
@@ -60,9 +83,12 @@ export default function ActivityPage() {
     loadData();
   }, [loadData, currentUser, getChallengeSubmissionStatus]);
 
-  const handleActionSelect = (action) => {
-    navigate("/submit/action", { state: { action } });
-  };
+  const handleActionSelect = useCallback(
+    (action) => {
+      navigate("/submit/action", { state: { action } });
+    },
+    [navigate],
+  );
 
   const handleChallengeSelect = (challenge) => {
     const submission = challengeSubmissions[challenge.id];
@@ -81,6 +107,8 @@ export default function ActivityPage() {
 
     navigate("/submit/action", { state: { challenge } });
   };
+
+  // ...existing code...
 
   // Funkcja pomocnicza do określania statusu wyzwania
   const getChallengeStatus = (challengeId) => {
@@ -142,12 +170,31 @@ export default function ActivityPage() {
           emoji="🌍"
           subtitle="Dotknij działania lub wyzwania, które chcesz zgłosić"
         />
+
+        {/* Przegląd limitów zgłoszeń */}
+        {/* {currentUser && (
+          <ActivityLimitsOverview
+            ecoActions={ecoActions}
+            challenges={challenges}
+            useSubmissionLimitsHook={useSubmissionLimits}
+            currentUser={currentUser}
+          />
+        )} */}
+
         <div>
           {/* Challenges Section - wyświetlane na górze gdy są dostępne */}
           <div className="mb-4">
-            <h2 className="mb-4 text-2xl font-bold text-gray-800 dark:text-white">
-              🏆 Dostępne EkoWyzwania
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                🏆 Dostępne EkoWyzwania
+              </h2>
+            </div>
+            {weeklyLimitData && !weeklyLimitData.canSubmit && (
+              <SubmissionLimitsBadge
+                limitData={{ challengeLimit: weeklyLimitData }}
+                type="challenge"
+              />
+            )}
 
             {/* Loading state for challenges */}
             {loading && (
@@ -254,44 +301,11 @@ export default function ActivityPage() {
             {!loading && ecoActions.length > 0 && (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {ecoActions.map((action) => (
-                  <div key={action.id} className="w-full">
-                    <button
-                      onClick={() => handleActionSelect(action)}
-                      className="w-full cursor-pointer"
-                      aria-label={action.name}
-                    >
-                      <div className="relative w-full pt-[100%]">
-                        {/* square wrapper */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 dark:border-gray-700 dark:bg-gray-800">
-                          <div className="mb-2 flex flex-col items-center">
-                            <div
-                              className={clsx(
-                                "mb-3 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl",
-                                backgroundStyles[
-                                  action.style?.color || "default"
-                                ],
-                              )}
-                            >
-                              {action.style?.icon || "🌱"}
-                            </div>
-                            <div
-                              className={clsx(
-                                "rounded-full px-2 py-1 text-xs font-medium",
-                                backgroundStyles[
-                                  action.style?.color || "default"
-                                ],
-                              )}
-                            >
-                              {action.category}
-                            </div>
-                          </div>
-                          <h3 className="px-2 text-center leading-tight font-semibold break-words text-gray-800 dark:text-white">
-                            {action.name}
-                          </h3>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
+                  <EcoActionCard
+                    key={action.id}
+                    action={action}
+                    onSelect={handleActionSelect}
+                  />
                 ))}
               </div>
             )}
@@ -301,3 +315,54 @@ export default function ActivityPage() {
     </>
   );
 }
+
+// Memoized card component moved outside ActivityPage to avoid re-creation on each render
+const EcoActionCard = memo(function EcoActionCard({ action, onSelect }) {
+  // Let the hook read currentUser from AuthContext itself; enabling by default
+  const { limitData, canSubmit } = useSubmissionLimits(
+    action,
+    "eco_action",
+    true,
+  );
+
+  return (
+    <div className="w-full">
+      <button
+        onClick={() => (canSubmit ? onSelect(action) : null)}
+        disabled={!canSubmit}
+        className={clsx(
+          "group relative flex w-full flex-col items-center gap-3 rounded-2xl border p-4 text-center transition-all duration-200",
+          canSubmit
+            ? "border-gray-200 bg-white shadow-sm hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800"
+            : "cursor-not-allowed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50",
+        )}
+      >
+        <div
+          className={clsx(
+            "flex h-16 w-16 items-center justify-center rounded-2xl text-3xl",
+            canSubmit
+              ? backgroundStyles[action.style?.color || "default"]
+              : "bg-gray-100 dark:bg-gray-600",
+          )}
+        >
+          {action.style?.icon || "🌱"}
+        </div>
+        <div className="w-full">
+          <h3
+            className={clsx(
+              "text-sm font-semibold",
+              canSubmit
+                ? "text-gray-800 dark:text-white"
+                : "text-gray-500 dark:text-gray-400",
+            )}
+          >
+            {action.name}
+          </h3>
+          <div className="mt-2 flex justify-center">
+            <SubmissionLimitsBadge limitData={limitData} type="eco_action" />
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+});

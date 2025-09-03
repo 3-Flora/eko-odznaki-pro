@@ -62,19 +62,22 @@ export default function TeacherStatisticsPage() {
           }
         }
 
-        // Pobierz uczniów z tej klasy
+        // Pobierz wszystkich użytkowników z tej klasy - uproszczone zapytanie
         const studentsQuery = query(
           collection(db, "users"),
           where("classId", "==", currentUser.classId),
-          where("role", "==", "student"),
-          where("isVerified", "==", true),
         );
 
         const studentsSnapshot = await getDocs(studentsQuery);
-        const studentsData = studentsSnapshot.docs.map((doc) => ({
+        const allStudents = studentsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
+        // Filtruj w pamięci
+        const studentsData = allStudents.filter(
+          (user) => user.role === "student" && user.isVerified === true,
+        );
 
         setStudents(studentsData);
       } catch (error) {

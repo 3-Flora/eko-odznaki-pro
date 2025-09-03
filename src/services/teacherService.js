@@ -34,19 +34,23 @@ export const getTeacherClassStats = async (classId) => {
       }
     }
 
-    // Pobierz uczniów z tej klasy
+    // Pobierz uczniów z tej klasy - uproszczone zapytanie
     const studentsQuery = query(
       collection(db, "users"),
       where("classId", "==", classId),
       where("role", "==", "student"),
-      where("isVerified", "==", true),
     );
 
     const studentsSnapshot = await getDocs(studentsQuery);
-    const students = studentsSnapshot.docs.map((doc) => ({
+    const allStudents = studentsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    // Filtruj zweryfikowanych w pamięci
+    const students = allStudents.filter(
+      (student) => student.isVerified === true,
+    );
 
     // Oblicz statystyki klasy
     const classStats = students.reduce(
@@ -101,27 +105,35 @@ export const getTeacherClassStats = async (classId) => {
  */
 export const getPendingVerifications = async (classId) => {
   try {
-    // Pobierz oczekujące zgłoszenia
+    // Pobierz wszystkie zgłoszenia z klasy - uproszczone zapytanie
     const submissionsQuery = query(
       collection(db, "submissions"),
       where("classId", "==", classId),
-      where("status", "in", ["pending", null]),
       limit(50),
     );
 
     const submissionsSnapshot = await getDocs(submissionsQuery);
-    const pendingSubmissions = submissionsSnapshot.docs.length;
 
-    // Pobierz niezweryfikowanych uczniów
+    // Filtruj oczekujące w pamięci
+    const pendingSubmissions = submissionsSnapshot.docs.filter((doc) => {
+      const status = doc.data().status;
+      return status === "pending" || status === null || status === undefined;
+    }).length;
+
+    // Pobierz uczniów z klasy - uproszczone zapytanie
     const studentsQuery = query(
       collection(db, "users"),
       where("classId", "==", classId),
       where("role", "==", "student"),
-      where("isVerified", "!=", true),
     );
 
     const studentsSnapshot = await getDocs(studentsQuery);
-    const pendingStudents = studentsSnapshot.docs.length;
+
+    // Filtruj niezweryfikowanych w pamięci
+    const pendingStudents = studentsSnapshot.docs.filter((doc) => {
+      const isVerified = doc.data().isVerified;
+      return isVerified !== true;
+    }).length;
 
     return {
       pendingSubmissions,

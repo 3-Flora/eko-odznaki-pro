@@ -54,32 +54,21 @@ export default function SchoolDetailPage() {
       }));
       setClasses(classesData);
 
-      // Pobierz uczniów w szkole
-      const studentsSnapshot = await getDocs(
-        query(
-          collection(db, "users"),
-          where("schoolId", "==", schoolId),
-          where("role", "==", "student"),
-        ),
+      // Pobierz wszystkich użytkowników w szkole - uproszczone zapytanie
+      const allUsersSnapshot = await getDocs(
+        query(collection(db, "users"), where("schoolId", "==", schoolId)),
       );
-      const studentsData = studentsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setStudents(studentsData);
 
-      // Pobierz nauczycieli w szkole
-      const teachersSnapshot = await getDocs(
-        query(
-          collection(db, "users"),
-          where("schoolId", "==", schoolId),
-          where("role", "==", "teacher"),
-        ),
-      );
-      const teachersData = teachersSnapshot.docs.map((doc) => ({
+      const allUsers = allUsersSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+
+      // Filtruj w pamięci zamiast w bazie danych
+      const studentsData = allUsers.filter((user) => user.role === "student");
+      const teachersData = allUsers.filter((user) => user.role === "teacher");
+
+      setStudents(studentsData);
       setTeachers(teachersData);
 
       // Oblicz statystyki

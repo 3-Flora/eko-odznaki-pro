@@ -117,7 +117,7 @@ export default function DashboardPage() {
 
         {/* Teacher-only section */}
         {isTeacher && (
-          <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
+          <div className="flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
             <div className="lg:col-span-2">
               {loading.teacher ? (
                 <TeacherStatsCard.Skeleton />
@@ -126,7 +126,7 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="lsg:col-span-1">
               {loading.teacher ? (
                 <PendingVerificationCard.Skeleton />
               ) : (
@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
         {/* Ekoskop section */}
         {isEkoskop && (
-          <div className="mb-6 space-y-6">
+          <div className="space-y-6">
             {/* Quick Actions for Ekoskop */}
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
               <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
 
         {/* Student section (visible for non-teachers and non-ekoskop) */}
         {!isTeacher && !isEkoskop && (
-          <div className="mb-6 flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
+          <div className="flex flex-col gap-6 lg:mb-0 lg:grid lg:grid-cols-3 lg:gap-6">
             <div className="lg:col-span-2">
               {loading.ecoChallenge ? (
                 <LargeChallengeCard.Skeleton />

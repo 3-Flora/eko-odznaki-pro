@@ -77,19 +77,27 @@ EkoWyzwania → wyzwania które trzeba wykonać w danym tygodniu
 
 - Wybór EkoZadania (Nazwa, Opis)
 - (opcjonalne) Zdjęcie i opis co się zrobiło
+- **Sprawdzenie limitów przed wysłaniem:** System automatycznie sprawdza czy użytkownik nie przekroczył dziennych lub tygodniowych limitów dla danego EkoDziałania
 - Zapisanie wykonania zadania, **automatyczna akceptacja.**
   - Nauczyciel ma wgląd w to, że dany uczeń to zrobił.
   - Zakładamy, **że uczeń jest uczciwy i to zależy od nauczyciela** czy odbierze mu wykonanie zadania czy zostawi
-- Dany uczeń może wykonać daną ilość EkoDziałań
+- Dany uczeń może wykonać daną ilość EkoDziałań **zgodnie z limitami określonymi w szablonie EkoDziałania**
+- **Limity są sprawdzane w czasie rzeczywistym** - w interfejsie użytkownik widzi:
+  - Ile pozostało mu zgłoszeń dzisiaj/w tym tygodniu
+  - Informację o przekroczeniu limitu z datą resetowania
+  - Zablokowane przyciski dla EkoDziałań z osiągniętym limitem
 
 #### Wykonywanie EkoWyzwania
 
 - Wybór EkoWyzwania (Nazwa, Opis)
 - (opcjonalne) Zdjęcie i opis co się zrobiło
+- **Sprawdzenie globalnego limitu EkoWyzwań:** System sprawdza czy użytkownik nie zgłosił już innego EkoWyzwania w tym tygodniu
+- **Sprawdzenie limitów konkretnego EkoWyzwania:** Dodatowa walidacja limitów dla wybranego wyzwania
 - Zapisanie wykonania wyzwania, **automatyczna akceptacja.**
   - Nauczyciel ma wgląd w to, że dany uczeń to zrobił.
   - Zakładamy, **że uczeń jest uczciwy i to zależy od nauczyciela** czy odbierze mu wykonanie wyzwania czy zostawi
 - Dany uczeń może wykonać **jedno** EkoWyzwanie na tydzień
+- **System wyświetla informacje o limitach** podobnie jak w EkoDziałaniach
 
 ---
 
@@ -105,6 +113,55 @@ EkoWyzwania → wyzwania które trzeba wykonać w danym tygodniu
 - Automatyczne przydzielanie odznak na bazie ilości ukończonych działań
   - W zależności ile razy wykonał dane EkoDziałanie, uczeń otrzymuje odznakę która potem automatycznie się ulepsza gdy zdobędzie kamień milowy.
   - Aby ograniczyć możliwość zdobycia najlepszej odznaki w pierwszych tygodniach, system będzie zaprojektowany w taki sposób, że uczeń MUSI być REGULARNY przez cały okres gry. Tzn. że w danym tygodniu może zrobić MAX ileś danego działania
+
+---
+
+## 🔒 System Limitów EkoDziałań i EkoWyzwań
+
+### Implementacja
+
+System limitów został zaimplementowany zgodnie z wymaganiami z dokumentacji. Składa się z następujących komponentów:
+
+#### Serwis walidacji limitów (`submissionLimitService.js`)
+
+- `validateSubmissionLimits()` - sprawdza dzienne i tygodniowe limity dla konkretnej aktywności
+- `validateWeeklyChallengeLimit()` - sprawdza globalny limit EkoWyzwań (jedno na tydzień)
+- `getUserSubmissionStats()` - pobiera statystyki zgłoszeń użytkownika
+- `formatResetDate()` - formatuje datę resetowania limitów
+
+#### Hook `useSubmissionLimits`
+
+- Integruje sprawdzanie limitów z komponentami React
+- Automatycznie odświeża dane o limitach
+- Zwraca informację czy użytkownik może zgłosić aktywność
+
+#### Komponenty UI
+
+- `SubmissionLimitsInfo` - wyświetla szczegółowe informacje o limitach
+- `SubmissionLimitsBadge` - kompaktowy znaczek z informacją o limitach
+
+### Jak działają limity
+
+1. **EkoDziałania:**
+   - Każde EkoDziałanie ma własne limity `maxDaily` i `maxWeekly`
+   - Limity są sprawdzane przed wysłaniem zgłoszenia
+   - UI pokazuje pozostałe zgłoszenia i blokuje przycisk gdy limit osiągnięty
+
+2. **EkoWyzwania:**
+   - Globalny limit: jedno EkoWyzwanie na tydzień (niezależnie od typu)
+   - Dodatkowo każde EkoWyzwanie może mieć własne limity `maxDaily`/`maxWeekly`
+   - Tydzień liczy się od poniedziałku do niedzieli
+
+3. **Walidacja:**
+   - Sprawdzana przed wysłaniem w `AuthContext.submitEcoAction()` i `submitChallengeSubmission()`
+   - Liczone są zgłoszenia ze statusem "approved" i "pending"
+   - Błąd jest rzucany jeśli limit zostanie przekroczony
+
+### Zmiany w interfejsie
+
+- **ActivityPage:** EkoDziałania z osiągniętym limitem są wyszarzone i nieaktywne
+- **SubmitActivityPage:** Widoczne informacje o limitach i zablokowany przycisk wysyłania
+- **Znaczniki limitów:** Kompaktowe informacje o pozostałych zgłoszeniach
 
 ---
 
