@@ -1,17 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  query,
+  where,
+  getDocs,
+  collection,
+} from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { useToast } from "../../contexts/ToastContext";
-import { School, Mail, MapPin, Save, ArrowLeft } from "lucide-react";
+import { School, Mail, MapPin, Save } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import BackButton from "../../components/ui/BackButton";
+import Loading from "../../components/routing/Loading";
 
-export default function CreateSchoolPage() {
+export default function EditSchoolPage() {
   const navigate = useNavigate();
+  const { schoolId } = useParams();
   const { currentUser } = useAuth();
   const { showSuccess, showError } = useToast();
 
@@ -24,8 +34,48 @@ export default function CreateSchoolPage() {
     description: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [originalData, setOriginalData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (schoolId) {
+      loadSchoolData();
+    }
+  }, [schoolId]);
+
+  const loadSchoolData = async () => {
+    try {
+      setLoading(true);
+      const schoolDoc = await getDoc(doc(db, "schools", schoolId));
+
+      if (!schoolDoc.exists()) {
+        showError("Nie znaleziono szkoły");
+        navigate("/ekoskop/schools");
+        return;
+      }
+
+      const schoolData = schoolDoc.data();
+      const dataToSet = {
+        name: schoolData.name || "",
+        address: schoolData.address || "",
+        email: schoolData.email || "",
+        phone: schoolData.phone || "",
+        website: schoolData.website || "",
+        description: schoolData.description || "",
+      };
+
+      setFormData(dataToSet);
+      setOriginalData(dataToSet);
+    } catch (error) {
+      console.error("Error loading school:", error);
+      showError("Nie udało się załadować danych szkoły");
+      navigate("/ekoskop/schools");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,11 +139,22 @@ export default function CreateSchoolPage() {
         where("name", "==", name.trim()),
       );
       const snapshot = await getDocs(q);
-      return !snapshot.empty;
+
+      // Sprawdź, czy inna szkoła (nie edytowana) ma tę samą nazwę
+      const existingSchools = snapshot.docs.filter(
+        (doc) => doc.id !== schoolId,
+      );
+      return existingSchools.length > 0;
     } catch (error) {
       console.error("Error checking school existence:", error);
       return false;
     }
+  };
+
+  const hasChanges = () => {
+    return Object.keys(formData).some(
+      (key) => formData[key].trim() !== originalData[key].trim(),
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -103,51 +164,65 @@ export default function CreateSchoolPage() {
       return;
     }
 
-    setLoading(true);
+    if (!hasChanges()) {
+      showError("Nie wprowadzono żadnych zmian");
+      return;
+    }
+
+    setSaving(true);
 
     try {
-      // Sprawdź, czy szkoła o tej nazwie już istnieje
-      const schoolExists = await checkIfSchoolExists(formData.name);
-      if (schoolExists) {
-        setErrors({ name: "Szkoła o tej nazwie już istnieje" });
-        setLoading(false);
-        return;
+      // Sprawdź, czy inna szkoła o tej nazwie już istnieje (tylko jeśli zmieniono nazwę)
+      if (formData.name.trim() !== originalData.name.trim()) {
+        const schoolExists = await checkIfSchoolExists(formData.name);
+        if (schoolExists) {
+          setErrors({ name: "Szkoła o tej nazwie już istnieje" });
+          setSaving(false);
+          return;
+        }
       }
 
-      // Przygotuj dane szkoły
-      const schoolData = {
+      // Przygotuj dane do aktualizacji
+      const updateData = {
         name: formData.name.trim(),
         address: formData.address.trim(),
         email: formData.email.trim() || null,
         phone: formData.phone.trim() || null,
         website: formData.website.trim() || null,
         description: formData.description.trim() || null,
-        createdAt: new Date(),
-        createdBy: currentUser.id,
         updatedAt: new Date(),
+        updatedBy: currentUser.id,
       };
 
-      // Dodaj szkołę do Firestore
-      const docRef = await addDoc(collection(db, "schools"), schoolData);
+      // Aktualizuj szkołę w Firestore
+      await updateDoc(doc(db, "schools", schoolId), updateData);
 
-      showSuccess("Szkoła została pomyślnie dodana do systemu");
+      showSuccess("Dane szkoły zostały pomyślnie zaktualizowane");
       navigate("/ekoskop/schools");
     } catch (error) {
-      console.error("Error creating school:", error);
-      showError("Nie udało się dodać szkoły. Spróbuj ponownie.");
+      console.error("Error updating school:", error);
+      showError("Nie udało się zaktualizować danych szkoły. Spróbuj ponownie.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Nowa szkoła"
-        subtitle="Dodaj nową szkołę do systemu"
+        title="Edytuj szkołę"
+        subtitle="Zaktualizuj informacje o szkole"
         breadcrumbs={[
           { name: "Szkoły", href: "/ekoskop/schools" },
-          { name: "Nowa szkoła", current: true },
+          {
+            name: originalData.name || "Szkoła",
+            href: `/ekoskop/school/${schoolId}`,
+          },
+          { name: "Edytuj", current: true },
         ]}
       />
 
@@ -300,37 +375,50 @@ export default function CreateSchoolPage() {
             <div className="flex items-center justify-between pt-6">
               <BackButton />
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2"
-              >
-                <Save className="h-4 w-4" />
-                {loading ? "Dodawanie..." : "Dodaj szkołę"}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  onClick={() => navigate("/ekoskop/schools")}
+                  style="outline"
+                >
+                  Anuluj
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={saving || !hasChanges()}
+                  className="inline-flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {saving ? "Zapisywanie..." : "Zapisz zmiany"}
+                </Button>
+              </div>
             </div>
           </form>
         </div>
 
         {/* Informacje pomocnicze */}
-        <div className="mt-6 rounded-xl bg-blue-50 p-4 dark:bg-blue-900/20">
+        <div className="mt-6 rounded-xl bg-amber-50 p-4 dark:bg-amber-900/20">
           <div className="flex">
             <div className="flex-shrink-0">
-              <School className="h-5 w-5 text-blue-400" />
+              <School className="h-5 w-5 text-amber-400" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                Informacje o dodawaniu szkół
+              <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Uwagi dotyczące edycji szkoły
               </h3>
-              <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+              <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
                 <ul className="list-inside list-disc space-y-1">
-                  <li>Pola oznaczone * są wymagane</li>
-                  <li>Nazwa szkoły musi być unikalna w systemie</li>
                   <li>
-                    Podaj jak najdokładniejszy adres dla łatwiejszego
+                    Zmiany będą widoczne dla wszystkich użytkowników
+                    przypisanych do tej szkoły
+                  </li>
+                  <li>
+                    Aktualizacja nazwy szkoły może wpłynąć na wyniki
                     wyszukiwania
                   </li>
-                  <li>Kontakt email i telefon ułatwią komunikację z szkołą</li>
+                  <li>
+                    Sprawdź poprawność danych kontaktowych przed zapisaniem
+                  </li>
                 </ul>
               </div>
             </div>

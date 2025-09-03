@@ -29,6 +29,7 @@ import {
   // Ekoskop pages
   EkoskopSchoolsPage,
   CreateSchoolPage,
+  EditSchoolPage,
   EkoskopStatisticsPage,
   EkoskopArticlesPage,
   CreateArticlePage,
@@ -128,6 +129,10 @@ export default function App() {
               >
                 <Route path="schools" element={<EkoskopSchoolsPage />} />
                 <Route path="schools/create" element={<CreateSchoolPage />} />
+                <Route
+                  path="schools/edit/:schoolId"
+                  element={<EditSchoolPage />}
+                />
                 <Route path="statistics" element={<EkoskopStatisticsPage />} />
                 <Route path="articles" element={<EkoskopArticlesPage />} />
                 <Route path="articles/create" element={<CreateArticlePage />} />

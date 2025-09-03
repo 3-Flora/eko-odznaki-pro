@@ -23,6 +23,7 @@ export { default as CreateNotificationPage } from "./CreateNotificationPage";
 // Ekoskop pages
 export { default as EkoskopSchoolsPage } from "./ekoskop/EkoskopSchoolsPage";
 export { default as CreateSchoolPage } from "./ekoskop/CreateSchoolPage";
+export { default as EditSchoolPage } from "./ekoskop/EditSchoolPage";
 export { default as EkoskopStatisticsPage } from "./ekoskop/EkoskopStatisticsPage";
 export { default as EkoskopArticlesPage } from "./ekoskop/EkoskopArticlesPage";
 export { default as CreateArticlePage } from "./ekoskop/CreateArticlePage";
