@@ -194,31 +194,25 @@ export default function EditProfilePage() {
           </div>
         )}
 
-        <button
-          type="button"
+        <Button
           onClick={handleDeleteAccount}
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-white transition duration-200 hover:from-red-600 hover:to-red-700 disabled:opacity-50"
+          icon={Trash2}
+          style="danger"
         >
-          <div className="flex items-center justify-center gap-2">
-            <Trash2 size={20} />
-            {showDeleteConfirmation
-              ? "Potwierdź usunięcie konta"
-              : "Usuń konto"}
-          </div>
-        </button>
+          {showDeleteConfirmation ? "Potwierdź usunięcie konta" : "Usuń konto"}
+        </Button>
 
         {showDeleteConfirmation && (
-          <button
-            type="button"
+          <Button
             onClick={() => {
               setShowDeleteConfirmation(false);
               setCurrentPassword("");
             }}
-            className="w-full rounded-xl border-2 border-gray-200 bg-white py-2 font-medium text-gray-700 transition duration-200 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            style="gray"
           >
             Anuluj
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -114,23 +114,24 @@ export default function Badge({
 */
 
 // Modal szczegółów odznaki
-export function BadgeModal({
-  id,
-  name,
-  badgeImage,
-  category,
-  currentLevel,
-  currentLevelData,
-  nextLevel,
-  nextLevelData,
-  currentCount,
-  isEarned,
-  progress,
-  progressText,
-  template,
-  isOpen,
-  onClose,
-}) {
+export function BadgeModal(props) {
+  // Accept either an object `badge` or individual props (backwards-compatible)
+  const { badge, isOpen, onClose } = props;
+
+  const id = badge?.id ?? props.id;
+  const name = badge?.name ?? props.name;
+  const badgeImage = badge?.badgeImage ?? props.badgeImage;
+  const category = badge?.category ?? props.category;
+  const currentLevel = badge?.currentLevel ?? props.currentLevel;
+  const currentLevelData = badge?.currentLevelData ?? props.currentLevelData;
+  const nextLevel = badge?.nextLevel ?? props.nextLevel;
+  const nextLevelData = badge?.nextLevelData ?? props.nextLevelData;
+  const currentCount = badge?.currentCount ?? props.currentCount;
+  const isEarned = badge?.isEarned ?? props.isEarned;
+  const progress = badge?.progress ?? props.progress;
+  const progressText = badge?.progressText ?? props.progressText;
+  const template = badge?.template ?? props.template;
+
   if (!isOpen || !id) return null;
 
   const description = isEarned

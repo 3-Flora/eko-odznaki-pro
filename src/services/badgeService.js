@@ -10,7 +10,6 @@ export const getBadgeTemplates = async () => {
     const snapshot = await getDocs(badgeTemplatesRef);
 
     const templates = {};
-    console.log("Templates: ", templates);
 
     snapshot.docs.forEach((doc) => {
       templates[doc.id] = {

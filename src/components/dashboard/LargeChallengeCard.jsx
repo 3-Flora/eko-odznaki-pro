@@ -18,11 +18,12 @@ function LargeChallengeCard({ data }) {
     navigate("/submit/action", {
       state: {
         challenge: {
-          id: data.challengeId,
-          title: data.challengeName,
-          description: data.challengeDescription,
+          ecoActivityId: data.id || data.challengeId,
+          name: data.name || data.challengeName,
+          description: data.description || data.challengeDescription,
+          type: "challenge",
           endDate: data.endDate,
-          icon: "🎯", // Domyślna ikona, można to rozszerzyć w przyszłości
+          icon: data.icon || "🎯",
         },
       },
     });

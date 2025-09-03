@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import clsx from "clsx";
 import { backgroundEcoAction as backgroundStyles } from "../../utils/styleUtils";
+import Button from "../ui/Button";
 
 function ActionsCarousel({ data }) {
   const navigate = useNavigate();
@@ -15,12 +16,14 @@ function ActionsCarousel({ data }) {
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white">
           Szybkie Działania
         </h3>
-        <button
+        <Button
           onClick={() => navigate("/submit")}
-          className="text-sm text-gray-500 dark:text-gray-300"
+          style="normal"
+          size="sm"
+          fullWidth={false}
         >
           Zobacz wszystkie
-        </button>
+        </Button>
       </div>
 
       <div className="flex space-x-3 overflow-x-auto pb-2">
