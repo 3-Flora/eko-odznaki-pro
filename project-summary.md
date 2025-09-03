@@ -1,0 +1,169 @@
+## Capacitor Plugins
+
+- 🟩 [@capacitor/app@7.0.2](https://github.com/ionic-team/capacitor-plugins.git)
+- 🟩 [@capacitor/haptics@7.0.2](https://github.com/ionic-team/capacitor-plugins.git)
+- 🟩 [@capacitor/preferences@7.0.2](https://github.com/ionic-team/capacitor-plugins.git)
+- 🟩 [@capacitor/status-bar@7.0.2](https://github.com/ionic-team/capacitor-plugins.git)
+## Cordova Plugins
+
+## Dependencies
+
+- 🟩 [@capacitor/android@7.4.3](https://github.com/ionic-team/capacitor.git)
+- 🟧 [@capacitor/assets@3.0.5](https://github.com/ionic-team/capacitor-assets.git) - May be unmaintained (1.4 years since last release)
+- 🟩 [@capacitor/cli@7.4.3](https://github.com/ionic-team/capacitor.git)
+- 🟩 [@capacitor/core@7.4.3](https://github.com/ionic-team/capacitor.git)
+- 🟩 [@capacitor/ios@7.4.3](https://github.com/ionic-team/capacitor.git)
+- 🟩 [@eslint/js@9.34.0](https://github.com/eslint/eslint.git)
+- 🟩 [@tailwindcss/vite@4.1.12](https://github.com/tailwindlabs/tailwindcss.git)
+- 🟩 [@types/react@19.1.12](https://github.com/DefinitelyTyped/DefinitelyTyped.git)
+- 🟩 [@types/react-dom@19.1.9](https://github.com/DefinitelyTyped/DefinitelyTyped.git)
+- 🟧 [@vitejs/plugin-react@4.7.0](https://github.com/vitejs/vite-plugin-react.git) - (Latest 5.0.2) - Is behind 1 major version.
+- 🟧 [clsx@2.1.1](https://github.com/lukeed/clsx.git) - May be unmaintained (1.4 years since last release)
+- 🟩 [date-fns@4.1.0](https://github.com/date-fns/date-fns.git)
+- 🟩 [eslint@9.34.0](https://github.com/eslint/eslint.git)
+- 🟩 [eslint-plugin-react-hooks@5.2.0](https://github.com/facebook/react.git)
+- 🟩 [eslint-plugin-react-refresh@0.4.20](https://github.com/ArnaudBarre/eslint-plugin-react-refresh.git)
+- 🟩 [firebase@12.2.1](https://github.com/firebase/firebase-js-sdk.git)
+- 🟩 [framer-motion@12.23.12](https://github.com/motiondivision/motion.git)
+- 🟩 [globals@16.3.0](https://github.com/sindresorhus/globals.git)
+- 🟩 [lucide-react@0.539.0](https://github.com/lucide-icons/lucide.git) - (Latest 0.542.0)
+- 🟩 [prettier@3.6.2](https://github.com/prettier/prettier.git)
+- 🟩 [prettier-plugin-tailwindcss@0.6.14](https://github.com/tailwindlabs/prettier-plugin-tailwindcss.git)
+- 🟩 [react@19.1.1](https://github.com/facebook/react.git)
+- 🟩 [react-dom@19.1.1](https://github.com/facebook/react.git)
+- 🟩 [react-router@7.8.2](https://github.com/remix-run/react-router.git)
+- 🟩 [react-textarea-autosize@8.5.9](https://github.com/Andarist/react-textarea-autosize.git)
+- 🟩 [tailwindcss@4.1.12](https://github.com/tailwindlabs/tailwindcss.git)
+- 🟩 [vite@7.1.4](https://github.com/vitejs/vite.git)
+### Maintenance Score
+28 out of 31 dependencies were up to date without issues.
+
+
+
+## Nonstandard naming
+The following files and folders do not follow the standard naming convention:
+
+- /App.jsx
+- /components/badges/BadgesList.jsx
+- /components/badges/BadgesStats.jsx
+- /components/badges/EcoCategoriesStats.jsx
+- /components/dashboard/ActionsCarousel.jsx
+- /components/dashboard/ActivityFeed.jsx
+- /components/dashboard/DashboardHeader.jsx
+- /components/dashboard/LargeChallengeCard.jsx
+- /components/dashboard/PendingVerificationCard.jsx
+- /components/dashboard/ProgressCard.jsx
+- /components/dashboard/QuickActionsCard.jsx
+- /components/dashboard/TeacherStatsCard.jsx
+- /components/debug/BadgeDebug.jsx
+- /components/debug/ClassFeedDebug.jsx
+- /components/debug/CountersEditor.jsx
+- /components/debug/DatabaseManager.jsx
+- /components/debug/DatabaseViewer.jsx
+- /components/debug/DebugButton.jsx
+- /components/debug/NotificationDebug.jsx
+- /components/debug/PwaCheck.jsx
+- /components/layout/BottomNav.jsx
+- /components/layout/Layout.jsx
+- /components/layout/Navbar.jsx
+- /components/layout/SideNav.jsx
+- /components/notifications/CreateNotification.jsx
+- /components/notifications/NotificationBell.jsx
+- /components/notifications/NotificationCenter.jsx
+- /components/notifications/SimpleNotificationBell.jsx
+- /components/profile/ProfilePhoto.jsx
+- /components/profile/VerificationStatus.jsx
+- /components/routing/Loading.jsx
+- /components/routing/NavigationWrapper.jsx
+- /components/routing/ProtectedRoute.jsx
+- /components/ui/BackButton.jsx
+- /components/ui/Badge.jsx
+- /components/ui/BadgesButton.jsx
+- /components/ui/Button.jsx
+- /components/ui/ConfirmModal.jsx
+- /components/ui/CreateNotificationButton.jsx
+- /components/ui/ErrorMessage.jsx
+- /components/ui/Input.jsx
+- /components/ui/Label.jsx
+- /components/ui/PageHeader.jsx
+- /components/ui/PullToRefreshIndicator.jsx
+- /components/ui/Select.jsx
+- /components/ui/SubmissionLimitsInfo.jsx
+- /components/ui/SuccessMessage.jsx
+- /components/ui/Toast.jsx
+- /components/ui/ToastContainer.jsx
+- /components/ui/ToggleTheme.jsx
+- /components/ui/UserButton.jsx
+- /components/ui/UserTypeSelect.jsx
+- /constants/ecoCategories.js
+- /contexts/AuthContext.jsx
+- /contexts/DeviceEnvironmentContext.jsx
+- /contexts/LimitsRefreshContext.jsx
+- /contexts/NotificationContext.jsx
+- /contexts/ThemeContext.jsx
+- /contexts/ToastContext.jsx
+- /data/badgeTemplates.js
+- /data/ecoActionsData.js
+- /data/ecoChallengesData.js
+- /hooks/useActiveEcoChallenge.js
+- /hooks/useAndroidBackButton.js
+- /hooks/useBackNavigation.js
+- /hooks/useBadges.js
+- /hooks/useDashboardData.js
+- /hooks/useLimitedEcoActions.js
+- /hooks/useNotifications.js
+- /hooks/usePullToRefresh.js
+- /hooks/useSubmissionLimits.js
+- /hooks/useSwipeBackGesture.js
+- /hooks/useTeacherDashboard.js
+- /pages/ActivityPage.jsx
+- /pages/AuthPage.jsx
+- /pages/BadgesPage.jsx
+- /pages/ChallengesPage.jsx
+- /pages/CreateNotificationPage.jsx
+- /pages/DashboardPage.jsx
+- /pages/DebugPage.jsx
+- /pages/EditEmailPage.jsx
+- /pages/EditPasswordPage.jsx
+- /pages/EditProfilePage.jsx
+- /pages/MySubmissionsPage.jsx
+- /pages/NotificationsPage.jsx
+- /pages/ProfilePage.jsx
+- /pages/RankingPage.jsx
+- /pages/SelectSchoolPage.jsx
+- /pages/StudentDetailPage.jsx
+- /pages/StudentsPage.jsx
+- /pages/SubmissionDetailPage.jsx
+- /pages/SubmitActivityPage.jsx
+- /pages/TeacherStatisticsPage.jsx
+- /pages/TeacherSubmissionsPage.jsx
+- /pages/ekoskop/CreateArticlePage.jsx
+- /pages/ekoskop/CreateBadgePage.jsx
+- /pages/ekoskop/CreateEcoActionPage.jsx
+- /pages/ekoskop/CreateSchoolPage.jsx
+- /pages/ekoskop/EditArticlePage.jsx
+- /pages/ekoskop/EditBadgePage.jsx
+- /pages/ekoskop/EditEcoActionPage.jsx
+- /pages/ekoskop/EkoskopArticlesPage.jsx
+- /pages/ekoskop/EkoskopBadgesPage.jsx
+- /pages/ekoskop/EkoskopEcoActionsPage.jsx
+- /pages/ekoskop/EkoskopSchoolsPage.jsx
+- /pages/ekoskop/EkoskopStatisticsPage.jsx
+- /pages/ekoskop/EkoskopUsersPage.jsx
+- /pages/ekoskop/SchoolDetailPage.jsx
+- /services/activityFeedCloudService.js
+- /services/activityFeedExamples.js
+- /services/activityFeedService.js
+- /services/badgeService.js
+- /services/contentCache.js
+- /services/ecoActionService.js
+- /services/ecoChallengeService.js
+- /services/nameCache.js
+- /services/notificationAutomationService.js
+- /services/notificationService.js
+- /services/storageService.js
+- /services/submissionLimitService.js
+- /services/teacherService.js
+- /utils/hapticUtils.js
+- /utils/imageUtils.js
+- /utils/styleUtils.js
