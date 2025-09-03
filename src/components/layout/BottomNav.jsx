@@ -7,6 +7,9 @@ import {
   BookOpen,
   CheckSquare,
   BarChart3,
+  Building,
+  Users,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink } from "react-router";
@@ -36,6 +39,25 @@ export const BottomNav = () => {
     },
   ];
 
+  // For mobile, show only the most important Ekoskop tabs
+  const ekoskopTabs = [
+    {
+      id: "/ekoskop/schools",
+      icon: Building,
+      label: "Szkoły",
+    },
+    {
+      id: "/ekoskop/users",
+      icon: Users,
+      label: "Użytkownicy",
+    },
+    {
+      id: "/ekoskop/statistics",
+      icon: BarChart3,
+      label: "Statystyki",
+    },
+  ];
+
   const studentTabs = [
     {
       id: "/submit",
@@ -47,7 +69,15 @@ export const BottomNav = () => {
   const tabs = [];
 
   tabs.push({ id: "/", icon: Home, label: "Główna" });
-  tabs.push(...(currentUser?.role === "teacher" ? teacherTabs : studentTabs));
+
+  if (currentUser?.role === "teacher") {
+    tabs.push(...teacherTabs);
+  } else if (currentUser?.role === "ekoskop") {
+    tabs.push(...ekoskopTabs);
+  } else {
+    tabs.push(...studentTabs);
+  }
+
   tabs.push({ id: "/profile", icon: User, label: "Profil" });
 
   return (

@@ -25,6 +25,21 @@ import {
   SubmissionDetailPage,
   NotificationsPage,
   CreateNotificationPage,
+  // Ekoskop pages
+  EkoskopSchoolsPage,
+  CreateSchoolPage,
+  EkoskopStatisticsPage,
+  EkoskopArticlesPage,
+  CreateArticlePage,
+  EditArticlePage,
+  EkoskopEcoActionsPage,
+  CreateEcoActionPage,
+  EditEcoActionPage,
+  EkoskopBadgesPage,
+  CreateBadgePage,
+  EditBadgePage,
+  EkoskopUsersPage,
+  SchoolDetailPage,
 } from "./pages/_index";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -42,7 +57,9 @@ export default function App() {
         <Route path="/selectSchool" element={<SelectSchoolPage />} />
         <Route
           path="/"
-          element={<ProtectedRoute allowedRoles={["student", "teacher"]} />}
+          element={
+            <ProtectedRoute allowedRoles={["student", "teacher", "ekoskop"]} />
+          }
         >
           <Route path="" element={<Layout />}>
             <Route index element={<DashboardPage />} />
@@ -85,6 +102,36 @@ export default function App() {
                 path="student/:studentId"
                 element={<StudentDetailPage />}
               />
+            </Route>
+
+            {/* Routes for ekoskop */}
+            <Route
+              path="ekoskop"
+              element={<ProtectedRoute allowedRoles={["ekoskop"]} />}
+            >
+              <Route path="schools" element={<EkoskopSchoolsPage />} />
+              <Route path="schools/create" element={<CreateSchoolPage />} />
+              <Route path="statistics" element={<EkoskopStatisticsPage />} />
+              <Route path="articles" element={<EkoskopArticlesPage />} />
+              <Route path="articles/create" element={<CreateArticlePage />} />
+              <Route
+                path="articles/edit/:articleId"
+                element={<EditArticlePage />}
+              />
+              <Route path="eco-actions" element={<EkoskopEcoActionsPage />} />
+              <Route
+                path="eco-actions/create"
+                element={<CreateEcoActionPage />}
+              />
+              <Route
+                path="eco-actions/edit/:actionId"
+                element={<EditEcoActionPage />}
+              />
+              <Route path="badges" element={<EkoskopBadgesPage />} />
+              <Route path="badges/create" element={<CreateBadgePage />} />
+              <Route path="badges/edit/:badgeId" element={<EditBadgePage />} />
+              <Route path="users" element={<EkoskopUsersPage />} />
+              <Route path="school/:schoolId" element={<SchoolDetailPage />} />
             </Route>
 
             {/* Profile Routes */}

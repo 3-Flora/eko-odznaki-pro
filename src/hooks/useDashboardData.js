@@ -40,6 +40,11 @@ export default function useDashboardData(currentUser) {
     [currentUser?.role],
   );
 
+  const isEkoskop = useMemo(
+    () => currentUser?.role === "ekoskop",
+    [currentUser?.role],
+  );
+
   // Funkcje cache
   const getCacheKey = useCallback((type, userId, classId) => {
     return `dashboard_${type}_${userId}_${classId || "no-class"}`;
@@ -248,5 +253,6 @@ export default function useDashboardData(currentUser) {
     refreshAll,
     clearCache,
     isTeacher,
+    isEkoskop,
   };
 }

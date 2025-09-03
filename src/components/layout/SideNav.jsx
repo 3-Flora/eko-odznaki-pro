@@ -8,6 +8,11 @@ import {
   CheckSquare,
   BarChart3,
   LogOut,
+  Building,
+  Users,
+  FileText,
+  Award,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { NavLink } from "react-router";
@@ -36,6 +41,39 @@ export const SideNav = () => {
     },
   ];
 
+  const ekoskopTabs = [
+    {
+      id: "/ekoskop/schools",
+      icon: Building,
+      label: "Szkoły",
+    },
+    {
+      id: "/ekoskop/users",
+      icon: Users,
+      label: "Użytkownicy",
+    },
+    {
+      id: "/ekoskop/statistics",
+      icon: BarChart3,
+      label: "Statystyki",
+    },
+    {
+      id: "/ekoskop/articles",
+      icon: FileText,
+      label: "Artykuły",
+    },
+    {
+      id: "/ekoskop/eco-actions",
+      icon: Plus,
+      label: "EkoDziałania",
+    },
+    {
+      id: "/ekoskop/badges",
+      icon: Award,
+      label: "Odznaki",
+    },
+  ];
+
   const studentTabs = [
     {
       id: "/submit",
@@ -47,7 +85,15 @@ export const SideNav = () => {
   const tabs = [];
 
   tabs.push({ id: "/", icon: Home, label: "Główna" });
-  tabs.push(...(currentUser?.role === "teacher" ? teacherTabs : studentTabs));
+
+  if (currentUser?.role === "teacher") {
+    tabs.push(...teacherTabs);
+  } else if (currentUser?.role === "ekoskop") {
+    tabs.push(...ekoskopTabs);
+  } else {
+    tabs.push(...studentTabs);
+  }
+
   tabs.push({ id: "/profile", icon: User, label: "Profil" });
 
   return (

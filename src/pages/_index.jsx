@@ -19,3 +19,19 @@ export { default as StudentDetailPage } from "./StudentDetailPage";
 export { default as SubmissionDetailPage } from "./SubmissionDetailPage";
 export { default as NotificationsPage } from "./NotificationsPage";
 export { default as CreateNotificationPage } from "./CreateNotificationPage";
+
+// Ekoskop pages
+export { default as EkoskopSchoolsPage } from "./ekoskop/EkoskopSchoolsPage";
+export { default as CreateSchoolPage } from "./ekoskop/CreateSchoolPage";
+export { default as EkoskopStatisticsPage } from "./ekoskop/EkoskopStatisticsPage";
+export { default as EkoskopArticlesPage } from "./ekoskop/EkoskopArticlesPage";
+export { default as CreateArticlePage } from "./ekoskop/CreateArticlePage";
+export { default as EditArticlePage } from "./ekoskop/EditArticlePage";
+export { default as EkoskopEcoActionsPage } from "./ekoskop/EkoskopEcoActionsPage";
+export { default as CreateEcoActionPage } from "./ekoskop/CreateEcoActionPage";
+export { default as EditEcoActionPage } from "./ekoskop/EditEcoActionPage";
+export { default as EkoskopBadgesPage } from "./ekoskop/EkoskopBadgesPage";
+export { default as CreateBadgePage } from "./ekoskop/CreateBadgePage";
+export { default as EditBadgePage } from "./ekoskop/EditBadgePage";
+export { default as EkoskopUsersPage } from "./ekoskop/EkoskopUsersPage";
+export { default as SchoolDetailPage } from "./ekoskop/SchoolDetailPage";
