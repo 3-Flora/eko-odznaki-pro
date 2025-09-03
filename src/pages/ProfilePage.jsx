@@ -173,23 +173,29 @@ export default function ProfilePage() {
                   {currentUser?.displayName}
                 </h1>
                 <p className="mb-2 text-green-100">
-                  {currentUser?.role === "teacher" ? "Nauczyciel" : "Uczeń"}
+                  {currentUser?.role === "teacher"
+                    ? "Nauczyciel"
+                    : currentUser?.role === "ekoskop"
+                      ? "Ekoskop"
+                      : "Uczeń"}
                 </p>
               </div>
             </div>
 
-            <div className="mb-2 flex items-center justify-between text-left">
-              <div className="flex items-center gap-2">
-                <School className="mr-1 h-6 w-6" />
-                <span className="text-sm">{schoolName || ""}</span>
+            {currentUser?.role !== "ekoskop" && (
+              <div className="mb-2 flex items-center justify-between text-left">
+                <div className="flex items-center gap-2">
+                  <School className="mr-1 h-6 w-6" />
+                  <span className="text-sm">{schoolName || ""}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="mr-1 h-6 w-6" />
+                  <span className="text-sm">{classNameState}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Users className="mr-1 h-6 w-6" />
-                <span className="text-sm">{classNameState}</span>
-              </div>
-            </div>
+            )}
 
-            <div className="flex justify-between">
+            <div className="mt-2 flex justify-between">
               <Button
                 size="sx"
                 style="lightBlue"
@@ -215,7 +221,8 @@ export default function ProfilePage() {
 
         {/* Right column: stats, quick actions, badges */}
         <div className="flex flex-col gap-4 md:col-span-2">
-          {currentUser.role === "teacher" ? null : (
+          {currentUser.role === "teacher" ||
+          currentUser.role === "ekoskop" ? null : (
             <>
               <div className="grid grid-cols-3 gap-4">
                 {stats.map((stat, index) => (

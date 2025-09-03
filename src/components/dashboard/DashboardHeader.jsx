@@ -30,33 +30,7 @@ export function DashboardHeader({
         <div className="flex-1">
           <h2 className="mb-2 text-2xl font-bold">Cześć, {name}! 👋</h2>
           <p className="text-white/90">{text}</p>
-
-          {lastRefresh && (
-            <p className="mt-2 text-xs text-white/70">
-              Dane z cache • {formatLastRefresh(lastRefresh)}
-            </p>
-          )}
         </div>
-
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className={clsx(
-              "ml-4 flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200",
-              isRefreshing
-                ? "cursor-not-allowed bg-white/20"
-                : "bg-white/20 hover:bg-white/30 active:scale-95",
-            )}
-            title="Odśwież dane"
-          >
-            <RefreshCw
-              className={clsx("h-5 w-5 text-white", {
-                "animate-spin": isRefreshing,
-              })}
-            />
-          </button>
-        )}
       </div>
     </div>
   );
