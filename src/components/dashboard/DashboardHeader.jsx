@@ -7,6 +7,7 @@ export function DashboardHeader({
   isRefreshing = false,
   lastRefresh = null,
   onRefresh = null,
+  className = "",
 }) {
   const formatLastRefresh = (timestamp) => {
     if (!timestamp) return null;
@@ -25,7 +26,12 @@ export function DashboardHeader({
   };
 
   return (
-    <div className="rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:from-green-700 dark:to-emerald-900">
+    <div
+      className={clsx(
+        "rounded-3xl bg-gradient-to-r from-green-400 to-emerald-500 p-6 text-white dark:from-green-700 dark:to-emerald-900",
+        className,
+      )}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h2 className="mb-2 text-2xl font-bold">Cześć, {name}! 👋</h2>

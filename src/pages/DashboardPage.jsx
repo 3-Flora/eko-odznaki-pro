@@ -113,6 +113,7 @@ export default function DashboardPage() {
           isRefreshing={isRefreshing}
           lastRefresh={lastRefresh}
           onRefresh={refreshAll}
+          className="mb-6"
         />
 
         {/* Teacher-only section */}
