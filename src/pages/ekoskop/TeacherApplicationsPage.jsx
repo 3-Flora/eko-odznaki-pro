@@ -78,18 +78,22 @@ export default function TeacherApplicationsPage() {
   }, [showError]);
 
   // Funkcja do weryfikacji dokumentu
-  const handleDocumentVerification = async (applicationId, documentType, verified) => {
+  const handleDocumentVerification = async (
+    applicationId,
+    documentType,
+    verified,
+  ) => {
     try {
       await DocumentUploadService.verifyDocument(
         applicationId,
         documentType,
         verified,
-        currentUser.id
+        currentUser.id,
       );
 
       // Aktualizuj lokalny stan
-      setApplications(prev =>
-        prev.map(app =>
+      setApplications((prev) =>
+        prev.map((app) =>
           app.id === applicationId
             ? {
                 ...app,
@@ -97,31 +101,32 @@ export default function TeacherApplicationsPage() {
                   ...app.documents,
                   [documentType]: {
                     ...app.documents[documentType],
-                    verified: verified
-                  }
-                }
+                    verified: verified,
+                  },
+                },
               }
-            : app
-        )
+            : app,
+        ),
       );
 
       showSuccess(
-        `Dokument ${documentType === 'idCard' ? 'legitymacji' : 'zatrudnienia'} został ${verified ? 'zweryfikowany' : 'oznaczony jako niezweryfikowany'}`
+        `Dokument ${documentType === "idCard" ? "legitymacji" : "zatrudnienia"} został ${verified ? "zweryfikowany" : "oznaczony jako niezweryfikowany"}`,
       );
     } catch (error) {
-      console.error('Error verifying document:', error);
-      showError('Nie udało się zweryfikować dokumentu');
+      console.error("Error verifying document:", error);
+      showError("Nie udało się zweryfikować dokumentu");
     }
   };
 
   // Funkcja do podglądu dokumentu
   const handleDocumentView = async (storagePath) => {
     try {
-      const downloadURL = await DocumentUploadService.getDocumentDownloadURL(storagePath);
-      window.open(downloadURL, '_blank');
+      const downloadURL =
+        await DocumentUploadService.getDocumentDownloadURL(storagePath);
+      window.open(downloadURL, "_blank");
     } catch (error) {
-      console.error('Error viewing document:', error);
-      showError('Nie udało się otworzyć dokumentu');
+      console.error("Error viewing document:", error);
+      showError("Nie udało się otworzyć dokumentu");
     }
   };
 
@@ -132,15 +137,18 @@ export default function TeacherApplicationsPage() {
     rejectionReason = "",
   ) => {
     // Walidacja przed zatwierdzeniem
-    if (newStatus === 'approved') {
-      const application = applications.find(app => app.id === applicationId);
-      
+    if (newStatus === "approved") {
+      const application = applications.find((app) => app.id === applicationId);
+
       // Sprawdź czy wszystkie wymagane dokumenty są zweryfikowane
       const hasIdCard = application.documents?.idCard?.verified;
-      const hasEmploymentCert = application.documents?.employmentCertificate?.verified;
-      
+      const hasEmploymentCert =
+        application.documents?.employmentCertificate?.verified;
+
       if (!hasIdCard || !hasEmploymentCert) {
-        showError('Przed zatwierdzeniem wniosku wszystkie dokumenty muszą być zweryfikowane');
+        showError(
+          "Przed zatwierdzeniem wniosku wszystkie dokumenty muszą być zweryfikowane",
+        );
         return;
       }
     }
@@ -455,7 +463,8 @@ export default function TeacherApplicationsPage() {
                     )}
 
                     {/* Dokumenty */}
-                    {(application.documents?.idCard || application.documents?.employmentCertificate) && (
+                    {(application.documents?.idCard ||
+                      application.documents?.employmentCertificate) && (
                       <div className="mt-4">
                         <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                           Załączone dokumenty:
@@ -465,16 +474,18 @@ export default function TeacherApplicationsPage() {
                             <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className={clsx(
-                                    "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-                                    application.documents.idCard.verified
-                                      ? "bg-green-100 dark:bg-green-900"
-                                      : "bg-gray-100 dark:bg-gray-700"
-                                  )}>
+                                  <div
+                                    className={clsx(
+                                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
+                                      application.documents.idCard.verified
+                                        ? "bg-green-100 dark:bg-green-900"
+                                        : "bg-gray-100 dark:bg-gray-700",
+                                    )}
+                                  >
                                     {application.documents.idCard.verified ? (
-                                      <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                                     ) : (
-                                      <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                      <FileText className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                     )}
                                   </div>
                                   <div>
@@ -490,31 +501,42 @@ export default function TeacherApplicationsPage() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleDocumentView(application.documents.idCard.storagePath)}
+                                    onClick={() =>
+                                      handleDocumentView(
+                                        application.documents.idCard
+                                          .storagePath,
+                                      )
+                                    }
                                     className="p-1"
                                   >
-                                    <Eye className="w-3 h-3" />
+                                    <Eye className="h-3 w-3" />
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant={application.documents.idCard.verified ? "success" : "outline"}
-                                    onClick={() => handleDocumentVerification(
-                                      application.id,
-                                      'idCard',
-                                      !application.documents.idCard.verified
-                                    )}
+                                    variant={
+                                      application.documents.idCard.verified
+                                        ? "success"
+                                        : "outline"
+                                    }
+                                    onClick={() =>
+                                      handleDocumentVerification(
+                                        application.id,
+                                        "idCard",
+                                        !application.documents.idCard.verified,
+                                      )
+                                    }
                                     className="p-1"
                                   >
                                     {application.documents.idCard.verified ? (
-                                      <CheckCircle className="w-3 h-3" />
+                                      <CheckCircle className="h-3 w-3" />
                                     ) : (
-                                      <Shield className="w-3 h-3" />
+                                      <Shield className="h-3 w-3" />
                                     )}
                                   </Button>
                                 </div>
                               </div>
                               {application.documents.idCard.verified && (
-                                <p className="mt-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                                <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">
                                   ✓ Zweryfikowano
                                 </p>
                               )}
@@ -525,16 +547,20 @@ export default function TeacherApplicationsPage() {
                             <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className={clsx(
-                                    "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-                                    application.documents.employmentCertificate.verified
-                                      ? "bg-green-100 dark:bg-green-900"
-                                      : "bg-gray-100 dark:bg-gray-700"
-                                  )}>
-                                    {application.documents.employmentCertificate.verified ? (
-                                      <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                  <div
+                                    className={clsx(
+                                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
+                                      application.documents
+                                        .employmentCertificate.verified
+                                        ? "bg-green-100 dark:bg-green-900"
+                                        : "bg-gray-100 dark:bg-gray-700",
+                                    )}
+                                  >
+                                    {application.documents.employmentCertificate
+                                      .verified ? (
+                                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                                     ) : (
-                                      <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                      <FileText className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                     )}
                                   </div>
                                   <div>
@@ -542,7 +568,10 @@ export default function TeacherApplicationsPage() {
                                       Zaświadczenie o zatrudnieniu
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                      {application.documents.employmentCertificate.fileName}
+                                      {
+                                        application.documents
+                                          .employmentCertificate.fileName
+                                      }
                                     </p>
                                   </div>
                                 </div>
@@ -550,31 +579,46 @@ export default function TeacherApplicationsPage() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleDocumentView(application.documents.employmentCertificate.storagePath)}
+                                    onClick={() =>
+                                      handleDocumentView(
+                                        application.documents
+                                          .employmentCertificate.storagePath,
+                                      )
+                                    }
                                     className="p-1"
                                   >
-                                    <Eye className="w-3 h-3" />
+                                    <Eye className="h-3 w-3" />
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant={application.documents.employmentCertificate.verified ? "success" : "outline"}
-                                    onClick={() => handleDocumentVerification(
-                                      application.id,
-                                      'employmentCertificate',
-                                      !application.documents.employmentCertificate.verified
-                                    )}
+                                    variant={
+                                      application.documents
+                                        .employmentCertificate.verified
+                                        ? "success"
+                                        : "outline"
+                                    }
+                                    onClick={() =>
+                                      handleDocumentVerification(
+                                        application.id,
+                                        "employmentCertificate",
+                                        !application.documents
+                                          .employmentCertificate.verified,
+                                      )
+                                    }
                                     className="p-1"
                                   >
-                                    {application.documents.employmentCertificate.verified ? (
-                                      <CheckCircle className="w-3 h-3" />
+                                    {application.documents.employmentCertificate
+                                      .verified ? (
+                                      <CheckCircle className="h-3 w-3" />
                                     ) : (
-                                      <Shield className="w-3 h-3" />
+                                      <Shield className="h-3 w-3" />
                                     )}
                                   </Button>
                                 </div>
                               </div>
-                              {application.documents.employmentCertificate.verified && (
-                                <p className="mt-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                              {application.documents.employmentCertificate
+                                .verified && (
+                                <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">
                                   ✓ Zweryfikowano
                                 </p>
                               )}
@@ -583,17 +627,18 @@ export default function TeacherApplicationsPage() {
                         </div>
 
                         {/* Ostrzeżenie jeśli brak dokumentów */}
-                        {(!application.documents?.idCard || !application.documents?.employmentCertificate) && (
+                        {(!application.documents?.idCard ||
+                          !application.documents?.employmentCertificate) && (
                           <div className="mt-2 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
-                            <AlertTriangle className="w-4 h-4" />
+                            <AlertTriangle className="h-4 w-4" />
                             <span>
-                              Wniosek niekompletny - brak {
-                                !application.documents?.idCard && !application.documents?.employmentCertificate
-                                  ? "obu dokumentów"
-                                  : !application.documents?.idCard
+                              Wniosek niekompletny - brak{" "}
+                              {!application.documents?.idCard &&
+                              !application.documents?.employmentCertificate
+                                ? "obu dokumentów"
+                                : !application.documents?.idCard
                                   ? "skanu legitymacji"
-                                  : "zaświadczenia o zatrudnieniu"
-                              }
+                                  : "zaświadczenia o zatrudnieniu"}
                             </span>
                           </div>
                         )}

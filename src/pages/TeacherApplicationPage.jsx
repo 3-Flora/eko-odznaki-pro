@@ -66,14 +66,14 @@ export default function TeacherApplicationPage() {
   };
 
   const handleDocumentUpload = (documentType, documentData) => {
-    setDocuments(prev => ({
+    setDocuments((prev) => ({
       ...prev,
-      [documentType]: documentData
+      [documentType]: documentData,
     }));
-    
+
     if (documentData) {
       showSuccess(
-        `Dokument ${documentType === "idCard" ? "legitymacji" : "zatrudnienia"} został przesłany`
+        `Dokument ${documentType === "idCard" ? "legitymacji" : "zatrudnienia"} został przesłany`,
       );
     }
   };
@@ -101,7 +101,9 @@ export default function TeacherApplicationPage() {
       // Jeśli nie ma jeszcze applicationId, utwórz wniosek
       if (!applicationId) {
         // Znajdź nazwę szkoły dla denormalizacji
-        const selectedSchool = schools.find(school => school.id === formData.schoolId);
+        const selectedSchool = schools.find(
+          (school) => school.id === formData.schoolId,
+        );
 
         const applicationData = {
           displayName: formData.displayName.trim(),
@@ -122,7 +124,7 @@ export default function TeacherApplicationPage() {
               timestamp: new Date(),
               performedBy: "anonymous", // Będzie zaktualizowane po auth
               details: "Teacher application created",
-            }
+            },
           ],
           metadata: {
             submissionSource: "web",
@@ -130,23 +132,26 @@ export default function TeacherApplicationPage() {
           },
         };
 
-        const docRef = await addDoc(collection(db, "teacherApplications"), applicationData);
+        const docRef = await addDoc(
+          collection(db, "teacherApplications"),
+          applicationData,
+        );
         setApplicationId(docRef.id);
 
         showSuccess(
-          "Podstawowe dane zostały zapisane. Teraz możesz przesłać wymagane dokumenty."
+          "Podstawowe dane zostały zapisane. Teraz możesz przesłać wymagane dokumenty.",
         );
       } else {
         // Walidacja finalnego wysłania - sprawdź czy są dokumenty
         if (!documents.idCard || !documents.employmentCertificate) {
           showError(
-            "Wymagane są oba dokumenty: skan legitymacji i zaświadczenie o zatrudnieniu"
+            "Wymagane są oba dokumenty: skan legitymacji i zaświadczenie o zatrudnieniu",
           );
           return;
         }
 
         showSuccess(
-          "Wniosek został wysłany pomyślnie. Ekoskop skontaktuje się z Tobą w ciągu 2-3 dni roboczych."
+          "Wniosek został wysłany pomyślnie. Ekoskop skontaktuje się z Tobą w ciągu 2-3 dni roboczych.",
         );
 
         // Przekieruj do strony głównej
@@ -329,9 +334,10 @@ export default function TeacherApplicationPage() {
               />
             </div>
           ) : (
-            <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
+            <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                💡 <strong>Informacja:</strong> Po wypełnieniu podstawowych danych będziesz mógł przesłać dokumenty.
+                💡 <strong>Informacja:</strong> Po wypełnieniu podstawowych
+                danych będziesz mógł przesłać dokumenty.
               </p>
             </div>
           )}
@@ -383,20 +389,20 @@ export default function TeacherApplicationPage() {
           >
             Anuluj
           </Button>
-          <Button 
-            type="submit" 
-            disabled={loading} 
-            className="flex-1"
-          >
+          <Button type="submit" disabled={loading} className="flex-1">
             {loading ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                {applicationId ? "Wysyłanie wniosku..." : "Zapisywanie danych..."}
+                {applicationId
+                  ? "Wysyłanie wniosku..."
+                  : "Zapisywanie danych..."}
               </div>
             ) : applicationId ? (
-              documents.idCard && documents.employmentCertificate 
-                ? "Wyślij wniosek" 
-                : "Najpierw prześlij dokumenty"
+              documents.idCard && documents.employmentCertificate ? (
+                "Wyślij wniosek"
+              ) : (
+                "Najpierw prześlij dokumenty"
+              )
             ) : (
               "Zapisz dane i przejdź do dokumentów"
             )}

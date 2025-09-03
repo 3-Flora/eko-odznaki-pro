@@ -429,12 +429,12 @@ teacher-applications/
   {applicationId}/
     id-card.{extension}        // Skan legitymacji (jpg, png, pdf)
     employment-cert.{extension} // Zaświadczenie o zatrudnieniu (pdf, jpg, png)
-    
+
 user-submissions/
   {submissionId}/
     photo-1.{extension}        // Zdjęcia do EkoDziałań/EkoWyzwań
     photo-2.{extension}
-    
+
 profile-images/
   {userId}/
     avatar.{extension}         // Zdjęcia profilowe użytkowników
@@ -449,54 +449,54 @@ service firebase.storage {
     // 🔒 WNIOSKI NAUCZYCIELI - tylko właściciel może uploadować, ekoskop może czytać
     match /teacher-applications/{applicationId}/{document} {
       // Pozwól na upload tylko jeśli użytkownik to właściciel wniosku
-      allow write: if request.auth != null 
+      allow write: if request.auth != null
         && isOwnerOfApplication(applicationId)
         && isValidTeacherDocument(document)
         && request.resource.size < 10 * 1024 * 1024; // Max 10MB
-      
+
       // Pozwól na odczyt tylko ekoskopowi lub właścicielowi
-      allow read: if request.auth != null 
+      allow read: if request.auth != null
         && (isEkoskop() || isOwnerOfApplication(applicationId));
     }
-    
+
     // 🔒 ZGŁOSZENIA UCZNIÓW - tylko właściciel może uploadować, nauczyciel i ekoskop mogą czytać
     match /user-submissions/{submissionId}/{file} {
-      allow write: if request.auth != null 
+      allow write: if request.auth != null
         && isOwnerOfSubmission(submissionId)
         && request.resource.size < 5 * 1024 * 1024; // Max 5MB
-      
-      allow read: if request.auth != null 
+
+      allow read: if request.auth != null
         && (isEkoskop() || isTeacherOfSubmission(submissionId) || isOwnerOfSubmission(submissionId));
     }
-    
+
     // 🔒 ZDJĘCIA PROFILOWE - tylko właściciel
     match /profile-images/{userId}/{file} {
-      allow read, write: if request.auth != null 
+      allow read, write: if request.auth != null
         && request.auth.uid == userId
         && request.resource.size < 2 * 1024 * 1024; // Max 2MB
     }
-    
+
     // Pomocnicze funkcje bezpieczeństwa
     function isEkoskop() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ekoskop";
     }
-    
+
     function isOwnerOfApplication(applicationId) {
       return get(/databases/$(database)/documents/teacherApplications/$(applicationId)).data.createdBy == request.auth.uid;
     }
-    
+
     function isOwnerOfSubmission(submissionId) {
       return get(/databases/$(database)/documents/submissions/$(submissionId)).data.studentId == request.auth.uid;
     }
-    
+
     function isTeacherOfSubmission(submissionId) {
       let submission = get(/databases/$(database)/documents/submissions/$(submissionId)).data;
       let userClass = get(/databases/$(database)/documents/classes/$(submission.classId)).data;
       return userClass.teacherId == request.auth.uid;
     }
-    
+
     function isValidTeacherDocument(document) {
-      return document in ['id-card.jpg', 'id-card.png', 'id-card.pdf', 
+      return document in ['id-card.jpg', 'id-card.png', 'id-card.pdf',
                          'employment-cert.jpg', 'employment-cert.png', 'employment-cert.pdf'];
     }
   }
@@ -509,27 +509,27 @@ service firebase.storage {
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // 🔒 WNIOSKI NAUCZYCIELI
     match /teacherApplications/{applicationId} {
       // Każdy może utworzyć wniosek (do rejestracji)
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
         && isValidTeacherApplication()
         && resource == null; // Upewnij się, że dokument nie istnieje
-      
+
       // Tylko właściciel może czytać swój wniosek
-      allow read: if request.auth != null 
+      allow read: if request.auth != null
         && (resource.data.createdBy == request.auth.uid || isEkoskop());
-      
+
       // Tylko ekoskop może aktualizować status wniosku
-      allow update: if request.auth != null 
+      allow update: if request.auth != null
         && isEkoskop()
         && isValidStatusUpdate();
-      
+
       // Nikt nie może usuwać wniosków (dla audytu)
       allow delete: if false;
     }
-    
+
     // Pomocnicze funkcje walidacji
     function isValidTeacherApplication() {
       let data = request.resource.data;
@@ -539,11 +539,11 @@ service cloud.firestore {
         && data.email is string
         && data.displayName is string;
     }
-    
+
     function isValidStatusUpdate() {
       let before = resource.data;
       let after = request.resource.data;
-      
+
       // Można zmieniać tylko status, reviewedAt, reviewedBy i powód odrzucenia
       return before.createdBy == after.createdBy
         && before.email == after.email
@@ -553,14 +553,13 @@ service cloud.firestore {
         && after.reviewedBy == request.auth.uid
         && after.reviewedAt is timestamp;
     }
-    
+
     function isEkoskop() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ekoskop";
     }
   }
 }
 ```
-
 
 ### Jak Twoja Logika Idealnie Pasuje do Rekomendowanej Struktury
 

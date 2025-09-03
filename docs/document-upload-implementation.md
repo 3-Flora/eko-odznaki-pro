@@ -23,7 +23,7 @@ teacherApplications/{applicationId}/
   - reviewedBy: "ekoskop_user_uid" // Który ekoskop dokonał oceny
   - rejectionReason: "Niepełne dokumenty" // Tylko przy statusie 'rejected'
   - approvedTeacherId: "utworzony_nauczyciel_uid" // Tylko przy statusie 'approved'
-  
+
   // 🔒 BEZPIECZEŃSTWO: Dokumenty przechowywane w FireStorage
   - documents: {
     - idCard: {
@@ -43,7 +43,7 @@ teacherApplications/{applicationId}/
       - verified: false
     }
   }
-  
+
   // 🔒 AUDIT LOG dla bezpieczeństwa i śledzenia
   - auditLog: [
     {
@@ -54,7 +54,7 @@ teacherApplications/{applicationId}/
       - documentType: "idCard" | "employmentCertificate" // Dla akcji na dokumentach
     }
   ]
-  
+
   // Metadata dla audytu
   - metadata: {
     - submissionSource: "web" | "mobile"
@@ -82,26 +82,26 @@ service firebase.storage {
     // 🔒 WNIOSKI NAUCZYCIELI - tylko właściciel może uploadować, ekoskop może czytać
     match /teacher-applications/{applicationId}/{document} {
       // Pozwól na upload tylko jeśli użytkownik to właściciel wniosku
-      allow write: if request.auth != null 
+      allow write: if request.auth != null
         && isOwnerOfApplication(applicationId)
         && isValidTeacherDocument(document)
         && request.resource.size < 10 * 1024 * 1024; // Max 10MB
-      
+
       // Pozwól na odczyt tylko ekoskopowi lub właścicielowi
-      allow read: if request.auth != null 
+      allow read: if request.auth != null
         && (isEkoskop() || isOwnerOfApplication(applicationId));
     }
-    
+
     function isEkoskop() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ekoskop";
     }
-    
+
     function isOwnerOfApplication(applicationId) {
       return get(/databases/$(database)/documents/teacherApplications/$(applicationId)).data.createdBy == request.auth.uid;
     }
-    
+
     function isValidTeacherDocument(document) {
-      return document in ['id-card.jpg', 'id-card.png', 'id-card.pdf', 
+      return document in ['id-card.jpg', 'id-card.png', 'id-card.pdf',
                          'employment-cert.jpg', 'employment-cert.png', 'employment-cert.pdf'];
     }
   }
@@ -113,19 +113,19 @@ service firebase.storage {
 ```javascript
 match /teacherApplications/{applicationId} {
   // Każdy może utworzyć wniosek (do rejestracji)
-  allow create: if request.auth != null 
+  allow create: if request.auth != null
     && isValidTeacherApplication()
     && resource == null;
-  
+
   // Tylko właściciel może czytać swój wniosek lub ekoskop wszystkie
-  allow read: if request.auth != null 
+  allow read: if request.auth != null
     && (resource.data.createdBy == request.auth.uid || isEkoskop());
-  
+
   // Tylko ekoskop może aktualizować status wniosku
-  allow update: if request.auth != null 
+  allow update: if request.auth != null
     && isEkoskop()
     && isValidStatusUpdate();
-  
+
   // Nikt nie może usuwać wniosków (dla audytu)
   allow delete: if false;
 }
@@ -136,6 +136,7 @@ match /teacherApplications/{applicationId} {
 ### 1. `DocumentUploadService.js` - Serwis obsługi uploadów
 
 **Funkcjonalności:**
+
 - Walidacja plików (typ, rozmiar)
 - Upload do Firebase Storage
 - Aktualizacja metadanych w Firestore
@@ -144,6 +145,7 @@ match /teacherApplications/{applicationId} {
 - Bezpieczne usuwanie dokumentów
 
 **Kluczowe metody:**
+
 - `uploadTeacherDocument()` - Upload dokumentu
 - `getDocumentDownloadURL()` - Pobieranie URL do podglądu
 - `verifyDocument()` - Weryfikacja dokumentu przez ekoskop
@@ -152,6 +154,7 @@ match /teacherApplications/{applicationId} {
 ### 2. `DocumentUpload.jsx` - Komponent UI
 
 **Funkcjonalności:**
+
 - Drag & drop interface
 - Walidacja po stronie klienta
 - Podgląd przesłanych dokumentów
@@ -161,11 +164,13 @@ match /teacherApplications/{applicationId} {
 ### 3. Zaktualizowane komponenty
 
 **`TeacherApplicationPage.jsx`:**
+
 - Dwuetapowy proces: najpierw dane podstawowe, potem dokumenty
 - Integracja z DocumentUpload
 - Walidacja kompletności wniosku
 
 **`TeacherApplicationsPage.jsx`:**
+
 - Wyświetlanie statusu dokumentów
 - Przyciski weryfikacji dla ekoskop
 - Podgląd dokumentów
@@ -201,21 +206,25 @@ graph TD
 ## ⚠️ Ważne Uwagi Bezpieczeństwa
 
 ### 1. Walidacja po stronie serwera
+
 - Firebase Rules sprawdzają uprawnienia
 - Rozmiar plików ograniczony do 10MB
 - Tylko dozwolone typy plików (JPG, PNG, PDF)
 
 ### 2. Audit Trail
+
 - Wszystkie akcje są logowane
 - Śledzenie kto i kiedy wykonał operację
 - Metadata przeglądarki i źródła zgłoszenia
 
 ### 3. Zasada najmniejszych uprawnień
+
 - Wnioskodawcy mogą tylko uploadować swoje dokumenty
 - Ekoskop może przeglądać i weryfikować wszystkie dokumenty
 - Dokumenty są widoczne tylko dla właściciela i ekoskop
 
 ### 4. Ochrona przed nadużyciami
+
 - Limity rozmiaru plików
 - Walidacja typów MIME
 - Audit log dla wszystkich operacji
@@ -223,15 +232,17 @@ graph TD
 ## 🧪 Testowanie
 
 ### 1. Test uploadu dokumentów
+
 ```bash
 # Sprawdź czy upload działa dla różnych typów plików
 - JPG (mały i duży)
-- PNG (mały i duży) 
+- PNG (mały i duży)
 - PDF (mały i duży)
 - Nieprawidłowy typ (powinien zostać odrzucony)
 ```
 
 ### 2. Test uprawnień
+
 ```bash
 # Sprawdź czy tylko właściciel może uploadować
 # Sprawdź czy tylko ekoskop może weryfikować
@@ -239,6 +250,7 @@ graph TD
 ```
 
 ### 3. Test procesu zatwierdzania
+
 ```bash
 # Sprawdź czy wniosek bez zweryfikowanych dokumentów zostanie odrzucony
 # Sprawdź czy po weryfikacji wszystkich dokumentów można zatwierdzić wniosek
@@ -247,15 +259,18 @@ graph TD
 ## 🚀 Deployment
 
 ### 1. Konfiguracja Firebase Storage
+
 - Skonfiguruj bucket w Firebase Console
 - Wdróż rules bezpieczeństwa
 - Ustaw CORS jeśli potrzebne
 
 ### 2. Konfiguracja Firestore
+
 - Wdróż rules bezpieczeństwa dla kolekcji `teacherApplications`
 - Sprawdź indeksy dla wydajności zapytań
 
 ### 3. Monitorowanie
+
 - Skonfiguruj alerty dla dużych plików
 - Monitoruj koszty Storage
 - Śledź metryki security rules
