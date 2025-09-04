@@ -8,6 +8,7 @@ import {
   uploadSubmissionPhotos,
   generateSubmissionId,
 } from "../services/storageService";
+import { invalidateCachedUserSubmissions } from "../services/contentCache";
 import {
   validateImageFile,
   validateMultipleImageFiles,
@@ -188,6 +189,24 @@ export default function SubmitActivityPage() {
         showSuccess(
           "🎉 EkoDziałanie zostało wysłane! Oczekuje na zatwierdzenie przez nauczyciela.",
         );
+      }
+
+      // Invalidate cached submissions for current user so other pages will refresh
+      try {
+        if (currentUser && currentUser.id) {
+          invalidateCachedUserSubmissions(currentUser.id);
+          // Set a lightweight flag so previous page can detect and refresh immediately
+          try {
+            localStorage.setItem(
+              "submissions_needs_refresh",
+              JSON.stringify({ ts: Date.now(), userId: currentUser.id }),
+            );
+          } catch (e) {
+            // ignore storage errors
+          }
+        }
+      } catch (e) {
+        console.error("Failed to invalidate submissions cache:", e);
       }
 
       // Natychmiastowe przekierowanie

@@ -6,13 +6,15 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
+import { getCachedUserSubmissions } from "./contentCache";
 
 /**
- * Sprawdza, czy użytkownik może zgłosić konkretne EkoDziałanie lub EkoWyzwanie
+ * Sprawdza, czy użytkownik może zgłosić konkretne EkoDziałanie lub EkoWyzwanie (używa cache gdy możliwe)
  * @param {string} userId - ID użytkownika
  * @param {string} activityId - ID aktywności (ecoAction lub ecoChallenge)
  * @param {string} type - Typ aktywności ("eco_action" lub "challenge")
  * @param {Object} activityData - Dane aktywności z limitami (maxDaily, maxWeekly)
+ * @param {boolean} useCache - Czy używać cache (domyślnie true)
  * @returns {Promise<Object>} - Wynik walidacji z informacjami o limitach
  */
 export const validateSubmissionLimits = async (
@@ -20,6 +22,7 @@ export const validateSubmissionLimits = async (
   activityId,
   type,
   activityData,
+  useCache = true,
 ) => {
   try {
     // Pobierz obecną datę i oblicz zakresy
@@ -39,34 +42,60 @@ export const validateSubmissionLimits = async (
     );
     const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
 
-    // Zapytanie uproszczone - pobierz wszystkie zgłoszenia użytkownika dla tej aktywności
-    const baseQuery = query(
-      collection(db, "submissions"),
-      where("studentId", "==", userId),
-      where("ecoActivityId", "==", activityId),
-      where("type", "==", type),
-    );
+    let allSubmissions;
 
-    const allSubmissionsSnapshot = await getDocs(baseQuery);
+    if (useCache) {
+      // Try to get submissions from cache first
+      try {
+        const cachedSubmissions = await getCachedUserSubmissions(userId);
+        // Filter for specific activity and type
+        allSubmissions = cachedSubmissions.filter(
+          (submission) =>
+            submission.ecoActivityId === activityId &&
+            submission.type === type &&
+            (submission.status === "approved" ||
+              submission.status === "pending"),
+        );
+      } catch (cacheError) {
+        console.log("Cache failed, falling back to direct query:", cacheError);
+        useCache = false;
+      }
+    }
 
-    // Filtruj w pamięci zamiast w bazie danych
-    const allSubmissions = allSubmissionsSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(
-        (submission) =>
-          submission.status === "approved" || submission.status === "pending",
+    if (!useCache) {
+      // Fallback to direct database query
+      const baseQuery = query(
+        collection(db, "submissions"),
+        where("studentId", "==", userId),
+        where("ecoActivityId", "==", activityId),
+        where("type", "==", type),
       );
+
+      const allSubmissionsSnapshot = await getDocs(baseQuery);
+
+      // Filtruj w pamięci zamiast w bazie danych
+      allSubmissions = allSubmissionsSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter(
+          (submission) =>
+            submission.status === "approved" || submission.status === "pending",
+        );
+    }
 
     // Policz zgłoszenia dzisiejsze
     const todaySubmissions = allSubmissions.filter((submission) => {
-      const submissionDate = submission.createdAt.toDate();
+      const submissionDate = submission.createdAt?.toDate
+        ? submission.createdAt.toDate()
+        : new Date(submission.createdAt);
       return submissionDate >= todayStart && submissionDate <= todayEnd;
     });
     const todayCount = todaySubmissions.length;
 
     // Policz zgłoszenia tygodniowe
     const weekSubmissions = allSubmissions.filter((submission) => {
-      const submissionDate = submission.createdAt.toDate();
+      const submissionDate = submission.createdAt?.toDate
+        ? submission.createdAt.toDate()
+        : new Date(submission.createdAt);
       return submissionDate >= weekStart && submissionDate <= weekEnd;
     });
     const weekCount = weekSubmissions.length;
@@ -81,23 +110,53 @@ export const validateSubmissionLimits = async (
 
     // Dla EkoWyzwań, dodatkowo sprawdź czy użytkownik może zgłosić tylko jedno na tydzień
     if (type === "challenge") {
-      // Sprawdź wszystkie wyzwania w tym tygodniu (niezależnie od typu)
-      const allChallengesQuery = query(
-        collection(db, "submissions"),
-        where("studentId", "==", userId),
-        where("type", "==", "challenge"),
-      );
+      let allChallenges;
 
-      const allChallengesSnapshot = await getDocs(allChallengesQuery);
-      const allChallenges = allChallengesSnapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter(
-          (submission) =>
-            (submission.status === "approved" ||
-              submission.status === "pending") &&
-            submission.createdAt.toDate() >= weekStart &&
-            submission.createdAt.toDate() <= weekEnd,
+      if (useCache) {
+        // Use cached submissions for challenge check
+        try {
+          const cachedSubmissions = await getCachedUserSubmissions(userId);
+          allChallenges = cachedSubmissions
+            .filter(
+              (submission) =>
+                submission.type === "challenge" &&
+                (submission.status === "approved" ||
+                  submission.status === "pending"),
+            )
+            .filter((submission) => {
+              const submissionDate = submission.createdAt?.toDate
+                ? submission.createdAt.toDate()
+                : new Date(submission.createdAt);
+              return submissionDate >= weekStart && submissionDate <= weekEnd;
+            });
+        } catch (cacheError) {
+          console.log(
+            "Cache failed for challenge check, falling back to direct query:",
+            cacheError,
+          );
+          useCache = false;
+        }
+      }
+
+      if (!useCache) {
+        // Fallback to direct query for challenge check
+        const allChallengesQuery = query(
+          collection(db, "submissions"),
+          where("studentId", "==", userId),
+          where("type", "==", "challenge"),
         );
+
+        const allChallengesSnapshot = await getDocs(allChallengesQuery);
+        allChallenges = allChallengesSnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter(
+            (submission) =>
+              (submission.status === "approved" ||
+                submission.status === "pending") &&
+              submission.createdAt.toDate() >= weekStart &&
+              submission.createdAt.toDate() <= weekEnd,
+          );
+      }
 
       if (allChallenges.length >= 1) {
         return {
@@ -155,13 +214,19 @@ export const validateSubmissionLimits = async (
 };
 
 /**
- * Pobiera statystyki zgłoszeń użytkownika dla danej aktywności
+ * Pobiera statystyki zgłoszeń użytkownika dla danej aktywności (używa cache gdy możliwe)
  * @param {string} userId - ID użytkownika
  * @param {string} activityId - ID aktywności
  * @param {string} type - Typ aktywności
+ * @param {boolean} useCache - Czy używać cache (domyślnie true)
  * @returns {Promise<Object>} - Statystyki zgłoszeń
  */
-export const getUserSubmissionStats = async (userId, activityId, type) => {
+export const getUserSubmissionStats = async (
+  userId,
+  activityId,
+  type,
+  useCache = true,
+) => {
   try {
     const now = new Date();
     const todayStart = new Date(
@@ -175,33 +240,59 @@ export const getUserSubmissionStats = async (userId, activityId, type) => {
       todayStart.getTime() - daysFromMonday * 24 * 60 * 60 * 1000,
     );
 
-    // Uproszczone zapytanie - pobierz wszystkie zgłoszenia użytkownika dla tej aktywności
-    const baseQuery = query(
-      collection(db, "submissions"),
-      where("studentId", "==", userId),
-      where("ecoActivityId", "==", activityId),
-      where("type", "==", type),
-    );
+    let allSubmissions;
 
-    const allSubmissionsSnapshot = await getDocs(baseQuery);
+    if (useCache) {
+      // Try to get submissions from cache first
+      try {
+        const cachedSubmissions = await getCachedUserSubmissions(userId);
+        // Filter for specific activity and type
+        allSubmissions = cachedSubmissions.filter(
+          (submission) =>
+            submission.ecoActivityId === activityId &&
+            submission.type === type &&
+            (submission.status === "approved" ||
+              submission.status === "pending"),
+        );
+      } catch (cacheError) {
+        console.log("Cache failed, falling back to direct query:", cacheError);
+        useCache = false;
+      }
+    }
 
-    // Filtruj w pamięci
-    const allSubmissions = allSubmissionsSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(
-        (submission) =>
-          submission.status === "approved" || submission.status === "pending",
+    if (!useCache) {
+      // Fallback to direct database query
+      const baseQuery = query(
+        collection(db, "submissions"),
+        where("studentId", "==", userId),
+        where("ecoActivityId", "==", activityId),
+        where("type", "==", type),
       );
+
+      const allSubmissionsSnapshot = await getDocs(baseQuery);
+
+      // Filtruj w pamięci
+      allSubmissions = allSubmissionsSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter(
+          (submission) =>
+            submission.status === "approved" || submission.status === "pending",
+        );
+    }
 
     // Filtruj dzisiejsze
     const todaySubmissions = allSubmissions.filter((submission) => {
-      const submissionDate = submission.createdAt.toDate();
+      const submissionDate = submission.createdAt?.toDate
+        ? submission.createdAt.toDate()
+        : new Date(submission.createdAt);
       return submissionDate >= todayStart;
     });
 
     // Filtruj tygodniowe
     const weekSubmissions = allSubmissions.filter((submission) => {
-      const submissionDate = submission.createdAt.toDate();
+      const submissionDate = submission.createdAt?.toDate
+        ? submission.createdAt.toDate()
+        : new Date(submission.createdAt);
       return submissionDate >= weekStart;
     });
 
@@ -223,11 +314,12 @@ export const getUserSubmissionStats = async (userId, activityId, type) => {
 };
 
 /**
- * Sprawdza ogólne limity EkoWyzwań dla użytkownika (jedno na tydzień)
+ * Sprawdza ogólne limity EkoWyzwań dla użytkownika (jedno na tydzień) (używa cache gdy możliwe)
  * @param {string} userId - ID użytkownika
+ * @param {boolean} useCache - Czy używać cache (domyślnie true)
  * @returns {Promise<Object>} - Wynik sprawdzenia limitów EkoWyzwań
  */
-export const validateWeeklyChallengeLimit = async (userId) => {
+export const validateWeeklyChallengeLimit = async (userId, useCache = true) => {
   try {
     const now = new Date();
     const todayStart = new Date(
@@ -242,27 +334,54 @@ export const validateWeeklyChallengeLimit = async (userId) => {
     );
     const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
 
-    // Uproszczone zapytanie - pobierz wszystkie wyzwania użytkownika
-    const challengesQuery = query(
-      collection(db, "submissions"),
-      where("studentId", "==", userId),
-      where("type", "==", "challenge"),
-    );
+    let weekChallenges;
 
-    const snapshot = await getDocs(challengesQuery);
+    if (useCache) {
+      // Try to get submissions from cache first
+      try {
+        const cachedSubmissions = await getCachedUserSubmissions(userId);
+        // Filter for challenges in current week
+        weekChallenges = cachedSubmissions.filter((submission) => {
+          const submissionDate = submission.createdAt?.toDate
+            ? submission.createdAt.toDate()
+            : new Date(submission.createdAt);
+          return (
+            submission.type === "challenge" &&
+            (submission.status === "approved" ||
+              submission.status === "pending") &&
+            submissionDate >= weekStart &&
+            submissionDate <= weekEnd
+          );
+        });
+      } catch (cacheError) {
+        console.log("Cache failed, falling back to direct query:", cacheError);
+        useCache = false;
+      }
+    }
 
-    // Filtruj w pamięci zamiast w bazie danych
-    const weekChallenges = snapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((submission) => {
-        const submissionDate = submission.createdAt.toDate();
-        return (
-          (submission.status === "approved" ||
-            submission.status === "pending") &&
-          submissionDate >= weekStart &&
-          submissionDate <= weekEnd
-        );
-      });
+    if (!useCache) {
+      // Fallback to direct database query
+      const challengesQuery = query(
+        collection(db, "submissions"),
+        where("studentId", "==", userId),
+        where("type", "==", "challenge"),
+      );
+
+      const snapshot = await getDocs(challengesQuery);
+
+      // Filtruj w pamięci zamiast w bazie danych
+      weekChallenges = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((submission) => {
+          const submissionDate = submission.createdAt.toDate();
+          return (
+            (submission.status === "approved" ||
+              submission.status === "pending") &&
+            submissionDate >= weekStart &&
+            submissionDate <= weekEnd
+          );
+        });
+    }
 
     const challengeCount = weekChallenges.length;
 

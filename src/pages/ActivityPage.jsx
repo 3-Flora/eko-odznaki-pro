@@ -6,6 +6,8 @@ import {
   getCachedEcoChallenges,
   invalidateCachedEcoActions,
   invalidateCachedEcoChallenges,
+  getCachedUserSubmissions,
+  invalidateCachedUserSubmissions,
 } from "../services/contentCache";
 import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import PageHeader from "../components/ui/PageHeader";
@@ -78,10 +80,76 @@ export default function ActivityPage() {
     enabled: true,
   });
 
-  // Ładowanie wszystkich EkoDziałań możliwych do wykonania
+  // Function to refresh user submissions/statuses from cache/db
+  const refreshUserSubmissionsIfNeeded = useCallback(async () => {
+    if (!currentUser) return;
+
+    try {
+      const submissions = await getCachedUserSubmissions(currentUser.id);
+
+      // Build map: challengeId -> latest submission
+      const map = {};
+      for (const s of submissions) {
+        if (!s.ecoActivityId) continue;
+        // keep first occurrence (submissions sorted newest first)
+        if (!map[s.ecoActivityId]) map[s.ecoActivityId] = s;
+      }
+
+      setChallengeSubmissions(map);
+    } catch (err) {
+      console.error("Failed to refresh user submissions:", err);
+    }
+  }, [currentUser]);
+
+  // Ładowanie wszystkich EkoDziałań możliwych do wykonania oraz submissions
   useEffect(() => {
-    loadData();
-  }, [loadData, currentUser, getChallengeSubmissionStatus]);
+    const loadAll = async () => {
+      await loadData();
+      // Load submissions cache early when page loads
+      await refreshUserSubmissionsIfNeeded();
+    };
+    loadAll();
+  }, [loadData, currentUser, refreshUserSubmissionsIfNeeded]);
+
+  // Listen for visibility/focus to detect return from SubmitActivityPage
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const checkAndRefresh = async () => {
+      try {
+        const raw = localStorage.getItem("submissions_needs_refresh");
+        if (!raw) return;
+        const payload = JSON.parse(raw);
+        if (!payload || payload.userId !== currentUser.id) return;
+
+        // Clear flag and invalidate cache then refresh
+        localStorage.removeItem("submissions_needs_refresh");
+        invalidateCachedUserSubmissions(currentUser.id);
+        await refreshUserSubmissionsIfNeeded();
+        // Also refresh limits which may have changed after submission
+        if (typeof triggerLimitsRefresh === "function") triggerLimitsRefresh();
+      } catch (e) {
+        console.error("Error handling submissions_needs_refresh:", e);
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") checkAndRefresh();
+    };
+
+    const onFocus = () => checkAndRefresh();
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", onFocus);
+
+    // also attempt once on mount
+    checkAndRefresh();
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [currentUser, triggerLimitsRefresh]);
 
   const handleActionSelect = useCallback(
     (action) => {

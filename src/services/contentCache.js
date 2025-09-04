@@ -1,6 +1,6 @@
 import { getEcoActions } from "./ecoActionService";
 import { getEcoChallenges } from "./ecoChallengeService";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
 
 const CACHE_KEY_PREFIX = "eko_content_cache_v1_";
@@ -10,6 +10,7 @@ const memoryCache = {
   ecoActions: null,
   ecoChallenges: null,
   schools: null,
+  submissions: {}, // map userId -> { data, ts }
 };
 
 function readLocal(key) {
@@ -162,5 +163,69 @@ export function invalidateCachedSchools() {
     localStorage.removeItem(CACHE_KEY_PREFIX + "schools");
   } catch (e) {
     console.error("invalidateCachedSchools error:", e);
+  }
+}
+
+// --- User submissions cache (per-user) ---
+export async function getCachedUserSubmissions(userId) {
+  if (!userId) return [];
+
+  // memory cache
+  const mem = memoryCache.submissions && memoryCache.submissions[userId];
+  if (mem && Date.now() - mem.ts < TTL) {
+    return mem.data;
+  }
+
+  // localStorage cache
+  const local = readLocal(CACHE_KEY_PREFIX + `submissions_${userId}`);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.submissions = memoryCache.submissions || {};
+    memoryCache.submissions[userId] = local;
+    return local.data;
+  }
+
+  try {
+    // Fetch submissions for the given user
+    const submissionsQuery = query(
+      collection(db, "submissions"),
+      where("studentId", "==", userId),
+    );
+
+    const querySnapshot = await getDocs(submissionsQuery);
+    const submissions = querySnapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+
+    // Sort newest first
+    submissions.sort((a, b) => {
+      const dateA = a.createdAt?.toDate
+        ? a.createdAt.toDate()
+        : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate
+        ? b.createdAt.toDate()
+        : new Date(b.createdAt);
+      return dateB - dateA;
+    });
+
+    const payload = { data: submissions, ts: Date.now() };
+    memoryCache.submissions = memoryCache.submissions || {};
+    memoryCache.submissions[userId] = payload;
+    writeLocal(CACHE_KEY_PREFIX + `submissions_${userId}`, payload);
+    return submissions;
+  } catch (err) {
+    console.error("getCachedUserSubmissions error:", err);
+    return [];
+  }
+}
+
+export function invalidateCachedUserSubmissions(userId) {
+  try {
+    if (memoryCache.submissions && memoryCache.submissions[userId]) {
+      delete memoryCache.submissions[userId];
+    }
+    localStorage.removeItem(CACHE_KEY_PREFIX + `submissions_${userId}`);
+  } catch (e) {
+    console.error("invalidateCachedUserSubmissions error:", e);
   }
 }
