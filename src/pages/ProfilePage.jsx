@@ -23,6 +23,7 @@ import {
 import Badge, { BadgeModal } from "../components/ui/Badge";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
 import Button from "../components/ui/Button";
+import { useRefreshTest } from "../hooks/useRefreshTest";
 import clsx from "clsx";
 
 export default function ProfilePage() {
@@ -34,6 +35,9 @@ export default function ProfilePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  // Test hook for global refresh system - TEMPORARILY DISABLED
+  // useRefreshTest('profile', 'Refreshing profile data...');
 
   // Cache badge templates so we don't refetch them on every user change
   const badgeTemplatesRef = useRef(null);

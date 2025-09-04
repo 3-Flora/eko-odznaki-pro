@@ -1,16 +1,16 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useMemo } from "react";
 import useDashboardData from "../hooks/useDashboardData";
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import LargeChallengeCard from "../components/dashboard/LargeChallengeCard";
 import ActionsCarousel from "../components/dashboard/ActionsCarousel";
 import TeacherStatsCard from "../components/dashboard/TeacherStatsCard";
 import PendingVerificationCard from "../components/dashboard/PendingVerificationCard";
 import QuickActionsCard from "../components/dashboard/QuickActionsCard";
-import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
+import PullToRefreshWrapper from "../components/ui/PullToRefreshWrapper";
 import { useToast } from "../contexts/ToastContext";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { useNavigate } from "react-router";
+import { useRegisterRefresh } from "../contexts/RefreshContext";
 import clsx from "clsx";
 
 export default function DashboardPage() {
@@ -29,14 +29,8 @@ export default function DashboardPage() {
     isEkoskop,
   } = useDashboardData(currentUser);
 
-  // Pull-to-refresh
-  const { isPulling, isRefreshing, progress, containerRef } = usePullToRefresh(
-    refreshAll,
-    {
-      threshold: 80,
-      enabled: true,
-    },
-  );
+  // Rejestrujemy funkcję odświeżania w globalnym systemie
+  useRegisterRefresh("dashboard", refreshAll);
 
   // Wyświetlanie błędów jako toast
   useEffect(() => {
@@ -98,21 +92,12 @@ export default function DashboardPage() {
   }, [data.ecoChallenge]);
 
   return (
-    <>
-      {/* Pull-to-refresh indicator */}
-      <PullToRefreshIndicator
-        isPulling={isPulling}
-        isRefreshing={isRefreshing}
-        progress={progress}
-        threshold={80}
-        onRefresh={refreshAll}
-      />
-
-      <div ref={containerRef}>
+    <PullToRefreshWrapper onRefresh={refreshAll} threshold={80} enabled={true}>
+      <div>
         <DashboardHeader
           name={currentUser?.displayName}
           text={headerText}
-          isRefreshing={isRefreshing}
+          isRefreshing={false}
           lastRefresh={lastRefresh}
           onRefresh={refreshAll}
           className="mb-6"
@@ -211,7 +196,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </>
+    </PullToRefreshWrapper>
   );
 }
 

@@ -8,6 +8,7 @@ import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
 import { ToastProvider } from "./contexts/ToastContext.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import { LimitsRefreshProvider } from "./contexts/LimitsRefreshContext.jsx";
+import { RefreshProvider } from "./contexts/RefreshContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -17,7 +18,9 @@ createRoot(document.getElementById("root")).render(
           <AuthProvider>
             <NotificationProvider>
               <ToastProvider>
-                <App />
+                <RefreshProvider>
+                  <App />
+                </RefreshProvider>
               </ToastProvider>
             </NotificationProvider>
           </AuthProvider>

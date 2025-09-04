@@ -17,6 +17,7 @@ import clsx from "clsx";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useLimitsRefresh } from "../contexts/LimitsRefreshContext";
+import { useRegisterRefresh } from "../contexts/RefreshContext";
 import {
   useSubmissionLimits,
   useWeeklyChallengeLimit,
@@ -79,6 +80,9 @@ export default function ActivityPage() {
     threshold: 80,
     enabled: true,
   });
+
+  // Rejestrujemy funkcję odświeżania w globalnym systemie
+  useRegisterRefresh("activity", handleRefresh);
 
   // Function to refresh user submissions/statuses from cache/db
   const refreshUserSubmissionsIfNeeded = useCallback(async () => {

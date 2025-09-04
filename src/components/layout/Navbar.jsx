@@ -6,6 +6,7 @@ import BadgesButton from "../ui/Badgesbutton";
 import UserButton from "../ui/UserButton";
 import DebugButton from "../debug/DebugButton";
 import BackButton from "../ui/BackButton";
+import RefreshButton from "../ui/RefreshButton";
 import { NotificationBell, SimpleNotificationBell } from "../notifications";
 import CreateNotificationButton from "../ui/CreateNotificationButton";
 import { useAuth } from "../../contexts/AuthContext";
@@ -66,6 +67,7 @@ export const Navbar = () => {
         <div className="flex flex-row gap-2">
           {currentUser.role === "teacher" && <CreateNotificationButton />}
           <SimpleNotificationBell />
+          <RefreshButton size="sm" />
           <DebugButton />
           <ToggleTheme />
           <UserButton />
