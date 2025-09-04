@@ -150,7 +150,6 @@ Dodano brakujące style:
 ### UX/UI
 
 - Automatyczne wypełnianie formularzy
-- Breadcrumbs do nawigacji
 - Statusy wizualne dla wniosków
 - Statystyki na dashboardzie wniosków
 - Loading states i komunikaty sukcesu/błędu

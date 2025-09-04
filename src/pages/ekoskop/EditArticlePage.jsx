@@ -125,10 +125,6 @@ export default function EditArticlePage() {
       <PageHeader
         title="Edytuj artykuł"
         subtitle="Wprowadź zmiany w artykule edukacyjnym"
-        breadcrumbs={[
-          { name: "Artykuły", href: "/ekoskop/articles" },
-          { name: "Edytuj artykuł", current: true },
-        ]}
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">

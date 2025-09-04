@@ -197,7 +197,7 @@ export default function ProfilePage() {
 
             <div className="mt-2 flex justify-between">
               <Button
-                size="sx"
+                size="xs"
                 style="lightBlue"
                 icon={Edit2}
                 onClick={() => navigate("/profile/edit")}
@@ -207,7 +207,7 @@ export default function ProfilePage() {
               </Button>
 
               <Button
-                size="sx"
+                size="xs"
                 style="gray"
                 icon={LogOut}
                 onClick={handleLogout}

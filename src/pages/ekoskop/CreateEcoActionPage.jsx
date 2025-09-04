@@ -111,10 +111,6 @@ export default function CreateEcoActionPage() {
       <PageHeader
         title="Nowe EkoDziałanie"
         subtitle="Utwórz nowy szablon EkoDziałania dla uczniów"
-        breadcrumbs={[
-          { name: "EkoDziałania", href: "/ekoskop/eco-actions" },
-          { name: "Nowe EkoDziałanie", current: true },
-        ]}
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">

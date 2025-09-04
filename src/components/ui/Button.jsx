@@ -6,7 +6,7 @@ export default function Button({
   children,
   onClick = () => {},
   style = "normal", // "normal" | "loading" | "danger"
-  size = "md", // "sx" | "sm" | "md" | "lg"
+  size = "md", // "xs" | "sm" | "md" | "lg"
   fullWidth = true,
   className,
 }) {
@@ -55,8 +55,8 @@ export default function Button({
   };
 
   const buttonSizes = {
-    sx: {
-      padding: "py-2 px-4",
+    xs: {
+      padding: "py-1 px-2",
       text: "text-xs",
     },
     sm: {

@@ -137,11 +137,6 @@ export default function CreateBadgePage() {
       <PageHeader
         title="Nowa odznaka"
         subtitle="Utwórz nową odznakę dla uczniów"
-        breadcrumbs={[
-          { label: "Panel administracyjny", href: "/ekoskop" },
-          { label: "Odznaki", href: "/ekoskop/badges" },
-          { label: "Nowa odznaka" },
-        ]}
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">

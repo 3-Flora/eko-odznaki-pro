@@ -17,12 +17,23 @@ export const Navbar = () => {
 
   // pokaż BackButton gdy jesteśmy na podstronie (ścieżka różna od "/", "/profile", "/submit")
   const excluded = new Set([
+    // Everyone
     "/",
     "/profile",
+    // Students
     "/submit",
+    // Teachers
     "/teacher/submissions",
     "/teacher/students",
     "/teacher/statistics",
+    // EkoSkop
+    "/ekoskop",
+    "/ekoskop/schools",
+    "/ekoskop/users",
+    "/ekoskop/statistics",
+    "/ekoskop/articles",
+    "/ekoskop/eco-actions",
+    "/ekoskop/badges",
   ]);
   const normalizedPath =
     (pathname || "/").split(/[?#]/)[0].replace(/\/+$/, "") || "/";

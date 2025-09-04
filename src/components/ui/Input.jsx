@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -5,6 +6,7 @@ export default function Input({
   type = "text",
   disablePasswordVisibilityToggle,
   icon: Icon,
+  className,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +24,10 @@ export default function Input({
       )}
       <input
         type={inputType}
-        className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-10 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+        className={clsx(
+          "w-full rounded-xl border border-gray-300 py-3 pr-4 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white",
+          Icon ? "pl-10" : "pl-4",
+        )}
         {...props}
       />
       {type === "password" && !disablePasswordVisibilityToggle && (

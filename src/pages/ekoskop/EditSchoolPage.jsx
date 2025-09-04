@@ -18,6 +18,10 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import BackButton from "../../components/ui/BackButton";
 import Loading from "../../components/routing/Loading";
+import TextareaAutosize from "react-textarea-autosize";
+import Label from "../../components/ui/Label";
+import Textarea from "../../components/ui/Textarea";
+import InfoBox from "../../components/ui/InfoBox";
 
 export default function EditSchoolPage() {
   const navigate = useNavigate();
@@ -216,27 +220,15 @@ export default function EditSchoolPage() {
       <PageHeader
         title="Edytuj szkołę"
         subtitle="Zaktualizuj informacje o szkole"
-        breadcrumbs={[
-          { name: "Szkoły", href: "/ekoskop/schools" },
-          {
-            name: originalData.name || "Szkoła",
-            href: `/ekoskop/school/${schoolId}`,
-          },
-          { name: "Edytuj", current: true },
-        ]}
+        emoji="📝"
       />
 
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Nazwa szkoły */}
             <div>
-              <label
-                htmlFor="name"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Nazwa szkoły *
-              </label>
+              <Label htmlFor="name">Nazwa szkoły *</Label>
               <Input
                 id="name"
                 name="name"
@@ -256,12 +248,7 @@ export default function EditSchoolPage() {
 
             {/* Adres */}
             <div>
-              <label
-                htmlFor="address"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Adres *
-              </label>
+              <Label htmlFor="address">Adres *</Label>
               <Input
                 id="address"
                 name="address"
@@ -281,12 +268,7 @@ export default function EditSchoolPage() {
 
             {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Adres email
-              </label>
+              <Label htmlFor="email">Adres email</Label>
               <Input
                 id="email"
                 name="email"
@@ -306,12 +288,7 @@ export default function EditSchoolPage() {
 
             {/* Telefon */}
             <div>
-              <label
-                htmlFor="phone"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Telefon
-              </label>
+              <Label htmlFor="phone">Telefon</Label>
               <Input
                 id="phone"
                 name="phone"
@@ -330,12 +307,7 @@ export default function EditSchoolPage() {
 
             {/* Strona internetowa */}
             <div>
-              <label
-                htmlFor="website"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Strona internetowa
-              </label>
+              <Label htmlFor="website">Strona internetowa</Label>
               <Input
                 id="website"
                 name="website"
@@ -354,76 +326,55 @@ export default function EditSchoolPage() {
 
             {/* Opis */}
             <div>
-              <label
-                htmlFor="description"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Opis szkoły
-              </label>
-              <textarea
+              <Label htmlFor="description">Opis szkoły</Label>
+              <Textarea
                 id="description"
                 name="description"
-                rows={4}
+                minRows={4}
+                maxLength={256}
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Krótki opis szkoły, jej misji i wartości..."
-                className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               />
             </div>
 
             {/* Przyciski */}
-            <div className="flex items-center justify-between pt-6">
-              <BackButton />
-
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  onClick={() => navigate("/ekoskop/schools")}
-                  style="outline"
-                >
-                  Anuluj
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving || !hasChanges()}
-                  className="inline-flex items-center gap-2"
-                >
-                  <Save className="h-4 w-4" />
-                  {saving ? "Zapisywanie..." : "Zapisz zmiany"}
-                </Button>
-              </div>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                onClick={() => navigate("/ekoskop/schools")}
+                style="outline"
+                className="max-w-[125px]"
+              >
+                Anuluj
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving || !hasChanges()}
+                fullWidth
+              >
+                <Save className="h-4 w-4" />
+                {saving ? "Zapisywanie..." : "Zapisz zmiany"}
+              </Button>
             </div>
           </form>
         </div>
 
         {/* Informacje pomocnicze */}
-        <div className="mt-6 rounded-xl bg-amber-50 p-4 dark:bg-amber-900/20">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <School className="h-5 w-5 text-amber-400" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                Uwagi dotyczące edycji szkoły
-              </h3>
-              <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
-                <ul className="list-inside list-disc space-y-1">
-                  <li>
-                    Zmiany będą widoczne dla wszystkich użytkowników
-                    przypisanych do tej szkoły
-                  </li>
-                  <li>
-                    Aktualizacja nazwy szkoły może wpłynąć na wyniki
-                    wyszukiwania
-                  </li>
-                  <li>
-                    Sprawdź poprawność danych kontaktowych przed zapisaniem
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+        <InfoBox style="warning">
+          <School />
+          <h3> Uwagi dotyczące edycji szkoły</h3>
+          <ul>
+            <li>
+              Zmiany będą widoczne dla wszystkich użytkowników przypisanych do
+              tej szkoły
+            </li>
+            <li>
+              Aktualizacja nazwy szkoły może wpłynąć na wyniki wyszukiwania
+            </li>
+            <li>Sprawdź poprawność danych kontaktowych przed zapisaniem</li>
+          </ul>
+        </InfoBox>
       </div>
     </div>
   );

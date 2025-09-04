@@ -10,6 +10,8 @@ import QuickActionsCard from "../components/dashboard/QuickActionsCard";
 import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
 import { useToast } from "../contexts/ToastContext";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
+import { useNavigate } from "react-router";
+import clsx from "clsx";
 
 export default function DashboardPage() {
   const { currentUser } = useAuth();
@@ -144,115 +146,46 @@ export default function DashboardPage() {
         {/* Ekoskop section */}
         {isEkoskop && (
           <div className="space-y-6">
-            {/* Quick Actions for Ekoskop */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                Szybkie akcje
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <a
-                  href="/ekoskop/schools"
-                  className="flex items-center gap-3 rounded-lg bg-blue-50 p-4 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40"
-                >
-                  <div className="text-2xl">🏫</div>
-                  <div>
-                    <div className="font-medium text-blue-900 dark:text-blue-100">
-                      Zarządzaj szkołami
-                    </div>
-                    <div className="text-xs text-blue-700 dark:text-blue-300">
-                      Przeglądaj i edytuj szkoły
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="/ekoskop/users"
-                  className="flex items-center gap-3 rounded-lg bg-green-50 p-4 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40"
-                >
-                  <div className="text-2xl">👥</div>
-                  <div>
-                    <div className="font-medium text-green-900 dark:text-green-100">
-                      Zarządzaj użytkownikami
-                    </div>
-                    <div className="text-xs text-green-700 dark:text-green-300">
-                      Weryfikuj i moderuj
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="/ekoskop/articles"
-                  className="flex items-center gap-3 rounded-lg bg-purple-50 p-4 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40"
-                >
-                  <div className="text-2xl">📝</div>
-                  <div>
-                    <div className="font-medium text-purple-900 dark:text-purple-100">
-                      Artykuły edukacyjne
-                    </div>
-                    <div className="text-xs text-purple-700 dark:text-purple-300">
-                      Twórz i publikuj
-                    </div>
-                  </div>
-                </a>
-
-                <a
-                  href="/ekoskop/statistics"
-                  className="flex items-center gap-3 rounded-lg bg-orange-50 p-4 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40"
-                >
-                  <div className="text-2xl">📊</div>
-                  <div>
-                    <div className="font-medium text-orange-900 dark:text-orange-100">
-                      Statystyki globalne
-                    </div>
-                    <div className="text-xs text-orange-700 dark:text-orange-300">
-                      Przegląd systemu
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-
             {/* System Overview */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100">Zarządzanie</p>
-                    <p className="text-lg font-bold">Szkoły & Klasy</p>
-                  </div>
-                  <div className="text-3xl opacity-80">🏫</div>
-                </div>
-              </div>
+              <DashboardCard
+                title="Zarządzanie"
+                subtitle="Szkoły & Klasy"
+                emoji="🏫"
+                className="from-blue-500 to-blue-600"
+                href="ekoskop/schools"
+              />
+              <DashboardCard
+                title="Treści"
+                subtitle="EkoDziałania & Odznaki"
+                emoji="🌱"
+                className="from-green-500 to-green-600"
+                href="ekoskop/badges"
+              />
 
-              <div className="rounded-2xl bg-gradient-to-br from-green-500 to-green-600 p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100">Treści</p>
-                    <p className="text-lg font-bold">EkoDziałania & Odznaki</p>
-                  </div>
-                  <div className="text-3xl opacity-80">🌱</div>
-                </div>
-              </div>
+              <DashboardCard
+                title="Użytkownicy"
+                subtitle="Zarządzanie Użytkownikami"
+                emoji="📲"
+                className="from-teal-500 to-teal-600"
+                href="ekoskop/users"
+              />
 
-              <div className="rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100">Edukacja</p>
-                    <p className="text-lg font-bold">Artykuły & Materiały</p>
-                  </div>
-                  <div className="text-3xl opacity-80">📚</div>
-                </div>
-              </div>
+              <DashboardCard
+                title="Edukacja"
+                subtitle="Artykuły & Materiały"
+                emoji="📚"
+                className="from-purple-500 to-purple-600"
+                href="ekoskop/articles"
+              />
 
-              <div className="rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100">Analityka</p>
-                    <p className="text-lg font-bold">Raporty & Statystyki</p>
-                  </div>
-                  <div className="text-3xl opacity-80">📈</div>
-                </div>
-              </div>
+              <DashboardCard
+                title="Analityka"
+                subtitle="Raporty & Statystyki"
+                emoji="📈"
+                className="from-orange-500 to-orange-600"
+                href="ekoskop/statistics"
+              />
             </div>
           </div>
         )}
@@ -279,5 +212,27 @@ export default function DashboardPage() {
         )}
       </div>
     </>
+  );
+}
+
+function DashboardCard({ title, subtitle, emoji, className, href }) {
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className={clsx(
+        "cursor-pointer rounded-2xl bg-gradient-to-br p-6 text-white",
+        className,
+      )}
+      onClick={() => navigate(href)}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-blue-100">{title}</p>
+          <p className="text-lg font-bold">{subtitle}</p>
+        </div>
+        <div className="text-3xl opacity-80">{emoji}</div>
+      </div>
+    </div>
   );
 }

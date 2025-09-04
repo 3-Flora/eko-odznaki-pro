@@ -256,10 +256,6 @@ export default function CreateTeacherPage() {
       <PageHeader
         title="Utwórz konto nauczyciela"
         subtitle="Stwórz nowe konto dla nauczyciela po weryfikacji dokumentów"
-        breadcrumbs={[
-          { name: "Użytkownicy", href: "/ekoskop/users" },
-          { name: "Nowy nauczyciel", current: true },
-        ]}
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">

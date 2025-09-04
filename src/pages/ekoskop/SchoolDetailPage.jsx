@@ -180,14 +180,7 @@ export default function SchoolDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <PageHeader
-          title={school.name}
-          subtitle={school.address}
-          breadcrumbs={[
-            { name: "Szkoły", href: "/ekoskop/schools" },
-            { name: school.name, current: true },
-          ]}
-        />
+        <PageHeader title={school.name} subtitle={school.address} />
 
         <Link
           to={`/ekoskop/schools/edit/${schoolId}`}

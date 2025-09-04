@@ -9,6 +9,8 @@ import PageHeader from "../../components/ui/PageHeader";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import BackButton from "../../components/ui/BackButton";
+import Label from "../../components/ui/Label";
+import Textarea from "../../components/ui/Textarea";
 
 export default function CreateSchoolPage() {
   const navigate = useNavigate();
@@ -142,26 +144,19 @@ export default function CreateSchoolPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Nowa szkoła"
-        subtitle="Dodaj nową szkołę do systemu"
-        breadcrumbs={[
-          { name: "Szkoły", href: "/ekoskop/schools" },
-          { name: "Nowa szkoła", current: true },
-        ]}
-      />
+      <PageHeader title="Nowa szkoła" subtitle="Dodaj nową szkołę do systemu" />
 
       <div className="mx-auto max-w-2xl">
         <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nazwa szkoły */}
             <div>
-              <label
+              <Label
                 htmlFor="name"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Nazwa szkoły *
-              </label>
+              </Label>
               <Input
                 id="name"
                 name="name"
@@ -181,12 +176,12 @@ export default function CreateSchoolPage() {
 
             {/* Adres */}
             <div>
-              <label
+              <Label
                 htmlFor="address"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Adres *
-              </label>
+              </Label>
               <Input
                 id="address"
                 name="address"
@@ -206,12 +201,12 @@ export default function CreateSchoolPage() {
 
             {/* Email */}
             <div>
-              <label
+              <Label
                 htmlFor="email"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Adres email
-              </label>
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -231,12 +226,12 @@ export default function CreateSchoolPage() {
 
             {/* Telefon */}
             <div>
-              <label
+              <Label
                 htmlFor="phone"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Telefon
-              </label>
+              </Label>
               <Input
                 id="phone"
                 name="phone"
@@ -255,12 +250,12 @@ export default function CreateSchoolPage() {
 
             {/* Strona internetowa */}
             <div>
-              <label
+              <Label
                 htmlFor="website"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Strona internetowa
-              </label>
+              </Label>
               <Input
                 id="website"
                 name="website"
@@ -279,36 +274,32 @@ export default function CreateSchoolPage() {
 
             {/* Opis */}
             <div>
-              <label
+              <Label
                 htmlFor="description"
                 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Opis szkoły
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 id="description"
                 name="description"
-                rows={4}
+                minRows={4}
+                maxLength={256}
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Krótki opis szkoły, jej misji i wartości..."
-                className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               />
             </div>
 
-            {/* Przyciski */}
-            <div className="flex items-center justify-between pt-6">
-              <BackButton />
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2"
-              >
-                <Save className="h-4 w-4" />
-                {loading ? "Dodawanie..." : "Dodaj szkołę"}
-              </Button>
-            </div>
+            {/* Przycisk dodawania */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {loading ? "Dodawanie..." : "Dodaj szkołę"}
+            </Button>
           </form>
         </div>
 

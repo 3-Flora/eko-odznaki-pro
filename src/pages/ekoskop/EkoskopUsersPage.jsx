@@ -11,6 +11,10 @@ import { db } from "../../services/firebase";
 import { useToast } from "../../contexts/ToastContext";
 import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
+import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import { Trash2 } from "lucide-react";
 
 export default function EkoskopUsersPage() {
   const [users, setUsers] = useState([]);
@@ -167,29 +171,28 @@ export default function EkoskopUsersPage() {
 
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <input
+        <div className="flex flex-col gap-4">
+          <Input
             type="text"
             placeholder="Szukaj użytkowników..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           />
 
-          <select
+          <Select
             value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
+            onChange={setFilterRole}
             className="rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           >
             <option value="all">Wszystkie role</option>
             <option value="student">Uczniowie</option>
             <option value="teacher">Nauczyciele</option>
             <option value="ekoskop">Ekoskop</option>
-          </select>
+          </Select>
 
-          <select
+          <Select
             value={filterSchool}
-            onChange={(e) => setFilterSchool(e.target.value)}
+            onChange={setFilterSchool}
             className="rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           >
             <option value="all">Wszystkie szkoły</option>
@@ -198,7 +201,7 @@ export default function EkoskopUsersPage() {
                 {school.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex gap-2">
@@ -298,22 +301,22 @@ export default function EkoskopUsersPage() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Użytkownik
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Rola
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Szkoła/Klasa
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="px-3 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Aktywność
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
+                <th className="border-l border-gray-500 px-3 py-2 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                   Akcje
                 </th>
               </tr>
@@ -324,7 +327,7 @@ export default function EkoskopUsersPage() {
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {user.displayName}
@@ -335,7 +338,7 @@ export default function EkoskopUsersPage() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <span
                       className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${getRoleBadgeClass(user.role)}`}
                     >
@@ -343,7 +346,7 @@ export default function EkoskopUsersPage() {
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white">
+                  <td className="px-3 py-2 text-sm whitespace-nowrap text-gray-900 dark:text-white">
                     {user.schoolId && (
                       <div>
                         <div>{getSchoolName(user.schoolId)}</div>
@@ -356,7 +359,7 @@ export default function EkoskopUsersPage() {
                     )}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <span
                       className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
                         user.isVerified
@@ -368,7 +371,7 @@ export default function EkoskopUsersPage() {
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white">
+                  <td className="px-3 py-2 text-sm whitespace-nowrap text-gray-900 dark:text-white">
                     {user.role === "student" && (
                       <div>
                         <div>{user.counters?.totalActions || 0} EkoDziałań</div>
@@ -379,29 +382,32 @@ export default function EkoskopUsersPage() {
                     )}
                   </td>
 
-                  <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                  <td className="px-3 py-2 text-right text-sm font-medium whitespace-nowrap">
                     <div className="flex justify-end gap-2">
-                      <button
+                      <Button
                         onClick={() =>
                           handleToggleVerification(user.id, user.isVerified)
                         }
-                        className={`rounded-lg px-3 py-1 text-xs font-medium ${
-                          user.isVerified
-                            ? "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
-                            : "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
-                        }`}
+                        // className={`rounded-lg px-3 py-1 text-xs font-medium ${
+                        //   user.isVerified
+                        //     ? "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+                        //     : "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+                        // }`}
+                        size="xs"
+                        style={user.isVerified ? "danger" : "success"}
                       >
                         {user.isVerified ? "Cofnij weryfikację" : "Zweryfikuj"}
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
                         onClick={() =>
                           handleDeleteUser(user.id, user.displayName)
                         }
-                        className="rounded-lg bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+                        size="xs"
+                        style="danger"
                       >
-                        Usuń
-                      </button>
+                        <Trash2 />
+                      </Button>
                     </div>
                   </td>
                 </tr>
