@@ -144,10 +144,14 @@ export default function CreateSchoolPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Nowa szkoła" subtitle="Dodaj nową szkołę do systemu" />
+      <PageHeader
+        title="Nowa szkoła"
+        subtitle="Dodaj nową szkołę do systemu"
+        emoji="🏫"
+      />
 
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nazwa szkoły */}
             <div>

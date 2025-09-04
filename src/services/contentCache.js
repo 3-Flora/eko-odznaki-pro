@@ -1,5 +1,7 @@
 import { getEcoActions } from "./ecoActionService";
 import { getEcoChallenges } from "./ecoChallengeService";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase";
 
 const CACHE_KEY_PREFIX = "eko_content_cache_v1_";
 const TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -7,6 +9,7 @@ const TTL = 24 * 60 * 60 * 1000; // 24 hours
 const memoryCache = {
   ecoActions: null,
   ecoChallenges: null,
+  schools: null,
 };
 
 function readLocal(key) {
@@ -22,7 +25,7 @@ function writeLocal(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {
-    // ignore
+    console.error("writeLocal error:", e);
   }
 }
 
@@ -82,7 +85,7 @@ export function invalidateCachedEcoActions() {
   try {
     localStorage.removeItem(CACHE_KEY_PREFIX + "ecoActions");
   } catch (e) {
-    // ignore
+    console.error("invalidateCachedEcoActions error:", e);
   }
 }
 
@@ -92,5 +95,72 @@ export function invalidateCachedEcoChallenges() {
     localStorage.removeItem(CACHE_KEY_PREFIX + "ecoChallenges");
   } catch (e) {
     // ignore
+  }
+}
+
+export async function getCachedSchools() {
+  // memory cache
+  if (memoryCache.schools && Date.now() - memoryCache.schools.ts < TTL) {
+    return memoryCache.schools.data;
+  }
+
+  // localStorage cache
+  const local = readLocal(CACHE_KEY_PREFIX + "schools");
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.schools = local;
+    return local.data;
+  }
+
+  try {
+    // Fetch schools, classes and users to compute counts and attach them to each school
+    const [schoolsSnapshot, classesSnapshot, usersSnapshot] = await Promise.all(
+      [
+        getDocs(collection(db, "schools")),
+        getDocs(collection(db, "classes")),
+        getDocs(collection(db, "users")),
+      ],
+    );
+
+    const classCountBySchool = new Map();
+    for (const cls of classesSnapshot.docs) {
+      const sid = cls.data().schoolId;
+      if (!sid) continue;
+      classCountBySchool.set(sid, (classCountBySchool.get(sid) || 0) + 1);
+    }
+
+    const studentCountBySchool = new Map();
+    for (const user of usersSnapshot.docs) {
+      const data = user.data();
+      if (data.role !== "student") continue;
+      const sid = data.schoolId;
+      if (!sid) continue;
+      studentCountBySchool.set(sid, (studentCountBySchool.get(sid) || 0) + 1);
+    }
+
+    const data = schoolsSnapshot.docs.map((d) => {
+      const base = { id: d.id, ...d.data() };
+      return {
+        ...base,
+        classCount: classCountBySchool.get(d.id) || 0,
+        studentCount: studentCountBySchool.get(d.id) || 0,
+      };
+    });
+
+    const payload = { data, ts: Date.now() };
+    memoryCache.schools = payload;
+    writeLocal(CACHE_KEY_PREFIX + "schools", payload);
+    return data;
+  } catch (err) {
+    console.error("getCachedSchools error:", err);
+    return [];
+  }
+}
+
+export function invalidateCachedSchools() {
+  memoryCache.schools = null;
+  try {
+    localStorage.removeItem(CACHE_KEY_PREFIX + "schools");
+  } catch (e) {
+    console.error("invalidateCachedSchools error:", e);
   }
 }

@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link } from "react-router";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../services/firebase";
 import { useToast } from "../../contexts/ToastContext";
 import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
@@ -11,12 +9,17 @@ import {
   GraduationCap,
   Plus,
   UsersRound,
-  ChevronLeft,
-  ChevronRight,
+  RefreshCcw,
 } from "lucide-react";
 import Input from "../../components/ui/Input";
 import NavButton from "../../components/ui/NavButton";
 import Pagination from "../../components/ui/Pagination";
+import {
+  getCachedSchools,
+  invalidateCachedSchools,
+} from "../../services/contentCache";
+import Button from "../../components/ui/Button";
+import PullToRefreshWrapper from "../../components/ui/PullToRefreshWrapper";
 
 export default function EkoskopSchoolsPage() {
   const isMounted = useRef(true);
@@ -27,61 +30,41 @@ export default function EkoskopSchoolsPage() {
   const itemsPerPage = 10;
   const { showError } = useToast();
 
+  const loadSchools = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Pobierz szkoły wraz z policzonymi countami z cache
+      const schoolsData = await getCachedSchools();
+      if (isMounted.current) setSchools(schoolsData);
+    } catch (error) {
+      console.error("Error loading schools:", error);
+      showError("Nie udało się załadować szkół");
+    } finally {
+      if (isMounted.current) setLoading(false);
+    }
+  }, [showError]);
+
+  // keep mount flag stable across re-renders
   useEffect(() => {
-    loadSchools();
+    isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
   }, []);
 
-  const loadSchools = async () => {
+  // call loadSchools once on mount
+  useEffect(() => {
+    loadSchools();
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
     try {
-      setLoading(true);
-
-      // Pobierz wszystkie zasoby jednocześnie zamiast w pętli
-      const [schoolsSnapshot, classesSnapshot, usersSnapshot] =
-        await Promise.all([
-          getDocs(collection(db, "schools")),
-          getDocs(collection(db, "classes")),
-          getDocs(collection(db, "users")),
-        ]);
-
-      // Zmapuj liczby klas na schoolId
-      const classCountBySchool = new Map();
-      for (const cls of classesSnapshot.docs) {
-        const sid = cls.data().schoolId;
-        if (!sid) continue;
-        classCountBySchool.set(sid, (classCountBySchool.get(sid) || 0) + 1);
-      }
-
-      // Zmapuj liczbę uczniów (role === 'student') na schoolId
-      const studentCountBySchool = new Map();
-      for (const user of usersSnapshot.docs) {
-        const data = user.data();
-        if (data.role !== "student") continue;
-        const sid = data.schoolId;
-        if (!sid) continue;
-        studentCountBySchool.set(sid, (studentCountBySchool.get(sid) || 0) + 1);
-      }
-
-      const schoolsData = schoolsSnapshot.docs.map((schoolDoc) => {
-        const data = schoolDoc.data() || {};
-        return {
-          id: schoolDoc.id,
-          ...data,
-          classCount: classCountBySchool.get(schoolDoc.id) || 0,
-          studentCount: studentCountBySchool.get(schoolDoc.id) || 0,
-        };
-      });
-
-      setSchools(schoolsData);
-    } catch (error) {
-      console.error("Error loading schools:", error);
-      showError("Nie udało się załadować szkół");
-    } finally {
-      setLoading(false);
+      invalidateCachedSchools();
+      await loadSchools();
+    } catch (err) {
+      console.error("Refresh error:", err);
     }
-  };
+  }, [loadSchools]);
 
   const filteredSchools = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -116,63 +99,83 @@ export default function EkoskopSchoolsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Zarządzanie szkołami"
-        subtitle="Przeglądaj i zarządzaj wszystkimi szkołami w systemie"
-        emoji="🏫"
-      />
+    <PullToRefreshWrapper
+      onRefresh={handleRefresh}
+      threshold={80}
+      enabled={true}
+    >
+      <div className="space-y-6">
+        <PageHeader
+          title="Zarządzanie szkołami"
+          subtitle="Przeglądaj i zarządzaj wszystkimi szkołami w systemie"
+          emoji="🏫"
+        />
 
-      {/* Search and Actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1 lg:max-w-md">
-          <Input
-            type="text"
-            placeholder="Szukaj szkół..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <NavButton href="/ekoskop/schools/create" fullWidth={false}>
-          <Plus />
-          Dodaj szkołę
-        </NavButton>
-      </div>
-
-      {/* Schools Grid */}
-      {filteredSchools.length === 0 ? (
-        <div className="rounded-2xl bg-gray-50 p-8 text-center dark:bg-gray-800">
-          <div className="mb-4 text-4xl">🏫</div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-            {searchTerm ? "Brak wyników wyszukiwania" : "Brak szkół"}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            {searchTerm
-              ? "Spróbuj zmienić kryteria wyszukiwania"
-              : "Dodaj pierwszą szkołę do systemu"}
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {paginatedSchools.map((school) => (
-              <SchoolCard key={school.id} school={school} />
-            ))}
+        {/* Search and Actions */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1 lg:max-w-md">
+            <Input
+              type="text"
+              placeholder="Szukaj szkół..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              onPageChange={(p) => setCurrentPage(p)}
-              totalItems={filteredSchools.length}
-              itemsPerPage={itemsPerPage}
-            />
-          )}
-        </>
-      )}
-    </div>
+          <div className="flex gap-4">
+            <Button
+              onClick={handleRefresh}
+              fullWidth={false}
+              className="hidden sm:inline-flex"
+            >
+              <RefreshCcw />
+              Odśwież
+            </Button>
+
+            <NavButton
+              href="/ekoskop/schools/create"
+              className="w-full sm:w-auto"
+            >
+              <Plus />
+              Dodaj szkołę
+            </NavButton>
+          </div>
+        </div>
+
+        {/* Schools Grid */}
+        {filteredSchools.length === 0 ? (
+          <div className="rounded-2xl bg-gray-50 p-8 text-center dark:bg-gray-800">
+            <div className="mb-4 text-4xl">🏫</div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+              {searchTerm ? "Brak wyników wyszukiwania" : "Brak szkół"}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {searchTerm
+                ? "Spróbuj zmienić kryteria wyszukiwania"
+                : "Dodaj pierwszą szkołę do systemu"}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {paginatedSchools.map((school) => (
+                <SchoolCard key={school.id} school={school} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                onPageChange={(p) => setCurrentPage(p)}
+                totalItems={filteredSchools.length}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
+          </>
+        )}
+      </div>
+    </PullToRefreshWrapper>
   );
 }
 

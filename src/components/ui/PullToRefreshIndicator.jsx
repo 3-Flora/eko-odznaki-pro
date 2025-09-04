@@ -34,29 +34,29 @@ export default function PullToRefreshIndicator({
   if (!shouldShow) return null;
 
   // Desktop button
-  if (!isTouchDevice) {
-    return (
-      <div className="fixed top-20 right-4 z-50">
-        <button
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className={clsx(
-            "flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-200",
-            isRefreshing
-              ? "cursor-not-allowed bg-green-500 text-white"
-              : "bg-white text-gray-600 hover:bg-green-50 hover:text-green-600 active:scale-95 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900 dark:hover:text-green-400",
-          )}
-          title="Odśwież dane"
-        >
-          {isRefreshing ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <RefreshCw className="h-5 w-5" />
-          )}
-        </button>
-      </div>
-    );
-  }
+  // if (!isTouchDevice) {
+  //   return (
+  //     <div className="fixed top-20 right-4 z-50">
+  //       <button
+  //         onClick={onRefresh}
+  //         disabled={isRefreshing}
+  //         className={clsx(
+  //           "flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-200",
+  //           isRefreshing
+  //             ? "cursor-not-allowed bg-green-500 text-white"
+  //             : "bg-white text-gray-600 hover:bg-green-50 hover:text-green-600 active:scale-95 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900 dark:hover:text-green-400",
+  //         )}
+  //         title="Odśwież dane"
+  //       >
+  //         {isRefreshing ? (
+  //           <Loader2 className="h-5 w-5 animate-spin" />
+  //         ) : (
+  //           <RefreshCw className="h-5 w-5" />
+  //         )}
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   // Mobilne: górny pasek postępu (od lewej do prawej)
   return (
@@ -75,22 +75,6 @@ export default function PullToRefreshIndicator({
           }}
         />
       </div>
-
-      {/* Opcjonalny tekst informacyjny pod paskiem */}
-      {/* <div className="z-10 flex justify-center pt-3">
-        <div
-          className={clsx(
-            "pointer-events-auto text-sm font-medium text-gray-700 transition-opacity duration-200 dark:text-gray-300",
-            isPulling || isRefreshing ? "opacity-100" : "opacity-0",
-          )}
-        >
-          {isRefreshing
-            ? "Odświeżanie..."
-            : isReady
-              ? "Upuść, aby odświeżyć"
-              : "Przeciągnij w dół"}
-        </div>
-      </div> */}
     </div>
   );
 }
