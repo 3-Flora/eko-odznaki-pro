@@ -5,15 +5,26 @@ import { db } from "../../services/firebase";
 import { useToast } from "../../contexts/ToastContext";
 import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
-import { Edit, Eye, GraduationCap, Plus, UsersRound } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  GraduationCap,
+  Plus,
+  UsersRound,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Input from "../../components/ui/Input";
 import NavButton from "../../components/ui/NavButton";
+import Pagination from "../../components/ui/Pagination";
 
 export default function EkoskopSchoolsPage() {
   const isMounted = useRef(true);
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { showError } = useToast();
 
   useEffect(() => {
@@ -82,6 +93,24 @@ export default function EkoskopSchoolsPage() {
     );
   }, [schools, searchTerm]);
 
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredSchools.length / itemsPerPage),
+  );
+  // Clamp currentPage when totalPages changes
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedSchools = filteredSchools.slice(startIndex, endIndex);
+
   if (loading) {
     return <Loading />;
   }
@@ -125,11 +154,23 @@ export default function EkoskopSchoolsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredSchools.map((school) => (
-            <SchoolCard key={school.id} school={school} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {paginatedSchools.map((school) => (
+              <SchoolCard key={school.id} school={school} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              totalItems={filteredSchools.length}
+              itemsPerPage={itemsPerPage}
+            />
+          )}
+        </>
       )}
     </div>
   );

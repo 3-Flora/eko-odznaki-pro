@@ -27,6 +27,7 @@ import Button from "../components/ui/Button";
 import clsx from "clsx";
 import ProfilePage from "./ProfilePage";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
+import Pagination from "../components/ui/Pagination";
 
 export default function TeacherStatisticsPage() {
   const { currentUser } = useAuth();
@@ -37,6 +38,8 @@ export default function TeacherStatisticsPage() {
   const [className, setClassName] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Załaduj uczniów z klasy nauczyciela i ich statystyki
   useEffect(() => {
@@ -296,64 +299,80 @@ export default function TeacherStatisticsPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {students
-              .sort(
-                (a, b) =>
-                  (b.counters?.totalActions || 0) -
-                  (a.counters?.totalActions || 0),
-              )
-              .map((student, index) => (
-                <div
-                  key={student.id}
-                  className="cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] dark:border-gray-700 dark:hover:bg-gray-700"
-                  onClick={() => navigate(`/teacher/student/${student.id}`)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-1 items-center gap-3">
-                      <div
-                        className={clsx(
-                          "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white",
-                          index === 0
-                            ? "bg-yellow-500"
-                            : index === 1
-                              ? "bg-gray-400"
-                              : index === 2
-                                ? "bg-orange-500"
-                                : "bg-gray-500",
-                        )}
-                      >
-                        {index + 1}
-                      </div>
-                      <div className="flex flex-1 flex-row items-center justify-between gap-2">
-                        <div>
-                          <h4 className="font-medium text-gray-800 dark:text-white">
-                            {student.displayName || student.email}
-                          </h4>
+          <>
+            <div className="space-y-3">
+              {students
+                .sort(
+                  (a, b) =>
+                    (b.counters?.totalActions || 0) -
+                    (a.counters?.totalActions || 0),
+                )
+                .slice(
+                  (currentPage - 1) * itemsPerPage,
+                  (currentPage - 1) * itemsPerPage + itemsPerPage,
+                )
+                .map((student, index) => (
+                  <div
+                    key={student.id}
+                    className="cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:scale-[1.02] hover:bg-gray-50 hover:shadow-lg active:scale-[0.98] dark:border-gray-700 dark:hover:bg-gray-700"
+                    onClick={() => navigate(`/teacher/student/${student.id}`)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-1 items-center gap-3">
+                        <div
+                          className={clsx(
+                            "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white",
+                            index === 0
+                              ? "bg-yellow-500"
+                              : index === 1
+                                ? "bg-gray-400"
+                                : index === 2
+                                  ? "bg-orange-500"
+                                  : "bg-gray-500",
+                          )}
+                        >
+                          {index + 1 + (currentPage - 1) * itemsPerPage}
                         </div>
-                        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center gap-1 text-green-500 dark:text-green-400">
-                            <LeafyGreen className="h-4 w-4" />
-                            <span>EkoDziałań</span>
-                            {student.counters?.totalActions || 0}
+                        <div className="flex flex-1 flex-row items-center justify-between gap-2">
+                          <div>
+                            <h4 className="font-medium text-gray-800 dark:text-white">
+                              {student.displayName || student.email}
+                            </h4>
                           </div>
-                          <div className="flex items-center gap-1 text-blue-500 dark:text-blue-400">
-                            <CalendarHeart className="h-4 w-4" />
-                            <span>EkoWyzwania</span>
-                            {student.counters?.totalChallenges || 0}
-                          </div>
-                          <div className="flex items-center gap-1 text-yellow-500 dark:text-yellow-400">
-                            <Award className="h-4 w-4" />
-                            <span>EkoOdznaki</span>
-                            {Object.keys(student.earnedBadges || {}).length}
+                          <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1 text-green-500 dark:text-green-400">
+                              <LeafyGreen className="h-4 w-4" />
+                              <span>EkoDziałań</span>
+                              {student.counters?.totalActions || 0}
+                            </div>
+                            <div className="flex items-center gap-1 text-blue-500 dark:text-blue-400">
+                              <CalendarHeart className="h-4 w-4" />
+                              <span>EkoWyzwania</span>
+                              {student.counters?.totalChallenges || 0}
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-500 dark:text-yellow-400">
+                              <Award className="h-4 w-4" />
+                              <span>EkoOdznaki</span>
+                              {Object.keys(student.earnedBadges || {}).length}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+
+            {/* Pagination for students */}
+            {Math.ceil(students.length / itemsPerPage) > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                onPageChange={(p) => setCurrentPage(p)}
+                totalItems={students.length}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
+          </>
         )}
       </div>
     </>
