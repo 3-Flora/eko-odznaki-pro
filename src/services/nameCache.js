@@ -85,3 +85,99 @@ export async function getClassName(id) {
 
   return "";
 }
+
+// Funkcje do preload cache przy logowaniu
+export async function preloadSchoolName(id) {
+  if (!id) return "";
+
+  // Sprawdź czy już mamy w cache
+  const mem = memoryCache.schools[id];
+  if (mem && Date.now() - mem.ts < TTL) return mem.name;
+
+  const local = readLocal(CACHE_KEY_PREFIX + "school_" + id);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.schools[id] = local;
+    return local.name;
+  }
+
+  // Pobierz z bazy i zapisz w cache
+  try {
+    const sRef = doc(db, "schools", id);
+    const sSnap = await getDoc(sRef);
+    if (sSnap.exists()) {
+      const data = sSnap.data();
+      const name = data.name || data.title || "";
+      const payload = { name, ts: Date.now() };
+      memoryCache.schools[id] = payload;
+      writeLocal(CACHE_KEY_PREFIX + "school_" + id, payload);
+      return name;
+    }
+  } catch (err) {
+    console.error("preloadSchoolName error:", err);
+  }
+
+  return "";
+}
+
+export async function preloadClassName(id) {
+  if (!id) return "";
+
+  // Sprawdź czy już mamy w cache
+  const mem = memoryCache.classes[id];
+  if (mem && Date.now() - mem.ts < TTL) return mem.name;
+
+  const local = readLocal(CACHE_KEY_PREFIX + "class_" + id);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.classes[id] = local;
+    return local.name;
+  }
+
+  // Pobierz z bazy i zapisz w cache
+  try {
+    const cRef = doc(db, "classes", id);
+    const cSnap = await getDoc(cRef);
+    if (cSnap.exists()) {
+      const data = cSnap.data();
+      const name = data.name || data.title || "";
+      const payload = { name, ts: Date.now() };
+      memoryCache.classes[id] = payload;
+      writeLocal(CACHE_KEY_PREFIX + "class_" + id, payload);
+      return name;
+    }
+  } catch (err) {
+    console.error("preloadClassName error:", err);
+  }
+
+  return "";
+}
+
+// Funkcje do odczytu z cache (synchroniczne)
+export function getCachedSchoolName(id) {
+  if (!id) return "";
+
+  const mem = memoryCache.schools[id];
+  if (mem && Date.now() - mem.ts < TTL) return mem.name;
+
+  const local = readLocal(CACHE_KEY_PREFIX + "school_" + id);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.schools[id] = local;
+    return local.name;
+  }
+
+  return "";
+}
+
+export function getCachedClassName(id) {
+  if (!id) return "";
+
+  const mem = memoryCache.classes[id];
+  if (mem && Date.now() - mem.ts < TTL) return mem.name;
+
+  const local = readLocal(CACHE_KEY_PREFIX + "class_" + id);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.classes[id] = local;
+    return local.name;
+  }
+
+  return "";
+}

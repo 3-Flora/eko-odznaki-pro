@@ -27,6 +27,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../services/firebase";
+import { preloadSchoolName, preloadClassName } from "../services/nameCache";
 import {
   validateSubmissionLimits,
   validateWeeklyChallengeLimit,
@@ -388,6 +389,18 @@ export const AuthProvider = ({ children }) => {
                       );
                       // Nie przerywaj procesu, kontynuuj z danymi z Firestore
                     }
+                  }
+
+                  // Preload nazwę szkoły i klasy do cache
+                  if (userData.schoolId) {
+                    preloadSchoolName(userData.schoolId).catch((error) =>
+                      console.error("Błąd preload nazwy szkoły:", error),
+                    );
+                  }
+                  if (userData.classId) {
+                    preloadClassName(userData.classId).catch((error) =>
+                      console.error("Błąd preload nazwy klasy:", error),
+                    );
                   }
 
                   setCurrentUser(userData);

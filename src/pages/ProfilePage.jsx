@@ -14,7 +14,7 @@ import {
 import { useNavigate } from "react-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { getSchoolName, getClassName } from "../services/nameCache";
+import { getCachedSchoolName, getCachedClassName } from "../services/nameCache";
 import {
   getBadgeTemplates,
   calculateBadgeProgress,
@@ -27,8 +27,6 @@ import clsx from "clsx";
 
 export default function ProfilePage() {
   const { currentUser, logout } = useAuth();
-  const [schoolName, setSchoolName] = useState("");
-  const [classNameState, setClassNameState] = useState("");
   const [badgeProgress, setBadgeProgress] = useState([]);
   const [recentBadges, setRecentBadges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,82 +56,22 @@ export default function ProfilePage() {
     }
   }, [logout]);
 
-  // Pobierz postęp odznak z bazy danych (memoized, używa cache dla szablonów)
-  const loadBadgeProgress = useCallback(async () => {
-    if (!currentUser) return;
-
-    try {
-      setLoading(true);
-      if (!badgeTemplatesRef.current) {
-        badgeTemplatesRef.current = await getBadgeTemplates();
-      }
-
-      const progress = calculateBadgeProgress(
-        currentUser.counters || {},
-        currentUser.earnedBadges || {},
-        badgeTemplatesRef.current,
-      );
-      setBadgeProgress(progress);
-
-      // Pobierz ostatnie 3 odznaki do wyświetlenia na profilu
-      const recent = getRecentBadgesForProfile(
-        progress,
-        currentUser.earnedBadges || {},
-      );
-      setRecentBadges(recent);
-    } catch (error) {
-      console.error("Error loading badge progress:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    loadBadgeProgress();
-  }, [loadBadgeProgress]);
-
-  // Filtruj odznaki: pokazuj zdobyte + te w trakcie zdobywania (mają jakiś postęp)
-  const displayBadges = useMemo(
-    () =>
-      badgeProgress.filter((badge) => badge.isEarned || badge.currentCount > 0),
-    [badgeProgress],
-  );
-
   // Statystyki zdobytych odznak
   const earnedBadgesCount = useMemo(
     () => badgeProgress.filter((badge) => badge.isEarned).length,
     [badgeProgress],
   );
 
-  // Ładuje czytelne nazwy szkoły/klasy, używając cache (localStorage + pamięć)
-  useEffect(() => {
-    let mounted = true;
-    const loadNames = async () => {
-      if (!currentUser) return;
+  // Pobierz nazwy szkoły i klasy z cache (synchronicznie)
+  const schoolName = useMemo(() => {
+    return currentUser?.schoolId
+      ? getCachedSchoolName(currentUser.schoolId)
+      : "";
+  }, [currentUser?.schoolId]);
 
-      setSchoolName("");
-      setClassNameState("");
-
-      try {
-        if (currentUser.schoolId) {
-          const sName = await getSchoolName(currentUser.schoolId);
-          if (mounted) setSchoolName(sName || "");
-        }
-
-        if (currentUser.classId) {
-          const cName = await getClassName(currentUser.classId);
-          if (mounted) setClassNameState(cName || "");
-        }
-      } catch (err) {
-        console.error("Failed to load school/class names:", err);
-      }
-    };
-
-    loadNames();
-    return () => {
-      mounted = false;
-    };
-  }, [currentUser]);
+  const classNameState = useMemo(() => {
+    return currentUser?.classId ? getCachedClassName(currentUser.classId) : "";
+  }, [currentUser?.classId]);
 
   const stats = useMemo(
     () => [
@@ -267,43 +205,6 @@ export default function ProfilePage() {
                     Moje Odznaki
                   </p>
                 </button>
-              </div>
-
-              {/* Badges Section */}
-              <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                    Ostatnie odznaki
-                  </h2>
-                  <button
-                    onClick={() => navigate("/profile/badges")}
-                    className="flex items-center gap-2 rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600"
-                  >
-                    Zobacz wszystkie
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-
-                {!loading && recentBadges.length === 0 && (
-                  <div className="py-8 text-center">
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Jeszcze nie zdobyłeś żadnych odznak. Zacznij wykonywać
-                      EkoDziałania!
-                    </p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                  {recentBadges.map((badge, index) => {
-                    return (
-                      <Badge
-                        {...badge}
-                        key={badge.id}
-                        onClick={() => handleBadgeClick(badge)}
-                      />
-                    );
-                  })}
-                </div>
               </div>
             </>
           )}
