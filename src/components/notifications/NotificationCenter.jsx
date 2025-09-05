@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import Button from "../ui/Button";
 import clsx from "clsx";
+import PageHeader from "../ui/PageHeader";
+import PullToRefreshWrapper from "../ui/PullToRefreshWrapper";
 
 /**
  * Komponent centrum powiadomień
@@ -127,15 +129,18 @@ const NotificationCenter = ({ onClose }) => {
   ];
 
   return (
-    <>
+    <PullToRefreshWrapper
+      onRefresh={fetchNotifications}
+      threshold={80}
+      enabled={true}
+    >
       <div>
-        {/* Header */}
         <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Powiadomienia
-            </h1>
-          </div>
+          <PageHeader
+            title="Powiadomienia"
+            subtitle="Zarządzaj swoimi powiadomieniami"
+            emoji="🔔"
+          />
           <div className="flex items-center gap-2">
             <button
               variant="ghost"
@@ -310,7 +315,7 @@ const NotificationCenter = ({ onClose }) => {
           </div>
         </div>
       )}
-    </>
+    </PullToRefreshWrapper>
   );
 };
 

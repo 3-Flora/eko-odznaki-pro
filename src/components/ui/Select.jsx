@@ -41,7 +41,7 @@ export default function Select({ icon: Icon, value, onChange, children }) {
             className={clsx(
               isNull &&
                 "border-b border-gray-200 font-semibold dark:border-gray-700",
-              "cursor-pointer px-4 py-3 text-center text-gray-700 hover:bg-gray-100 dark:text-gray-300",
+              "cursor-pointer px-4 py-3 text-center text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700",
               value === child.props.value && "bg-gray-100 dark:bg-gray-800",
             )}
           >

@@ -12,6 +12,12 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { ChevronLeft, Send, Info, AlertTriangle, Clock } from "lucide-react";
 import Button from "../ui/Button";
+import PageHeader from "../ui/PageHeader";
+import Loading from "../routing/Loading";
+import Label from "../ui/Label";
+import Select from "../ui/Select";
+import Textarea from "../ui/Textarea";
+import Input from "../ui/Input";
 
 /**
  * Komponent do tworzenia nowych powiadomień
@@ -275,53 +281,26 @@ const CreateNotification = ({ onClose }) => {
 
   return (
     <>
-      {" "}
-      {/* Header */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={onClose} className="p-2">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Nowe powiadomienie
-            </h1>
-          </div>
-          <Button
-            onClick={() => setShowConfirmModal(true)}
-            disabled={loading || loadingData}
-            className="flex items-center gap-2"
-          >
-            <Send className="h-4 w-4" />
-            Wyślij
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Nowe powiadomienie"
+        subtitle="Utwórz nowe powiadomienie"
+        emoji="📢"
+      />
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {loadingData ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="flex items-center gap-3">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
-              <span className="text-gray-600 dark:text-gray-400">
-                Ładowanie danych...
-              </span>
-            </div>
-          </div>
+          <Loading />
         ) : (
           <div className="mx-auto max-w-2xl space-y-6">
             {/* Tytuł */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tytuł powiadomienia *
-              </label>
-              <input
+              <Label>Tytuł powiadomienia *</Label>
+              <Input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Wprowadź tytuł..."
                 maxLength={100}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {title.length}/100
@@ -330,16 +309,13 @@ const CreateNotification = ({ onClose }) => {
 
             {/* Treść */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Treść wiadomości *
-              </label>
-              <textarea
+              <Label>Treść wiadomości *</Label>
+              <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Wprowadź treść powiadomienia..."
-                rows={4}
+                minRows={1}
                 maxLength={500}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {message.length}/500
@@ -348,18 +324,16 @@ const CreateNotification = ({ onClose }) => {
 
             {/* Typ powiadomienia */}
             <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Typ powiadomienia
-              </label>
+              <Label>Typ powiadomienia</Label>
               <div className="space-y-2">
                 {typeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
-                    <label
+                    <Label
                       key={option.value}
-                      className="flex cursor-pointer items-center gap-3"
+                      className="flex items-center gap-3"
                     >
-                      <input
+                      <Input
                         type="radio"
                         name="type"
                         value={option.value}
@@ -371,7 +345,7 @@ const CreateNotification = ({ onClose }) => {
                       <span className="text-gray-700 dark:text-gray-300">
                         {option.label}
                       </span>
-                    </label>
+                    </Label>
                   );
                 })}
               </div>
@@ -379,79 +353,56 @@ const CreateNotification = ({ onClose }) => {
 
             {/* Typ celu */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Docelowi odbiorcy
-              </label>
-              <select
-                value={targetType}
-                onChange={(e) => setTargetType(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              >
+              <Label>Docelowi odbiorcy</Label>
+              <Select value={targetType} onChange={setTargetType}>
+                <option value="">Wybierz grupę docelową</option>
                 {targetOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Wybór klasy */}
             {targetType === "class" && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Wybierz klasę
-                </label>
-                <select
-                  value={targetClassId}
-                  onChange={(e) => setTargetClassId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                >
+                <Label>Wybierz klasę</Label>
+                <Select value={targetClassId} onChange={setTargetClassId}>
                   <option value="">Wybierz klasę...</option>
                   {availableClasses.map((classItem) => (
                     <option key={classItem.id} value={classItem.id}>
                       {classItem.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             )}
 
             {/* Wybór szkoły */}
             {targetType === "school" && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Wybierz szkołę
-                </label>
-                <select
-                  value={targetSchoolId}
-                  onChange={(e) => setTargetSchoolId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                >
+                <Label>Wybierz szkołę</Label>
+                <Select value={targetSchoolId} onChange={setTargetSchoolId}>
                   <option value="">Wybierz szkołę...</option>
                   {availableSchools.map((school) => (
                     <option key={school.id} value={school.id}>
                       {school.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             )}
 
             {/* Wybór roli */}
             {targetType === "role" && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Wybierz rolę
-                </label>
-                <select
-                  value={targetRole}
-                  onChange={(e) => setTargetRole(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                >
+                <Label>Wybierz rolę</Label>
+                <Select value={targetRole} onChange={setTargetRole}>
                   <option value="student">Uczniowie</option>
                   <option value="teacher">Nauczyciele</option>
                   <option value="all">Wszyscy</option>
-                </select>
+                </Select>
               </div>
             )}
 
@@ -461,6 +412,15 @@ const CreateNotification = ({ onClose }) => {
                 {getTargetDescription()}
               </p>
             </div>
+
+            <Button
+              onClick={() => setShowConfirmModal(true)}
+              disabled={loading || loadingData}
+              className="flex items-center gap-2"
+            >
+              <Send className="h-4 w-4" />
+              Wyślij
+            </Button>
           </div>
         )}
       </div>
@@ -471,7 +431,7 @@ const CreateNotification = ({ onClose }) => {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Potwierdzenie wysyłki
             </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-2 wrap-break-word text-gray-600 dark:text-gray-400">
               Czy na pewno chcesz wysłać powiadomienie "{title}"?
             </p>
             <div className="mt-4 flex gap-3">

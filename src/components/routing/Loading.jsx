@@ -1,5 +1,6 @@
 export default function Loading() {
   return (
+    // TODO: poprawić wysokość, poniewąż jest używany w różnych komponentach
     <div className="flex min-h-svh items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="text-center">
         <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-green-500"></div>
