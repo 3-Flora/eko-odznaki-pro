@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { useNavigate, useSearchParams } from "react-router";
+import { useRegisterRefresh } from "../contexts/RefreshContext";
 import {
   collection,
   query,
@@ -27,7 +28,12 @@ import {
 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
+import PullToRefreshWrapper from "../components/ui/PullToRefreshWrapper";
 import clsx from "clsx";
+
+// Cache konfiguracja
+const CACHE_TTL = 5 * 60 * 1000; // 5 minut
+const submissionsCache = new Map();
 
 export default function TeacherSubmissionsPage() {
   const { currentUser } = useAuth();
@@ -42,18 +48,70 @@ export default function TeacherSubmissionsPage() {
   const [schoolName, setSchoolName] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("pending");
-  const [selectedType, setSelectedType] = useState("actions"); // "actions" lub "challenges" // Paginacja
+  const [selectedType, setSelectedType] = useState("actions"); // "actions" lub "challenges"
+  const [lastRefresh, setLastRefresh] = useState(null);
+
+  // Paginacja
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   // Sprawdź czy filtrujemy po konkretnym uczniu
   const filterByStudent = searchParams.get("student");
 
-  // Załaduj zgłoszenia EkoDziałań
-  useEffect(() => {
-    if (!currentUser?.classId) return;
+  // Funkcje cache
+  const getCacheKey = useCallback((classId, studentId = null) => {
+    return `teacher_submissions_${classId}_${studentId || "all"}`;
+  }, []);
 
-    const loadSubmissions = async () => {
+  const getCachedData = useCallback((key) => {
+    const cached = submissionsCache.get(key);
+    if (!cached) return null;
+
+    const now = Date.now();
+    if (now - cached.timestamp > CACHE_TTL) {
+      submissionsCache.delete(key);
+      return null;
+    }
+
+    return cached.data;
+  }, []);
+
+  const setCachedData = useCallback((key, data) => {
+    const timestamp = Date.now();
+    submissionsCache.set(key, {
+      data,
+      timestamp,
+    });
+    setLastRefresh(timestamp);
+  }, []);
+
+  // Funkcja ładowania danych z cache lub API
+  const loadSubmissions = useCallback(
+    async (forceRefresh = false) => {
+      if (!currentUser?.classId) return;
+
+      const cacheKey = getCacheKey(currentUser.classId, filterByStudent);
+
+      // Sprawdź cache jeśli nie wymuszamy odświeżenia
+      if (!forceRefresh) {
+        const cached = getCachedData(cacheKey);
+        if (cached !== null) {
+          setSubmissions(cached.submissions);
+          setEcoActions(cached.ecoActions);
+          setEcoChallenges(cached.ecoChallenges);
+          setClassName(cached.className);
+          setSchoolName(cached.schoolName);
+
+          // Ustaw timestamp ostatniego odświeżenia z cache
+          const cacheEntry = submissionsCache.get(cacheKey);
+          if (cacheEntry) {
+            setLastRefresh(cacheEntry.timestamp);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+
       setLoading(true);
       try {
         // Pobierz dane EkoDziałań
@@ -66,9 +124,13 @@ export default function TeacherSubmissionsPage() {
 
         // Pobierz informacje o klasie
         const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
+        let classNameData = "";
+        let schoolNameData = "";
+
         if (classDoc.exists()) {
           const classData = classDoc.data();
-          setClassName(classData.name || "");
+          classNameData = classData.name || "";
+          setClassName(classNameData);
 
           // Pobierz informacje o szkole
           if (classData.schoolId) {
@@ -76,7 +138,8 @@ export default function TeacherSubmissionsPage() {
               doc(db, "schools", classData.schoolId),
             );
             if (schoolDoc.exists()) {
-              setSchoolName(schoolDoc.data().name || "");
+              schoolNameData = schoolDoc.data().name || "";
+              setSchoolName(schoolNameData);
             }
           }
         }
@@ -113,16 +176,66 @@ export default function TeacherSubmissionsPage() {
         });
 
         setSubmissions(allSubmissionsData);
+
+        // Zapisz do cache
+        const cacheData = {
+          submissions: allSubmissionsData,
+          ecoActions: ecoActionsData,
+          ecoChallenges: challengesData,
+          className: classNameData,
+          schoolName: schoolNameData,
+        };
+        setCachedData(cacheKey, cacheData);
       } catch (error) {
         console.error("Error loading submissions:", error);
         showError("Błąd podczas ładowania zgłoszeń");
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [
+      currentUser?.classId,
+      filterByStudent,
+      showError,
+      getCacheKey,
+      getCachedData,
+      setCachedData,
+    ],
+  );
 
+  // Funkcja odświeżania dla pull-to-refresh i globalnego systemu
+  const refreshAll = useCallback(async () => {
+    await loadSubmissions(true);
+  }, [loadSubmissions]);
+
+  // Rejestracja w globalnym systemie odświeżania
+  useRegisterRefresh("teacher-submissions", refreshAll);
+
+  // Załaduj zgłoszenia EkoDziałań
+  useEffect(() => {
     loadSubmissions();
-  }, [currentUser?.classId, filterByStudent, showError]);
+  }, [loadSubmissions]);
+
+  // Funkcja do czyszczenia cache
+  const clearCache = useCallback(() => {
+    submissionsCache.clear();
+  }, []);
+
+  // Formatowanie ostatniego odświeżenia
+  const formatLastRefresh = useMemo(() => {
+    if (!lastRefresh) return null;
+
+    const now = Date.now();
+    const diffMinutes = Math.floor((now - lastRefresh) / (1000 * 60));
+
+    if (diffMinutes < 1) return "przed chwilą";
+    if (diffMinutes === 1) return "1 min temu";
+    if (diffMinutes < 60) return `${diffMinutes} min temu`;
+
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours === 1) return "1 godz. temu";
+    return `${diffHours} godz. temu`;
+  }, [lastRefresh]);
 
   // Znajdź EkoDziałanie po ID
   const getEcoActionById = (ecoActivityId) => {
@@ -219,7 +332,7 @@ export default function TeacherSubmissionsPage() {
   }
 
   return (
-    <>
+    <PullToRefreshWrapper onRefresh={refreshAll} threshold={80} enabled={true}>
       <PageHeader
         emoji="✅"
         title={filterByStudent ? "Zgłoszenia ucznia" : "Weryfikacja zgłoszeń"}
@@ -490,6 +603,6 @@ export default function TeacherSubmissionsPage() {
           </>
         )}
       </div>
-    </>
+    </PullToRefreshWrapper>
   );
 }
