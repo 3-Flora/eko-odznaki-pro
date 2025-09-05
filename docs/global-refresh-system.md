@@ -92,6 +92,38 @@ export default function MyPage() {
 />
 ```
 
+### 5. Dark Mode Support
+
+Wszystkie warianty przycisku automatycznie obsługują dark mode:
+
+- **Navbar variant**: Przezroczyste tło dostosowuje się do kontekstu
+- **Button variant**: Zielone tło ma ciemniejsze odcienie w dark mode
+- **Floating variant**: Białe tło zmienia się na ciemne z odpowiednimi kolorami tekstu
+
+```jsx
+// Wszystkie warianty automatycznie obsługują dark mode
+<RefreshButton variant="navbar" />     // Przezroczyste tło
+<RefreshButton variant="button" />     // Zielone tło z dark mode
+<RefreshButton variant="floating" />   // Białe/ciemne tło z automatyczną zmianą
+```
+
+### 6. Accessibility (Dostępność)
+
+Komponent automatycznie obsługuje:
+
+- **Keyboard navigation**: Przycisk jest focusable i można go aktywować Enterem/Spacją
+- **Screen readers**: Ma `title` attribute z opisem "Odśwież dane"
+- **Visual feedback**: Animacja spinning i disabled states
+- **High contrast**: Style działają poprawnie w trybie wysokiego kontrastu
+
+```jsx
+// Przycisk automatycznie ma title i proper ARIA states
+<RefreshButton
+  variant="button"
+  showText={true} // Dodatkowy tekst dla lepszej dostępności
+/>
+```
+
 ## Aktualny stan implementacji
 
 ✅ **Zaimplementowane:**

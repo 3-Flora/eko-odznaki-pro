@@ -2,7 +2,7 @@ import { useLocation } from "react-router";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
 import ToggleTheme from "../ui/ToggleTheme";
-import BadgesButton from "../ui/Badgesbutton";
+import BadgesButton from "../ui/BadgesButton";
 import UserButton from "../ui/UserButton";
 import DebugButton from "../debug/DebugButton";
 import BackButton from "../ui/BackButton";
@@ -65,9 +65,10 @@ export const Navbar = () => {
           )}
         </div>
         <div className="flex flex-row gap-2">
-          {currentUser.role === "teacher" && <CreateNotificationButton />}
+          {(currentUser.role === "teacher" ||
+            currentUser.role === "ekoskop") && <CreateNotificationButton />}
           <SimpleNotificationBell />
-          <RefreshButton size="sm" />
+          <RefreshButton className="hidden sm:flex" />
           <DebugButton />
           <ToggleTheme />
           <UserButton />

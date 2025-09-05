@@ -5,7 +5,6 @@ import clsx from "clsx";
 
 export default function RefreshButton({
   className = "",
-  size = "default",
   showText = false,
   variant = "navbar", // "navbar", "button", "floating"
 }) {
@@ -17,18 +16,12 @@ export default function RefreshButton({
     lg: "h-12 w-12 text-lg",
   };
 
-  const iconSizes = {
-    sm: "h-4 w-4",
-    default: "h-5 w-5",
-    lg: "h-6 w-6",
-  };
-
   const variantClasses = {
-    navbar: "bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white",
+    navbar: "text-gray-600 dark:text-gray-400",
     button:
-      "bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl",
+      "bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl dark:bg-green-600 dark:hover:bg-green-700",
     floating:
-      "bg-white shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:bg-gray-50",
+      "bg-white shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700",
   };
 
   if (showText && variant !== "navbar") {
@@ -38,7 +31,7 @@ export default function RefreshButton({
         disabled={isRefreshing}
         className={clsx(
           "flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-all duration-200",
-          "active:scale-95 disabled:cursor-not-allowed disabled:opacity-50",
+          "active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:disabled:opacity-40",
           variantClasses[variant],
           className,
         )}
@@ -63,9 +56,7 @@ export default function RefreshButton({
       onClick={triggerGlobalRefresh}
       disabled={isRefreshing}
       className={clsx(
-        "flex items-center justify-center rounded-full transition-all duration-200",
-        "active:scale-95 disabled:cursor-not-allowed disabled:opacity-50",
-        sizeClasses[size],
+        "flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition-colors dark:bg-gray-800",
         variantClasses[variant],
         className,
       )}
@@ -73,7 +64,6 @@ export default function RefreshButton({
     >
       <RefreshCw
         className={clsx(
-          iconSizes[size],
           "transition-transform duration-500",
           isRefreshing && "animate-spin",
         )}
