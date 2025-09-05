@@ -8,7 +8,7 @@ export default function ToggleTheme() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition-colors dark:bg-gray-800"
+      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 transition-colors dark:bg-gray-800"
     >
       {theme === "dark" ? (
         <Sun className="text-white" />

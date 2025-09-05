@@ -135,14 +135,14 @@ const NotificationCenter = ({ onClose }) => {
       enabled={true}
     >
       <div>
+        <PageHeader
+          title="Powiadomienia"
+          subtitle="Zarządzaj swoimi powiadomieniami"
+          emoji="🔔"
+        />
         <div className="mb-2 flex items-center justify-between">
-          <PageHeader
-            title="Powiadomienia"
-            subtitle="Zarządzaj swoimi powiadomieniami"
-            emoji="🔔"
-          />
           <div className="flex items-center gap-2">
-            <button
+            {/* <button
               variant="ghost"
               size="sm"
               onClick={fetchNotifications}
@@ -154,13 +154,13 @@ const NotificationCenter = ({ onClose }) => {
                   "animate-spin": loading,
                 })}
               />
-            </button>
+            </button> */}
             {unreadCount > 0 && (
               <button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowMarkAllConfirm(true)}
-                className="flex items-center gap-1 rounded-full bg-gray-200 px-2 py-1.5 text-gray-900 dark:bg-gray-800 dark:text-gray-300"
+                className="flex cursor-pointer items-center gap-1 rounded-full bg-gray-200 px-2 py-1.5 text-gray-900 dark:bg-gray-800 dark:text-gray-300"
               >
                 <MailOpen className="h-4 w-4" />
                 Wszystkie
@@ -175,7 +175,7 @@ const NotificationCenter = ({ onClose }) => {
             <button
               key={filter.id}
               onClick={() => setSelectedFilter(filter.id)}
-              className={`flex min-w-0 items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${
+              className={`flex min-w-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${
                 selectedFilter === filter.id
                   ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"

@@ -14,21 +14,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { getEcoActions } from "../services/ecoActionService";
-import { getEcoChallenges } from "../services/ecoChallengeService";
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  Image as ImageIcon,
-  MessageSquare,
-  Calendar,
-  User,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { getAllEcoChallenges } from "../services/ecoChallengeService";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import PullToRefreshWrapper from "../components/ui/PullToRefreshWrapper";
+import { SubmissionsGrid } from "../components/submissions";
 import clsx from "clsx";
 
 // Cache konfiguracja
@@ -119,7 +110,7 @@ export default function TeacherSubmissionsPage() {
         setEcoActions(ecoActionsData);
 
         // Pobierz dane EkoWyzwań
-        const challengesData = await getEcoChallenges();
+        const challengesData = await getAllEcoChallenges();
         setEcoChallenges(challengesData);
 
         // Pobierz informacje o klasie
@@ -247,42 +238,6 @@ export default function TeacherSubmissionsPage() {
     return ecoChallenges.find((challenge) => challenge.id === challengeId);
   };
 
-  const getStatusInfo = (status) => {
-    switch (status) {
-      case "approved":
-        return {
-          icon: CheckCircle,
-          text: "Zatwierdzone",
-          color: "text-green-600 dark:text-green-400",
-          bgColor: "bg-green-50 dark:bg-green-900/20",
-        };
-      case "rejected":
-        return {
-          icon: XCircle,
-          text: "Odrzucone",
-          color: "text-red-600 dark:text-red-400",
-          bgColor: "bg-red-50 dark:bg-red-900/20",
-        };
-      default:
-        return {
-          icon: Clock,
-          text: "Oczekuje",
-          color: "text-orange-600 dark:text-orange-400",
-          bgColor: "bg-orange-50 dark:bg-orange-900/20",
-        };
-    }
-  };
-
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat("pl", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
   const getCurrentSubmissions = () => {
     return submissions.filter((submission) => {
       if (selectedType === "actions") {
@@ -341,7 +296,7 @@ export default function TeacherSubmissionsPage() {
 
       {/* Selector typu zgłoszeń */}
       <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
-        <div className="flex">
+        <div className="flex gap-2">
           {[
             { id: "actions", label: "EkoDziałania", icon: "🌱" },
             { id: "challenges", label: "EkoWyzwania", icon: "🏆" },
@@ -350,7 +305,7 @@ export default function TeacherSubmissionsPage() {
               key={id}
               onClick={() => setSelectedType(id)}
               className={clsx(
-                "flex flex-1 items-center justify-center rounded-lg px-4 py-3 transition-all duration-200",
+                "flex flex-1 cursor-pointer items-center justify-center rounded-lg px-4 py-3 transition-all duration-200",
                 selectedType === id
                   ? "bg-blue-500 text-white shadow-lg dark:bg-blue-700"
                   : "text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
@@ -365,7 +320,7 @@ export default function TeacherSubmissionsPage() {
 
       {/* Tabs */}
       <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
-        <div className="flex">
+        <div className="flex gap-2">
           {[
             { id: "pending", label: "Nowe", count: pendingCount },
             { id: "approved", label: "Zatwierdzone", count: approvedCount },
@@ -375,7 +330,7 @@ export default function TeacherSubmissionsPage() {
               key={id}
               onClick={() => setSelectedTab(id)}
               className={clsx(
-                "flex flex-1 items-center justify-center rounded-lg px-2 py-1 transition-all duration-200",
+                "flex flex-1 cursor-pointer items-center justify-center rounded-lg px-2 py-1 transition-all duration-200",
                 selectedTab === id
                   ? "bg-green-500 text-white shadow-lg dark:bg-green-700"
                   : "text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400",
@@ -389,220 +344,47 @@ export default function TeacherSubmissionsPage() {
         </div>
       </div>
 
-      {/* Lista zgłoszeń */}
-      <div className="space-y-4">
-        {filteredSubmissions.length === 0 ? (
-          <div className="rounded-xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
-            <Clock className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-            <p className="text-gray-600 dark:text-gray-400">
-              {selectedTab === "pending"
-                ? `Brak nowych ${selectedType === "actions" ? "EkoDziałań" : "EkoWyzwań"} do weryfikacji`
-                : `Brak ${selectedTab === "approved" ? "zatwierdzonych" : "odrzuconych"} ${selectedType === "actions" ? "EkoDziałań" : "EkoWyzwań"}`}
-            </p>
+      {/* Grid zgłoszeń */}
+      <SubmissionsGrid
+        submissions={paginatedSubmissions}
+        selectedType={selectedType}
+        selectedTab={selectedTab}
+        getEcoActionById={getEcoActionById}
+        getChallengeById={getChallengeById}
+        onViewDetails={(submissionId) =>
+          navigate(`/teacher/submission/${submissionId}`)
+        }
+      />
+
+      {/* Paginacja */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex flex-col items-center justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
+          <div className="mb-2 text-gray-600 dark:text-gray-400">
+            Strona {currentPage} z {totalPages} • Wyników:{" "}
+            {filteredSubmissions.length}
           </div>
-        ) : (
-          <>
-            {paginatedSubmissions.map((submission) => {
-              const statusInfo = getStatusInfo(submission.status);
-              const StatusIcon = statusInfo.icon;
-
-              return (
-                <div
-                  key={submission.id}
-                  className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800"
-                >
-                  <div className="mb-4 flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                        <User className="h-6 w-6 text-green-600 dark:text-green-400" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-white">
-                          {submission.studentName || "Nieznany uczeń"}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(submission.createdAt)}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div
-                      className={clsx(
-                        "inline-flex items-center gap-1 rounded-full p-2 text-sm",
-                        statusInfo.bgColor,
-                        statusInfo.color,
-                      )}
-                    >
-                      <StatusIcon className="h-4 w-4" />
-                      {/* {statusInfo.text} */}
-                    </div>
-                  </div>
-                  {/* Szczegóły EkoDziałania lub EkoWyzwania */}
-                  <div className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
-                    <h4 className="mb-2 font-medium text-gray-800 dark:text-white">
-                      {selectedType === "actions"
-                        ? "EkoDziałanie"
-                        : "EkoWyzwanie"}
-                    </h4>
-                    {selectedType === "actions"
-                      ? (() => {
-                          const ecoAction = getEcoActionById(
-                            submission.ecoActivityId,
-                          );
-                          if (ecoAction) {
-                            return (
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className="flex h-10 w-10 items-center justify-center rounded-full text-white"
-                                  style={{
-                                    backgroundColor: ecoAction.style.color,
-                                  }}
-                                >
-                                  <span className="text-lg">
-                                    {ecoAction.style.icon}
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="font-medium text-gray-800 dark:text-white">
-                                    {ecoAction.name}
-                                  </p>
-                                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                                    {ecoAction.category}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          } else {
-                            return (
-                              <p className="text-sm text-gray-600 dark:text-gray-300">
-                                ID: {submission.ecoActivityId}
-                              </p>
-                            );
-                          }
-                        })()
-                      : (() => {
-                          const challenge = getChallengeById(
-                            submission.ecoActivityId,
-                          );
-                          if (challenge) {
-                            return (
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white">
-                                  <span className="text-lg">🏆</span>
-                                </div>
-                                <div>
-                                  <p className="font-medium text-gray-800 dark:text-white">
-                                    {challenge.challengeName || challenge.name}
-                                  </p>
-                                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                                    {challenge.category || "EkoWyzwanie"}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          } else {
-                            return (
-                              <p className="text-sm text-gray-600 dark:text-gray-300">
-                                ID: {submission.ecoActivityId}
-                              </p>
-                            );
-                          }
-                        })()}
-                  </div>
-                  {/* Komentarz ucznia */}
-                  {submission.comment && (
-                    <div className="mb-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                          Komentarz ucznia:
-                        </span>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        {submission.comment.length > 256
-                          ? submission.comment.slice(0, 256) + "..."
-                          : submission.comment}
-                      </p>
-                    </div>
-                  )}
-                  {/* Zdjęcia */}
-                  {submission.photoUrls && submission.photoUrls.length > 0 && (
-                    <div className="mb-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <ImageIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                          Zdjęcia:
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        {submission.photoUrls.map((url, index) => (
-                          <img
-                            key={index}
-                            src={url}
-                            alt={`Zdjęcie ${index + 1}`}
-                            className="h-20 w-20 rounded-lg object-cover"
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {/* Przycisk do szczegółów */}
-                  <div className="">
-                    <Button
-                      onClick={() =>
-                        navigate(`/teacher/submission/${submission.id}`)
-                      }
-                      className="w-full rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600"
-                    >
-                      Zobacz szczegóły
-                    </Button>
-                  </div>
-                  {/* Info o recenzji */}
-                  {submission.reviewedAt && (
-                    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                      Sprawdzone: {formatDate(submission.reviewedAt)}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Paginacja */}
-            {totalPages > 1 && (
-              <div className="mt-4 flex flex-col items-center justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
-                <div className="mb-2 text-gray-600 dark:text-gray-400">
-                  Strona {currentPage} z {totalPages} • Wyników:{" "}
-                  {filteredSubmissions.length}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Poprzednia
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                  >
-                    Następna
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Poprzednia
+            </Button>
+            <Button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              Następna
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </PullToRefreshWrapper>
   );
 }

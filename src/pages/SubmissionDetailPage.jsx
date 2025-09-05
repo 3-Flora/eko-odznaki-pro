@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Calendar,
   User,
+  X,
 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
@@ -34,6 +35,9 @@ export default function SubmissionDetailPage() {
   // Stan dla popupu odrzucenia
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+
+  // Stan dla podglądu zdjęć
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
 
   // Załaduj szczegóły zgłoszenia
   useEffect(() => {
@@ -213,6 +217,14 @@ export default function SubmissionDetailPage() {
     }).format(date);
   };
 
+  const openPhotoPreview = (index) => {
+    setSelectedPhotoIndex(index);
+  };
+
+  const closePhotoPreview = () => {
+    setSelectedPhotoIndex(null);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -267,9 +279,30 @@ export default function SubmissionDetailPage() {
             </div>
           </div>
         </div>
-
         {/* Informacje o uczniu */}
-        <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Pokaż profil ucznia ${submission.studentName || "Nieznany"}`}
+          onClick={() => {
+            if (submission?.studentId) {
+              navigate(`/teacher/student/${submission.studentId}`);
+            } else {
+              showError("Brak ID ucznia");
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (submission?.studentId) {
+                navigate(`/teacher/student/${submission.studentId}`);
+              } else {
+                showError("Brak ID ucznia");
+              }
+            }
+          }}
+          className="cursor-pointer rounded-xl bg-white p-6 shadow-sm transition hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+        >
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
             Informacje o uczniu
           </h3>
@@ -294,7 +327,6 @@ export default function SubmissionDetailPage() {
             </div>
           </div>
         </div>
-
         {/* Szczegóły EkoDziałania lub EkoWyzwania */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
@@ -317,7 +349,7 @@ export default function SubmissionDetailPage() {
                 <p className="text-gray-600 dark:text-gray-300">
                   Kategoria: {ecoAction.category}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-gray-500 dark:text-gray-400">
                   {ecoAction.description}
                 </p>
               </div>
@@ -374,7 +406,6 @@ export default function SubmissionDetailPage() {
             </div>
           ) : null}
         </div>
-
         {/* Komentarz ucznia */}
         {submission.comment && (
           <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
@@ -389,14 +420,13 @@ export default function SubmissionDetailPage() {
             </p>
           </div>
         )}
-
         {/* Zdjęcia */}
         {submission.photoUrls && submission.photoUrls.length > 0 && (
           <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
             <div className="mb-4 flex items-center gap-2">
               <ImageIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Zdjęcia ({submission.photoUrls.length})
+                Zdjęcia
               </h3>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -405,14 +435,14 @@ export default function SubmissionDetailPage() {
                   key={index}
                   src={url}
                   alt={`Zdjęcie ${index + 1}`}
-                  className="aspect-square rounded-lg object-cover shadow-sm"
+                  className="aspect-square cursor-pointer rounded-lg object-cover shadow-sm transition-opacity hover:opacity-75"
                   loading="lazy"
+                  onClick={() => openPhotoPreview(index)}
                 />
               ))}
             </div>
           </div>
         )}
-
         {/* Powód odrzucenia */}
         {submission.status === "rejected" && submission.rejectionReason && (
           <div className="rounded-xl bg-red-50 p-6 shadow-sm dark:bg-red-900/20">
@@ -424,7 +454,6 @@ export default function SubmissionDetailPage() {
             </p>
           </div>
         )}
-
         {/* Akcje weryfikacji */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
@@ -436,7 +465,6 @@ export default function SubmissionDetailPage() {
               <Button
                 onClick={() => handleUpdateSubmission("approved")}
                 disabled={updating}
-                className="flex-1 rounded-lg bg-green-500 py-3 text-white hover:bg-green-600 disabled:opacity-50"
               >
                 {updating
                   ? "Przetwarzanie..."
@@ -449,7 +477,7 @@ export default function SubmissionDetailPage() {
               <Button
                 onClick={handleRejectSubmission}
                 disabled={updating}
-                className="flex-1 rounded-lg bg-red-500 py-3 text-white hover:bg-red-600 disabled:opacity-50"
+                style="danger"
               >
                 {updating
                   ? "Przetwarzanie..."
@@ -514,6 +542,37 @@ export default function SubmissionDetailPage() {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+      {/* Photo Preview Modal */}
+      {selectedPhotoIndex !== null && submission.photoUrls && (
+        <div className="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+          <div className="relative max-h-full max-w-full">
+            <img
+              src={submission.photoUrls[selectedPhotoIndex]}
+              alt={`Podgląd zdjęcia ${selectedPhotoIndex + 1}`}
+              className="max-h-[80vh] max-w-full rounded-lg object-contain"
+            />
+
+            {/* Close button */}
+            <button
+              onClick={closePhotoPreview}
+              className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-white transition hover:bg-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Photo counter */}
+            <div className="bg-opacity-60 absolute bottom-2 left-2 rounded-lg bg-black px-2 py-1 text-sm text-white">
+              {selectedPhotoIndex + 1} / {submission.photoUrls.length}
+            </div>
+          </div>
+
+          {/* Background click to close */}
+          <div
+            className="absolute inset-0 -z-10"
+            onClick={closePhotoPreview}
+          ></div>
         </div>
       )}
     </>

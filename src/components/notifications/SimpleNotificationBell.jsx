@@ -14,7 +14,7 @@ export default function SimpleNotificationBell() {
     <div className="relative">
       <button
         onClick={handleClick}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition-colors dark:bg-gray-800"
+        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 transition-colors dark:bg-gray-800"
       >
         {unreadCount > 0 ? (
           <BellRing className="text-orange-500 dark:text-orange-400" />
