@@ -1,6 +1,13 @@
 import { getEcoActions } from "./ecoActionService";
 import { getEcoChallenges } from "./ecoChallengeService";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "./firebase";
 
 const CACHE_KEY_PREFIX = "eko_content_cache_v1_";
@@ -11,6 +18,9 @@ const memoryCache = {
   ecoChallenges: null,
   schools: null,
   submissions: {}, // map userId -> { data, ts }
+  students: {}, // map classId -> { data, ts }
+  classInfo: {}, // map classId -> { data, ts }
+  studentStatistics: {}, // map classId -> { data, ts }
 };
 
 function readLocal(key) {
@@ -227,5 +237,217 @@ export function invalidateCachedUserSubmissions(userId) {
     localStorage.removeItem(CACHE_KEY_PREFIX + `submissions_${userId}`);
   } catch (e) {
     console.error("invalidateCachedUserSubmissions error:", e);
+  }
+}
+
+// --- Students cache (per-class) ---
+export async function getCachedStudents(classId) {
+  if (!classId) return [];
+
+  // memory cache
+  const mem = memoryCache.students && memoryCache.students[classId];
+  if (mem && Date.now() - mem.ts < TTL) {
+    return mem.data;
+  }
+
+  // localStorage cache
+  const local = readLocal(CACHE_KEY_PREFIX + `students_${classId}`);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.students = memoryCache.students || {};
+    memoryCache.students[classId] = local;
+    return local.data;
+  }
+
+  try {
+    // Fetch students for the given class
+    const studentsQuery = query(
+      collection(db, "users"),
+      where("classId", "==", classId),
+      where("role", "==", "student"),
+    );
+
+    const querySnapshot = await getDocs(studentsQuery);
+    const students = querySnapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+
+    const payload = { data: students, ts: Date.now() };
+    memoryCache.students = memoryCache.students || {};
+    memoryCache.students[classId] = payload;
+    writeLocal(CACHE_KEY_PREFIX + `students_${classId}`, payload);
+    return students;
+  } catch (err) {
+    console.error("getCachedStudents error:", err);
+    return [];
+  }
+}
+
+export function invalidateCachedStudents(classId) {
+  try {
+    if (memoryCache.students && memoryCache.students[classId]) {
+      delete memoryCache.students[classId];
+    }
+    localStorage.removeItem(CACHE_KEY_PREFIX + `students_${classId}`);
+  } catch (e) {
+    console.error("invalidateCachedStudents error:", e);
+  }
+}
+
+// Funkcja do invalidacji wszystkich cache'y studentów (użyteczna przy globalnym refresh)
+export function invalidateAllCachedStudents() {
+  try {
+    memoryCache.students = {};
+    // Usuń wszystkie klucze studentów z localStorage
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith(CACHE_KEY_PREFIX + "students_")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (e) {
+    console.error("invalidateAllCachedStudents error:", e);
+  }
+}
+
+// --- Class info cache (per-class) ---
+export async function getCachedClassInfo(classId) {
+  if (!classId) return null;
+
+  // memory cache
+  const mem = memoryCache.classInfo && memoryCache.classInfo[classId];
+  if (mem && Date.now() - mem.ts < TTL) {
+    return mem.data;
+  }
+
+  // localStorage cache
+  const local = readLocal(CACHE_KEY_PREFIX + `classInfo_${classId}`);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.classInfo = memoryCache.classInfo || {};
+    memoryCache.classInfo[classId] = local;
+    return local.data;
+  }
+
+  try {
+    // Fetch class info
+    const classDoc = await getDoc(doc(db, "classes", classId));
+    if (!classDoc.exists()) {
+      return null;
+    }
+
+    const classData = classDoc.data();
+    let schoolName = "";
+
+    // Fetch school info if schoolId exists
+    if (classData.schoolId) {
+      const schoolDoc = await getDoc(doc(db, "schools", classData.schoolId));
+      if (schoolDoc.exists()) {
+        schoolName = schoolDoc.data().name || "";
+      }
+    }
+
+    const classInfo = {
+      className: classData.name || "",
+      schoolName: schoolName,
+      schoolId: classData.schoolId || null,
+    };
+
+    const payload = { data: classInfo, ts: Date.now() };
+    memoryCache.classInfo = memoryCache.classInfo || {};
+    memoryCache.classInfo[classId] = payload;
+    writeLocal(CACHE_KEY_PREFIX + `classInfo_${classId}`, payload);
+    return classInfo;
+  } catch (err) {
+    console.error("getCachedClassInfo error:", err);
+    return null;
+  }
+}
+
+export function invalidateCachedClassInfo(classId) {
+  try {
+    if (memoryCache.classInfo && memoryCache.classInfo[classId]) {
+      delete memoryCache.classInfo[classId];
+    }
+    localStorage.removeItem(CACHE_KEY_PREFIX + `classInfo_${classId}`);
+  } catch (e) {
+    console.error("invalidateCachedClassInfo error:", e);
+  }
+}
+
+// --- Student statistics cache (per-class) ---
+export async function getCachedStudentStatistics(classId) {
+  if (!classId) return [];
+
+  // memory cache
+  const mem =
+    memoryCache.studentStatistics && memoryCache.studentStatistics[classId];
+  if (mem && Date.now() - mem.ts < TTL) {
+    return mem.data;
+  }
+
+  // localStorage cache
+  const local = readLocal(CACHE_KEY_PREFIX + `studentStatistics_${classId}`);
+  if (local && Date.now() - local.ts < TTL) {
+    memoryCache.studentStatistics = memoryCache.studentStatistics || {};
+    memoryCache.studentStatistics[classId] = local;
+    return local.data;
+  }
+
+  try {
+    // Fetch all users from the class
+    const studentsQuery = query(
+      collection(db, "users"),
+      where("classId", "==", classId),
+    );
+
+    const studentsSnapshot = await getDocs(studentsQuery);
+    const allStudents = studentsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Filter in memory for verified students only
+    const studentsData = allStudents.filter(
+      (user) => user.role === "student" && user.isVerified === true,
+    );
+
+    const payload = { data: studentsData, ts: Date.now() };
+    memoryCache.studentStatistics = memoryCache.studentStatistics || {};
+    memoryCache.studentStatistics[classId] = payload;
+    writeLocal(CACHE_KEY_PREFIX + `studentStatistics_${classId}`, payload);
+    return studentsData;
+  } catch (err) {
+    console.error("getCachedStudentStatistics error:", err);
+    return [];
+  }
+}
+
+export function invalidateCachedStudentStatistics(classId) {
+  try {
+    if (
+      memoryCache.studentStatistics &&
+      memoryCache.studentStatistics[classId]
+    ) {
+      delete memoryCache.studentStatistics[classId];
+    }
+    localStorage.removeItem(CACHE_KEY_PREFIX + `studentStatistics_${classId}`);
+  } catch (e) {
+    console.error("invalidateCachedStudentStatistics error:", e);
+  }
+}
+
+// Funkcja do invalidacji wszystkich cache'y statystyk studentów
+export function invalidateAllCachedStudentStatistics() {
+  try {
+    memoryCache.studentStatistics = {};
+    // Usuń wszystkie klucze statystyk z localStorage
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith(CACHE_KEY_PREFIX + "studentStatistics_")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (e) {
+    console.error("invalidateAllCachedStudentStatistics error:", e);
   }
 }

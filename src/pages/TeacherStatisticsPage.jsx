@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { useNavigate } from "react-router";
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-} from "firebase/firestore";
-import { db } from "../services/firebase";
+  getCachedStudentStatistics,
+  getCachedClassInfo,
+  invalidateCachedStudentStatistics,
+  invalidateCachedClassInfo,
+} from "../services/contentCache";
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import { useRegisterRefresh } from "../contexts/RefreshContext";
 import {
   Users,
   Calendar,
@@ -24,6 +23,7 @@ import {
 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
+import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
 import clsx from "clsx";
 import ProfilePage from "./ProfilePage";
 import ProfilePhoto from "../components/profile/ProfilePhoto";
@@ -41,58 +41,56 @@ export default function TeacherStatisticsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Załaduj uczniów z klasy nauczyciela i ich statystyki
-  useEffect(() => {
+  // Funkcja do ładowania danych z cache
+  const loadData = useCallback(async () => {
     if (!currentUser?.classId) return;
 
-    const loadStudentsStatistics = async () => {
+    try {
       setLoading(true);
-      try {
-        // Pobierz informacje o klasie
-        const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
-        if (classDoc.exists()) {
-          const classData = classDoc.data();
-          setClassName(classData.name || "");
 
-          // Pobierz informacje o szkole
-          if (classData.schoolId) {
-            const schoolDoc = await getDoc(
-              doc(db, "schools", classData.schoolId),
-            );
-            if (schoolDoc.exists()) {
-              setSchoolName(schoolDoc.data().name || "");
-            }
-          }
-        }
+      // Ładuj równolegle dane studentów i informacje o klasie
+      const [studentsData, classInfo] = await Promise.all([
+        getCachedStudentStatistics(currentUser.classId),
+        getCachedClassInfo(currentUser.classId),
+      ]);
 
-        // Pobierz wszystkich użytkowników z tej klasy - uproszczone zapytanie
-        const studentsQuery = query(
-          collection(db, "users"),
-          where("classId", "==", currentUser.classId),
-        );
+      setStudents(studentsData);
 
-        const studentsSnapshot = await getDocs(studentsQuery);
-        const allStudents = studentsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Filtruj w pamięci
-        const studentsData = allStudents.filter(
-          (user) => user.role === "student" && user.isVerified === true,
-        );
-
-        setStudents(studentsData);
-      } catch (error) {
-        console.error("Error loading students statistics:", error);
-        showError("Błąd podczas ładowania statystyk");
-      } finally {
-        setLoading(false);
+      if (classInfo) {
+        setClassName(classInfo.className || "");
+        setSchoolName(classInfo.schoolName || "");
       }
-    };
-
-    loadStudentsStatistics();
+    } catch (error) {
+      console.error("Error loading statistics:", error);
+      showError("Błąd podczas ładowania statystyk");
+    } finally {
+      setLoading(false);
+    }
   }, [currentUser?.classId, showError]);
+
+  // Funkcja odświeżania dla pull-to-refresh
+  const handleRefresh = useCallback(async () => {
+    if (!currentUser?.classId) return;
+
+    // Invaliduj cache i przeładuj dane
+    invalidateCachedStudentStatistics(currentUser.classId);
+    invalidateCachedClassInfo(currentUser.classId);
+    await loadData();
+  }, [currentUser?.classId, loadData]);
+
+  // Pull-to-refresh hook
+  const pullToRefresh = usePullToRefresh(handleRefresh, {
+    threshold: 80,
+    enabled: true,
+  });
+
+  // Rejestrujemy funkcję odświeżania w globalnym systemie
+  useRegisterRefresh("teacher-statistics", handleRefresh);
+
+  // Załaduj uczniów z klasy nauczyciela i ich statystyki
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Oblicz statystyki całej klasy
   const classStats = students.reduce(
@@ -181,6 +179,15 @@ export default function TeacherStatisticsPage() {
 
   return (
     <>
+      {/* Pull-to-refresh indicator - fixed na górze ekranu */}
+      <PullToRefreshIndicator
+        isPulling={pullToRefresh.isPulling}
+        isRefreshing={pullToRefresh.isRefreshing}
+        progress={pullToRefresh.progress}
+        threshold={pullToRefresh.threshold}
+        onRefresh={handleRefresh}
+      />
+
       <PageHeader
         emoji="📊"
         title="Statystyki klasy"

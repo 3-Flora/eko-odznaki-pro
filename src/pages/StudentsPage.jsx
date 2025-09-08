@@ -1,21 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { useNavigate } from "react-router";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { createStudentVerifiedNotification } from "../services/notificationAutomationService";
+import {
+  getCachedStudents,
+  getCachedClassInfo,
+  invalidateCachedStudents,
+  invalidateCachedClassInfo,
+} from "../services/contentCache";
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import { useRegisterRefresh } from "../contexts/RefreshContext";
 import { Users, CheckCircle, XCircle, Clock, School } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
+import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
 import clsx from "clsx";
 
 export default function StudentsPage() {
@@ -29,54 +30,56 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState({});
 
-  // Załaduj uczniów z klasy nauczyciela
-  useEffect(() => {
+  // Funkcja do ładowania danych z cache
+  const loadData = useCallback(async () => {
     if (!currentUser?.classId) return;
 
-    const loadStudents = async () => {
+    try {
       setLoading(true);
-      try {
-        // Pobierz informacje o klasie
-        const classDoc = await getDoc(doc(db, "classes", currentUser.classId));
-        if (classDoc.exists()) {
-          const classData = classDoc.data();
-          setClassName(classData.name || "");
 
-          // Pobierz informacje o szkole
-          if (classData.schoolId) {
-            const schoolDoc = await getDoc(
-              doc(db, "schools", classData.schoolId),
-            );
-            if (schoolDoc.exists()) {
-              setSchoolName(schoolDoc.data().name || "");
-            }
-          }
-        }
+      // Ładuj równolegle dane studentów i informacje o klasie
+      const [studentsData, classInfo] = await Promise.all([
+        getCachedStudents(currentUser.classId),
+        getCachedClassInfo(currentUser.classId),
+      ]);
 
-        // Pobierz uczniów z tej klasy
-        const studentsQuery = query(
-          collection(db, "users"),
-          where("classId", "==", currentUser.classId),
-          where("role", "==", "student"),
-        );
+      setStudents(studentsData);
 
-        const studentsSnapshot = await getDocs(studentsQuery);
-        const studentsData = studentsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setStudents(studentsData);
-      } catch (error) {
-        console.error("Error loading students:", error);
-        showError("Błąd podczas ładowania uczniów");
-      } finally {
-        setLoading(false);
+      if (classInfo) {
+        setClassName(classInfo.className || "");
+        setSchoolName(classInfo.schoolName || "");
       }
-    };
-
-    loadStudents();
+    } catch (error) {
+      console.error("Error loading data:", error);
+      showError("Błąd podczas ładowania danych uczniów");
+    } finally {
+      setLoading(false);
+    }
   }, [currentUser?.classId, showError]);
+
+  // Funkcja odświeżania dla pull-to-refresh
+  const handleRefresh = useCallback(async () => {
+    if (!currentUser?.classId) return;
+
+    // Invaliduj cache i przeładuj dane
+    invalidateCachedStudents(currentUser.classId);
+    invalidateCachedClassInfo(currentUser.classId);
+    await loadData();
+  }, [currentUser?.classId, loadData]);
+
+  // Pull-to-refresh hook
+  const pullToRefresh = usePullToRefresh(handleRefresh, {
+    threshold: 80,
+    enabled: true,
+  });
+
+  // Rejestrujemy funkcję odświeżania w globalnym systemie
+  useRegisterRefresh("students", handleRefresh);
+
+  // Załaduj uczniów z klasy nauczyciela
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Funkcja do weryfikacji ucznia
   const handleVerifyStudent = async (studentId, isVerified) => {
@@ -91,10 +94,8 @@ export default function StudentsPage() {
       // Pobierz dane o klasie dla powiadomienia
       if (isVerified && currentUser?.classId) {
         try {
-          const classDoc = await getDoc(
-            doc(db, "classes", currentUser.classId),
-          );
-          const className = classDoc.exists() ? classDoc.data().name : "klasa";
+          const classInfo = await getCachedClassInfo(currentUser.classId);
+          const className = classInfo?.className || "klasa";
 
           // Utwórz powiadomienie dla ucznia
           await createStudentVerifiedNotification(
@@ -119,6 +120,11 @@ export default function StudentsPage() {
             : student,
         ),
       );
+
+      // Invaliduj cache studentów aby następnym razem dane były świeże
+      if (currentUser?.classId) {
+        invalidateCachedStudents(currentUser.classId);
+      }
 
       showSuccess(
         isVerified
@@ -178,6 +184,15 @@ export default function StudentsPage() {
 
   return (
     <>
+      {/* Pull-to-refresh indicator - fixed na górze ekranu */}
+      <PullToRefreshIndicator
+        isPulling={pullToRefresh.isPulling}
+        isRefreshing={pullToRefresh.isRefreshing}
+        progress={pullToRefresh.progress}
+        threshold={pullToRefresh.threshold}
+        onRefresh={handleRefresh}
+      />
+
       <PageHeader
         emoji="👨‍🏫"
         title="Zarządzanie uczniami"
