@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
 import {
   Bell,
-  ChevronLeft,
   MailOpen,
   Clock,
   Info,
   AlertTriangle,
-  RefreshCcw,
   BellIcon,
   MailOpenIcon,
   InfoIcon,
@@ -142,19 +140,6 @@ const NotificationCenter = ({ onClose }) => {
         />
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* <button
-              variant="ghost"
-              size="sm"
-              onClick={fetchNotifications}
-              disabled={loading}
-              className="rounded-full bg-gray-200 p-2 dark:bg-gray-800"
-            >
-              <RefreshCcw
-                className={clsx("h-4 w-4 text-gray-900 dark:text-gray-300", {
-                  "animate-spin": loading,
-                })}
-              />
-            </button> */}
             {unreadCount > 0 && (
               <button
                 variant="outline"
@@ -175,7 +160,7 @@ const NotificationCenter = ({ onClose }) => {
             <button
               key={filter.id}
               onClick={() => setSelectedFilter(filter.id)}
-              className={`flex min-w-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${
+              className={`flex min-w-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 font-medium transition-colors ${
                 selectedFilter === filter.id
                   ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
@@ -184,7 +169,7 @@ const NotificationCenter = ({ onClose }) => {
               <span className="truncate">{filter.label}</span>
               {filter.count > 0 && (
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-xs ${
+                  className={`rounded-full px-1.5 py-0.5 text-sm ${
                     selectedFilter === filter.id
                       ? "bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
                       : filter.id === "unread" && filter.count > 0
@@ -227,7 +212,7 @@ const NotificationCenter = ({ onClose }) => {
 
         {/* Lista powiadomień */}
         {!loading && !error && (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="space-y-4 divide-y divide-gray-200 dark:divide-gray-700">
             {displayedNotifications.length === 0 ? (
               <div className="flex flex-col items-center p-8 text-center">
                 <Bell className="h-16 w-16 text-gray-300 dark:text-gray-600" />
@@ -247,7 +232,7 @@ const NotificationCenter = ({ onClose }) => {
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`cursor-pointer p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    className={`cursor-pointer rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 ${
                       !notification.isRead
                         ? "border-l-4 border-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
                         : ""
@@ -257,21 +242,21 @@ const NotificationCenter = ({ onClose }) => {
                       <div
                         className={`mt-1 ${getNotificationColor(notification.type)}`}
                       >
-                        <IconComponent className="h-5 w-5" />
+                        <IconComponent className="h-6 w-6" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between">
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-gray-900 dark:text-white">
                             {notification.title}
                             {!notification.isRead && (
                               <span className="ml-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
                             )}
                           </h4>
-                          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
                             {formatNotificationDate(notification.createdAt)}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        <p className="mt-1 text-gray-600 dark:text-gray-300">
                           {notification.message}
                         </p>
                       </div>
@@ -290,7 +275,7 @@ const NotificationCenter = ({ onClose }) => {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Oznacz wszystkie jako przeczytane
             </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Czy na pewno chcesz oznaczyć wszystkie powiadomienia jako
               przeczytane?
             </p>
