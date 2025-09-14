@@ -12,7 +12,6 @@ import {
   ChallengesPage,
   DashboardPage,
   ProfilePage,
-  RankingPage,
   EditProfilePage,
   SelectSchoolPage,
   DebugPage,
@@ -46,7 +45,7 @@ import {
   SchoolDetailPage,
   // Other pages
   TeacherApplicationPage,
-} from "./pages/_index";
+} from "./pages/index";
 import { useAuth } from "./contexts/AuthContext";
 
 export default function App() {
@@ -88,7 +87,6 @@ export default function App() {
 
               {/* General Routes for all users */}
               <Route path="challenges" element={<ChallengesPage />} />
-              <Route path="ranking" element={<RankingPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
 
               {/* Routes for teachers and ekoskop */}

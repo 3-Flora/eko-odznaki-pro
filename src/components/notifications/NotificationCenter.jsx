@@ -14,9 +14,8 @@ import {
   Clock3,
 } from "lucide-react";
 import Button from "../ui/Button";
-import clsx from "clsx";
 import PageHeader from "../ui/PageHeader";
-import PullToRefreshWrapper from "../ui/PullToRefreshWrapper";
+import PullToRefreshWrapper from "../refresh/PullToRefreshWrapper";
 
 /**
  * Komponent centrum powiadomień

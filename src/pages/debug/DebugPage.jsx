@@ -1,16 +1,16 @@
-import BadgeDebug from "../components/debug/BadgeDebug";
-import CountersEditor from "../components/debug/CountersEditor";
-import DatabaseManager from "../components/debug/DatabaseManager";
-import DatabaseViewer from "../components/debug/DatabaseViewer";
-import ClassFeedDebug from "../components/debug/ClassFeedDebug";
-import NotificationDebug from "../components/debug/NotificationDebug";
+import BadgeDebug from "../../components/debug/BadgeDebug";
+import CountersEditor from "../../components/debug/CountersEditor";
+import DatabaseManager from "../../components/debug/DatabaseManager";
+import DatabaseViewer from "../../components/debug/DatabaseViewer";
+import ClassFeedDebug from "../../components/debug/ClassFeedDebug";
+import NotificationDebug from "../../components/debug/NotificationDebug";
 
 import {
   calculateBadgeProgress,
   getBadgeTemplates,
   getRecentBadgesForProfile,
-} from "../services/badgeService";
-import { useAuth } from "../contexts/AuthContext";
+} from "../../services/badgeService";
+import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 
 export default function DebugPage() {

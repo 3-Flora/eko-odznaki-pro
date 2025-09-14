@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { collection, getDocs, addDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { useToast } from "../contexts/ToastContext";
+import { db } from "../../services/firebase";
+import { useToast } from "../../contexts/ToastContext";
 import {
   Mail,
   User,
@@ -12,11 +12,11 @@ import {
   Upload,
   FileText,
 } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
-import BackButton from "../components/ui/BackButton";
-import DocumentUpload from "../components/upload/DocumentUpload";
+import PageHeader from "../../components/ui/PageHeader";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import BackButton from "../../components/ui/BackButton";
+import DocumentUpload from "../../components/upload/DocumentUpload";
 
 export default function TeacherApplicationPage() {
   const navigate = useNavigate();

@@ -1,30 +1,24 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Calendar,
   School,
   Users,
   LogOut,
   CheckCircle,
-  ArrowRight,
   Edit2,
   LeafyGreen,
   Award,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { getCachedSchoolName, getCachedClassName } from "../services/nameCache";
 import {
-  getBadgeTemplates,
-  calculateBadgeProgress,
-  getRecentBadgesForProfile,
-} from "../services/badgeService";
-import Badge, { BadgeModal } from "../components/ui/Badge";
-import ProfilePhoto from "../components/profile/ProfilePhoto";
-import Button from "../components/ui/Button";
-import { useRefreshTest } from "../hooks/useRefreshTest";
+  getCachedSchoolName,
+  getCachedClassName,
+} from "../../services/nameCache";
+import ProfilePhoto from "../../components/profile/ProfilePhoto";
+import Button from "../../components/ui/Button";
 import clsx from "clsx";
+import BadgeModal from "../../components/badges/BadgeModal";
 
 export default function ProfilePage() {
   const { currentUser, logout } = useAuth();

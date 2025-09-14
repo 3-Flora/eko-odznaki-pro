@@ -1,16 +1,16 @@
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useMemo } from "react";
-import useDashboardData from "../hooks/useDashboardData";
-import LargeChallengeCard from "../components/dashboard/LargeChallengeCard";
-import ActionsCarousel from "../components/dashboard/ActionsCarousel";
-import TeacherStatsCard from "../components/dashboard/TeacherStatsCard";
-import PendingVerificationCard from "../components/dashboard/PendingVerificationCard";
-import QuickActionsCard from "../components/dashboard/QuickActionsCard";
-import PullToRefreshWrapper from "../components/ui/PullToRefreshWrapper";
-import { useToast } from "../contexts/ToastContext";
-import { DashboardHeader } from "../components/dashboard/DashboardHeader";
+import useDashboardData from "../../hooks/useDashboardData";
+import LargeChallengeCard from "../../components/dashboard/LargeChallengeCard";
+import ActionsCarousel from "../../components/dashboard/ActionsCarousel";
+import TeacherStatsCard from "../../components/dashboard/TeacherStatsCard";
+import PendingVerificationCard from "../../components/dashboard/PendingVerificationCard";
+import QuickActionsCard from "../../components/dashboard/QuickActionsCard";
+import { useToast } from "../../contexts/ToastContext";
+import { DashboardHeader } from "../../components/dashboard/DashboardHeader";
 import { useNavigate } from "react-router";
-import { useRegisterRefresh } from "../contexts/RefreshContext";
+import { useRegisterRefresh } from "../../contexts/RefreshContext";
+import PullToRefreshWrapper from "../../components/refresh/PullToRefreshWrapper";
 import clsx from "clsx";
 
 export default function DashboardPage() {

@@ -1,5 +1,5 @@
 import React from "react";
-import { CreateNotification } from "../components/notifications";
+import { CreateNotification } from "../../components/notifications";
 import { useNavigate } from "react-router";
 
 /**

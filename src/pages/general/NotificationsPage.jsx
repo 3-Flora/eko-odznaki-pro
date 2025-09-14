@@ -1,4 +1,4 @@
-import { NotificationCenter } from "../components/notifications";
+import { NotificationCenter } from "../../components/notifications";
 import { useNavigate } from "react-router";
 
 /**

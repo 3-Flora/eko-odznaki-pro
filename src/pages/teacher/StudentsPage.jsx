@@ -1,23 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useNavigate } from "react-router";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { createStudentVerifiedNotification } from "../services/notificationAutomationService";
+import { db } from "../../services/firebase";
+import { createStudentVerifiedNotification } from "../../services/notificationAutomationService";
 import {
   getCachedStudents,
   getCachedClassInfo,
   invalidateCachedStudents,
   invalidateCachedClassInfo,
-} from "../services/contentCache";
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
-import { useRegisterRefresh } from "../contexts/RefreshContext";
+} from "../../services/contentCache";
+import { usePullToRefresh } from "../../hooks/usePullToRefresh";
+import { useRegisterRefresh } from "../../contexts/RefreshContext";
 import { Users, CheckCircle, XCircle, Clock, School } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
+import PageHeader from "../../components/ui/PageHeader";
+import Button from "../../components/ui/Button";
 import clsx from "clsx";
+import PullToRefreshIndicator from "../../components/refresh/PullToRefreshIndicator";
 
 export default function StudentsPage() {
   const { currentUser } = useAuth();

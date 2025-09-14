@@ -1,33 +1,28 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useNavigate } from "react-router";
 import {
   getCachedStudentStatistics,
   getCachedClassInfo,
   invalidateCachedStudentStatistics,
   invalidateCachedClassInfo,
-} from "../services/contentCache";
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
-import { useRegisterRefresh } from "../contexts/RefreshContext";
+} from "../../services/contentCache";
+import { usePullToRefresh } from "../../hooks/usePullToRefresh";
+import { useRegisterRefresh } from "../../contexts/RefreshContext";
 import {
   Users,
-  Calendar,
   Award,
   Leaf,
   TrendingUp,
-  ArrowLeft,
   BarChart3,
   LeafyGreen,
   CalendarHeart,
 } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
+import PageHeader from "../../components/ui/PageHeader";
 import clsx from "clsx";
-import ProfilePage from "./ProfilePage";
-import ProfilePhoto from "../components/profile/ProfilePhoto";
-import Pagination from "../components/ui/Pagination";
+import PullToRefreshIndicator from "../../components/refresh/PullToRefreshIndicator";
+import Pagination from "../../components/ui/Pagination";
 
 export default function TeacherStatisticsPage() {
   const { currentUser } = useAuth();

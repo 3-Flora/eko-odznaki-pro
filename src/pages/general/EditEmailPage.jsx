@@ -1,18 +1,18 @@
-import Label from "../components/ui/Label";
-import Input from "../components/ui/Input";
+import Label from "../../components/ui/Label";
+import Input from "../../components/ui/Input";
 import { useState } from "react";
 import { Mail, Lock, Save } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   reauthenticateWithCredential,
   EmailAuthProvider,
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
-import { auth } from "../services/firebase";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import SuccessMessage from "../components/ui/SuccessMessage";
-import { useToast } from "../contexts/ToastContext";
+import { auth } from "../../services/firebase";
+import PageHeader from "../../components/ui/PageHeader";
+import Button from "../../components/ui/Button";
+import SuccessMessage from "../../components/ui/SuccessMessage";
+import { useToast } from "../../contexts/ToastContext";
 
 export default function EditEmailPage() {
   const [newEmail, setNewEmail] = useState("");

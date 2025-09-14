@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 
 export default function CreateNotificationButton() {
   const navigate = useNavigate();
-
   return (
     <button
       onClick={() => navigate("/create-notification")}

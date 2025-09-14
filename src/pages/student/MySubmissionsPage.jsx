@@ -15,13 +15,13 @@ import {
   User,
   FileText,
 } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { getEcoActions } from "../services/ecoActionService";
-import { getAllEcoChallenges } from "../services/ecoChallengeService";
-import Select from "../components/ui/Select";
-import PageHeader from "../components/ui/PageHeader";
+import { useAuth } from "../../contexts/AuthContext";
+import { getEcoActions } from "../../services/ecoActionService";
+import { getAllEcoChallenges } from "../../services/ecoChallengeService";
+import Select from "../../components/ui/Select";
+import PageHeader from "../../components/ui/PageHeader";
 import clsx from "clsx";
-import { useToast } from "../contexts/ToastContext";
+import { useToast } from "../../contexts/ToastContext";
 
 const ITEMS_PER_PAGE = 6;
 

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useNavigate, useParams } from "react-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { getEcoActions } from "../services/ecoActionService";
-import { getEcoChallenges } from "../services/ecoChallengeService";
+import { db } from "../../services/firebase";
+import { getEcoActions } from "../../services/ecoActionService";
+import { getEcoChallenges } from "../../services/ecoChallengeService";
 import {
   CheckCircle,
   XCircle,
@@ -16,8 +16,8 @@ import {
   User,
   X,
 } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
+import PageHeader from "../../components/ui/PageHeader";
+import Button from "../../components/ui/Button";
 import clsx from "clsx";
 
 export default function SubmissionDetailPage() {

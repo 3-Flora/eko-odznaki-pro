@@ -19,7 +19,7 @@ import {
   invalidateCachedSchools,
 } from "../../services/contentCache";
 import Button from "../../components/ui/Button";
-import PullToRefreshWrapper from "../../components/ui/PullToRefreshWrapper";
+import PullToRefreshWrapper from "../../components/refresh/PullToRefreshWrapper";
 
 export default function EkoskopSchoolsPage() {
   const isMounted = useRef(true);

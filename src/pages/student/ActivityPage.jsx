@@ -8,24 +8,21 @@ import {
   invalidateCachedEcoChallenges,
   getCachedUserSubmissions,
   invalidateCachedUserSubmissions,
-} from "../services/contentCache";
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
-import PageHeader from "../components/ui/PageHeader";
-import PullToRefreshIndicator from "../components/ui/PullToRefreshIndicator";
-import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
+} from "../../services/contentCache";
+import { usePullToRefresh } from "../../hooks/usePullToRefresh";
+import PageHeader from "../../components/ui/PageHeader";
+import { backgroundEcoAction as backgroundStyles } from "../../utils/styleUtils";
 import clsx from "clsx";
-import { useToast } from "../contexts/ToastContext";
-import { useAuth } from "../contexts/AuthContext";
-import { useLimitsRefresh } from "../contexts/LimitsRefreshContext";
-import { useRegisterRefresh } from "../contexts/RefreshContext";
+import { useToast } from "../../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLimitsRefresh } from "../../contexts/LimitsRefreshContext";
+import { useRegisterRefresh } from "../../contexts/RefreshContext";
 import {
   useSubmissionLimits,
   useWeeklyChallengeLimit,
-} from "../hooks/useSubmissionLimits";
-import {
-  SubmissionLimitsBadge,
-  ActivityLimitsOverview,
-} from "../components/ui/SubmissionLimitsInfo";
+} from "../../hooks/useSubmissionLimits";
+import { SubmissionLimitsBadge } from "../../components/ui/SubmissionLimitsInfo";
+import PullToRefreshIndicator from "../../components/refresh/PullToRefreshIndicator";
 
 export default function ActivityPage() {
   const navigate = useNavigate();

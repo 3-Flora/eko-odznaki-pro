@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useNavigate, useSearchParams } from "react-router";
-import { useRegisterRefresh } from "../contexts/RefreshContext";
+import { useRegisterRefresh } from "../../contexts/RefreshContext";
 import {
   collection,
   query,
@@ -12,14 +12,14 @@ import {
   getDoc,
   limit,
 } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { getEcoActions } from "../services/ecoActionService";
-import { getAllEcoChallenges } from "../services/ecoChallengeService";
+import { db } from "../../services/firebase";
+import { getEcoActions } from "../../services/ecoActionService";
+import { getAllEcoChallenges } from "../../services/ecoChallengeService";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import PullToRefreshWrapper from "../components/ui/PullToRefreshWrapper";
-import { SubmissionsGrid } from "../components/submissions";
+import PageHeader from "../../components/ui/PageHeader";
+import Button from "../../components/ui/Button";
+import { SubmissionsGrid } from "../../components/submissions";
+import PullToRefreshWrapper from "../../components/refresh/PullToRefreshWrapper";
 import clsx from "clsx";
 
 // Cache konfiguracja

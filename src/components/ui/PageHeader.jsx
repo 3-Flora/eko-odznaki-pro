@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { Link } from "react-router";
 
 export default function PageHeader({ emoji, title, subtitle, className }) {
   return (

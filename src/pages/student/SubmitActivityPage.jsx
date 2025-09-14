@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
 import { Upload, X, Plus, Eye, Trash2 } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router";
 import clsx from "clsx";
-import { backgroundEcoAction as backgroundStyles } from "../utils/styleUtils";
+import { backgroundEcoAction as backgroundStyles } from "../../utils/styleUtils";
 import {
   uploadSubmissionPhotos,
   generateSubmissionId,
-} from "../services/storageService";
-import { invalidateCachedUserSubmissions } from "../services/contentCache";
+} from "../../services/storageService";
+import { invalidateCachedUserSubmissions } from "../../services/contentCache";
 import {
   validateImageFile,
   validateMultipleImageFiles,
   createImagePreview,
-} from "../utils/imageUtils";
+} from "../../utils/imageUtils";
 import TextareaAutosize from "react-textarea-autosize";
-import { useToast } from "../contexts/ToastContext";
-import useSubmissionLimits from "../hooks/useSubmissionLimits";
-import SubmissionLimitsInfo from "../components/ui/SubmissionLimitsInfo";
+import { useToast } from "../../contexts/ToastContext";
+import useSubmissionLimits from "../../hooks/useSubmissionLimits";
+import SubmissionLimitsInfo from "../../components/ui/SubmissionLimitsInfo";
 
 export default function SubmitActivityPage() {
   const { showError, showSuccess } = useToast();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useNavigate, useParams } from "react-router";
 import {
   collection,
@@ -11,7 +11,7 @@ import {
   getDoc,
   limit,
 } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { db } from "../../services/firebase";
 import {
   Calendar,
   Award,
@@ -23,12 +23,10 @@ import {
   XCircle,
   User,
 } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import { useBadges } from "../hooks/useBadges";
-import BadgesStats from "../components/badges/BadgesStats";
-import Badge, { BadgeModal } from "../components/ui/Badge";
-import EcoCategoriesStats from "../components/badges/EcoCategoriesStats";
+import Button from "../../components/ui/Button";
+import { useBadges } from "../../hooks/useBadges";
+import BadgesStats from "../../components/badges/BadgesStats";
+import EcoCategoriesStats from "../../components/badges/EcoCategoriesStats";
 import clsx from "clsx";
 
 export default function StudentDetailPage() {

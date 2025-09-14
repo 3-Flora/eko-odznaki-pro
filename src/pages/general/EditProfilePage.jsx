@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, User, Trash2, Save, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router";
 import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
-import { auth } from "../services/firebase";
-import Input from "../components/ui/Input";
-import Label from "../components/ui/Label";
-import PageHeader from "../components/ui/PageHeader";
-import SuccessMessage from "../components/ui/SuccessMessage";
-import Button from "../components/ui/Button";
-import { useToast } from "../contexts/ToastContext";
+import { auth } from "../../services/firebase";
+import Input from "../../components/ui/Input";
+import Label from "../../components/ui/Label";
+import PageHeader from "../../components/ui/PageHeader";
+import SuccessMessage from "../../components/ui/SuccessMessage";
+import Button from "../../components/ui/Button";
+import { useToast } from "../../contexts/ToastContext";
 
 export default function EditProfilePage() {
   const [displayName, setDisplayName] = useState("");

@@ -2,13 +2,13 @@ import { useLocation } from "react-router";
 import { useDeviceEnvironment } from "../../contexts/DeviceEnvironmentContext";
 import clsx from "clsx";
 import ToggleTheme from "../ui/ToggleTheme";
-import BadgesButton from "../ui/BadgesButton";
+import BadgesButton from "./BadgesButton";
 import UserButton from "../ui/UserButton";
 import DebugButton from "../debug/DebugButton";
 import BackButton from "../ui/BackButton";
 import RefreshButton from "../ui/RefreshButton";
-import { NotificationBell, SimpleNotificationBell } from "../notifications";
-import CreateNotificationButton from "../ui/CreateNotificationButton";
+import { SimpleNotificationBell } from "../notifications";
+import CreateNotificationButton from "../notifications/CreateNotificationButton";
 import { useAuth } from "../../contexts/AuthContext";
 
 export const Navbar = () => {

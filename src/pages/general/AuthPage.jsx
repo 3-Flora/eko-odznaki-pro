@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, User, School, Users } from "lucide-react";
 import { useNavigate } from "react-router";
-import Input from "../components/ui/Input";
-import PageHeader from "../components/ui/PageHeader";
-import { useToast } from "../contexts/ToastContext";
+import Input from "../../components/ui/Input";
+import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../contexts/ToastContext";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");

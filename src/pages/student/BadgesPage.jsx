@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useBadges } from "../hooks/useBadges";
-import BadgesStats from "../components/badges/BadgesStats";
-import Badge, { BadgeModal } from "../components/ui/Badge";
-import PageHeader from "../components/ui/PageHeader";
+import { useAuth } from "../../contexts/AuthContext";
+import { useBadges } from "../../hooks/useBadges";
+import BadgesStats from "../../components/badges/BadgesStats";
+import PageHeader from "../../components/ui/PageHeader";
 
 export default function BadgesPage() {
   const { currentUser } = useAuth();
