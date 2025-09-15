@@ -246,7 +246,9 @@ badgeTemplates/{badgeId}/
             - level: 2,
             - description: "Wykonaj 25 EkoDziałań z kategorii Recykling",
             - requiredCount: 25,
-        }
+        },
+        createdAt: Timestamp,
+        isActive: true,
         ]
     }
   - "eko-edukator": { // <- eko-edukator to jako badgeId

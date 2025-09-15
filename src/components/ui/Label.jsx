@@ -1,6 +1,11 @@
 import clsx from "clsx";
 
-export default function Label({ htmlFor, children, className }) {
+export default function Label({
+  htmlFor,
+  children,
+  className,
+  isRequired = false,
+}) {
   return (
     <label
       htmlFor={htmlFor}
@@ -10,6 +15,7 @@ export default function Label({ htmlFor, children, className }) {
       )}
     >
       {children}
+      {isRequired && <span className="text-red-500">*</span>}
     </label>
   );
 }

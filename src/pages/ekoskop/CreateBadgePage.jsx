@@ -3,14 +3,18 @@ import { useNavigate } from "react-router";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import PageHeader from "../../components/ui/PageHeader";
-import Loading from "../../components/routing/Loading";
 import { ECO_CATEGORIES } from "../../constants/ecoCategories";
 import { useToast } from "../../contexts/ToastContext";
 import { Trash2, Plus } from "lucide-react";
+import Input from "../../components/ui/Input";
+import Label from "../../components/ui/Label";
+import Select from "../../components/ui/Select";
+import Textarea from "../../components/ui/Textarea";
+import Button from "../../components/ui/Button";
 
 export default function CreateBadgePage() {
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -86,7 +90,7 @@ export default function CreateBadgePage() {
     e.preventDefault();
 
     if (!formData.name || !formData.category || !formData.counterToCheck) {
-      showToast("Wypełnij wszystkie wymagane pola", "error");
+      showError("Wypełnij wszystkie wymagane pola", "error");
       return;
     }
 
@@ -95,7 +99,7 @@ export default function CreateBadgePage() {
         (level) => !level.description || level.requiredCount < 1,
       )
     ) {
-      showToast("Wypełnij wszystkie dane poziomów", "error");
+      showError("Wypełnij wszystkie dane poziomów", "error");
       return;
     }
 
@@ -109,7 +113,7 @@ export default function CreateBadgePage() {
         .replace(/[^a-z0-9-]/g, "");
 
       const badgeData = {
-        id: badgeId,
+        // id: badgeId,
         name: formData.name,
         category: formData.category,
         counterToCheck: formData.counterToCheck,
@@ -122,24 +126,25 @@ export default function CreateBadgePage() {
 
       await addDoc(collection(db, "badgeTemplates"), badgeData);
 
-      showToast("Odznaka została utworzona pomyślnie", "success");
+      showSuccess("Odznaka została utworzona pomyślnie", "success");
       navigate("/ekoskop/badges");
     } catch (error) {
       console.error("Błąd podczas tworzenia odznaki:", error);
-      showToast("Wystąpił błąd podczas tworzenia odznaki", "error");
+      showError("Wystąpił błąd podczas tworzenia odznaki", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <>
       <PageHeader
+        emoji="🎖️"
         title="Nowa odznaka"
         subtitle="Utwórz nową odznakę dla uczniów"
       />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Podstawowe informacje */}
         <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
@@ -148,29 +153,24 @@ export default function CreateBadgePage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Nazwa odznaki *
-              </label>
-              <input
+              <Label isRequired>Nazwa odznaki</Label>
+              <Input
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 placeholder="np. Mistrz Recyklingu"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Kategoria *
-              </label>
-              <select
+              <Label isRequired>Kategoria</Label>
+              <Select
                 value={
                   ECO_CATEGORIES.find((cat) => cat.name === formData.category)
                     ?.id || ""
                 }
-                onChange={(e) => handleCategoryChange(e.target.value)}
+                onChange={handleCategoryChange}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 required
               >
@@ -181,38 +181,31 @@ export default function CreateBadgePage() {
                   </option>
                 ))}
                 <option value="total">🌍 Ogólne (wszystkie kategorie)</option>
-              </select>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Nazwa pliku obrazu
-              </label>
-              <input
-                type="text"
+              <Label>Obrazek Odznaki</Label>
+              <Input
+                type="file"
                 value={formData.badgeImage}
-                onChange={(e) =>
-                  handleInputChange("badgeImage", e.target.value)
-                }
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                placeholder="np. mistrz_recyklingu.png"
+                onChange={(e) => handleInputChange("badgeImage", e.target.file)}
+                min="0"
+                max="1"
+                accept="image/*"
+                placeholder="Wybierz plik z obrazkiem odznaki"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                Pozostaw puste, aby automatycznie wygenerować nazwę
-              </p>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Opis odznaki
-              </label>
-              <textarea
+              <Label>Opis odznaki</Label>
+              <Textarea
                 value={formData.description}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                rows={3}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                minRows={3}
+                maxLength={256}
                 placeholder="Krótki opis celu i znaczenia odznaki"
               />
             </div>
@@ -225,14 +218,15 @@ export default function CreateBadgePage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Poziomy odznaki
             </h3>
-            <button
+            <Button
               type="button"
               onClick={addLevel}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              fullWidth={false}
+              icon={Plus}
+              size="sm"
             >
-              <Plus className="h-4 w-4" />
               Dodaj poziom
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -241,15 +235,15 @@ export default function CreateBadgePage() {
                 key={index}
                 className="rounded-lg border border-gray-200 p-4 dark:border-gray-600"
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <h4 className="font-medium text-gray-900 dark:text-white">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xl font-medium text-gray-900 dark:text-white">
                     Poziom {level.level}
                   </h4>
                   {formData.levels.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeLevel(index)}
-                      className="text-red-600 hover:text-red-700"
+                      className="cursor-pointer rounded-full p-1 text-red-600 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/20"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -258,28 +252,22 @@ export default function CreateBadgePage() {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Opis poziomu *
-                    </label>
-                    <input
+                    <Label isRequired>Opis poziomu</Label>
+                    <Input
                       type="text"
                       value={level.description}
                       onChange={(e) =>
                         handleLevelChange(index, "description", e.target.value)
                       }
-                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       placeholder="np. Wykonaj 3 EkoDziałania z kategorii Recykling"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Wymagana liczba *
-                    </label>
-                    <input
+                    <Label isRequired>Wymagana ilość</Label>
+                    <Input
                       type="number"
-                      min="1"
                       value={level.requiredCount}
                       onChange={(e) =>
                         handleLevelChange(
@@ -288,7 +276,6 @@ export default function CreateBadgePage() {
                           e.target.value,
                         )
                       }
-                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       required
                     />
                   </div>
@@ -300,17 +287,14 @@ export default function CreateBadgePage() {
 
         {/* Przyciski akcji */}
         <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => navigate("/ekoskop/badges")}
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
+          <Button onClick={() => navigate("/ekoskop/badges")} style="outline">
             Anuluj
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+            style="success"
+            loading={isSubmitting}
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">
@@ -320,9 +304,9 @@ export default function CreateBadgePage() {
             ) : (
               "Utwórz odznakę"
             )}
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

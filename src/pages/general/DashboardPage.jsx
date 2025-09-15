@@ -11,7 +11,7 @@ import { DashboardHeader } from "../../components/dashboard/DashboardHeader";
 import { useNavigate } from "react-router";
 import { useRegisterRefresh } from "../../contexts/RefreshContext";
 import PullToRefreshWrapper from "../../components/refresh/PullToRefreshWrapper";
-import clsx from "clsx";
+import DashboardCard from "../../components/dashboard/DashboardCard";
 
 export default function DashboardPage() {
   const { currentUser } = useAuth();
@@ -134,17 +134,17 @@ export default function DashboardPage() {
             {/* System Overview */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <DashboardCard
-                title="Zarządzanie"
-                subtitle="Szkoły & Klasy"
+                title="Szkoła"
+                subtitle="Zarządzaj szkołami"
                 emoji="🏫"
-                className="from-blue-500 to-blue-600"
+                className="from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                 href="ekoskop/schools"
               />
               <DashboardCard
                 title="Treści"
-                subtitle="EkoDziałania & Odznaki"
+                subtitle="EkoDziałania & EkoOdznaki"
                 emoji="🌱"
-                className="from-green-500 to-green-600"
+                className="from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 href="ekoskop/badges"
               />
 
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                 title="Użytkownicy"
                 subtitle="Zarządzanie Użytkownikami"
                 emoji="📲"
-                className="from-teal-500 to-teal-600"
+                className="from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700"
                 href="ekoskop/users"
               />
 
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                 title="Edukacja"
                 subtitle="Artykuły & Materiały"
                 emoji="📚"
-                className="from-purple-500 to-purple-600"
+                className="from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                 href="ekoskop/articles"
               />
 
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                 title="Analityka"
                 subtitle="Raporty & Statystyki"
                 emoji="📈"
-                className="from-orange-500 to-orange-600"
+                className="from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
                 href="ekoskop/statistics"
               />
             </div>
@@ -197,27 +197,5 @@ export default function DashboardPage() {
         )}
       </div>
     </PullToRefreshWrapper>
-  );
-}
-
-function DashboardCard({ title, subtitle, emoji, className, href }) {
-  const navigate = useNavigate();
-
-  return (
-    <div
-      className={clsx(
-        "cursor-pointer rounded-2xl bg-gradient-to-br p-6 text-white",
-        className,
-      )}
-      onClick={() => navigate(href)}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-blue-100">{title}</p>
-          <p className="text-lg font-bold">{subtitle}</p>
-        </div>
-        <div className="text-3xl opacity-80">{emoji}</div>
-      </div>
-    </div>
   );
 }

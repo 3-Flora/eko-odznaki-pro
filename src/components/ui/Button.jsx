@@ -5,7 +5,7 @@ export default function Button({
   icon: Icon,
   children,
   onClick = () => {},
-  style = "normal", // "normal" | "loading" | "danger"
+  style = "normal", // "normal" | "loading" | "danger" | "outline" | "gray" | "lightBlue" | "success"
   size = "md", // "xs" | "sm" | "md" | "lg"
   fullWidth = true,
   className,
@@ -77,7 +77,9 @@ export default function Button({
     <button
       type="submit"
       disabled={loading}
-      onClick={onClick}
+      onClick={(e) => {
+        onClick();
+      }}
       className={clsx(
         "cursor-pointer rounded-xl font-semibold transition duration-200 disabled:opacity-50",
         buttonStyles[style].background,
