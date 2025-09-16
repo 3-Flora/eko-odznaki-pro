@@ -81,6 +81,15 @@ export default function DatabaseManager() {
       action: clearEcoChallenges,
       dangerous: true,
     },
+    {
+      id: "clear-submissions",
+      title: "Usuń Zgłoszenia",
+      description: "Usuwa wszystkie zgłoszenia użytkowników",
+      icon: Trash2,
+      color: "bg-red-600 hover:bg-red-700",
+      action: () => clearCollection("submissions"),
+      dangerous: true,
+    },
   ];
 
   const executeOperation = async (operation) => {
@@ -112,9 +121,9 @@ export default function DatabaseManager() {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
+    <div className="rounded-2xl bg-white p-4 shadow-lg sm:p-6 dark:bg-gray-800">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="rounded-full bg-indigo-100 p-3 dark:bg-indigo-900">
           <Database className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
         </div>
@@ -127,7 +136,7 @@ export default function DatabaseManager() {
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {operations.map((operation) => (
           <button
             key={operation.id}
@@ -138,7 +147,7 @@ export default function DatabaseManager() {
               operation.color,
               {
                 "cursor-not-allowed opacity-50": loading,
-                "shadow-lg hover:shadow-xl": !loading,
+                "transform shadow-lg hover:scale-105 hover:shadow-xl": !loading,
                 "ring-2 ring-red-200 dark:ring-red-800": operation.dangerous,
               },
             )}
