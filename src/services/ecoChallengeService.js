@@ -7,6 +7,10 @@ import {
   getDoc,
   orderBy,
   limit,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -201,4 +205,134 @@ export const getActiveEcoChallenge = async () => {
     console.error("Error fetching active eco challenge:", error);
     return null;
   }
+};
+
+/**
+ * Tworzy nowe EkoWyzwanie
+ * @param {Object} challengeData - Dane wyzwania zgodne ze strukturą bazy danych
+ * @returns {Promise<string>} - ID utworzonego wyzwania
+ */
+export const createEcoChallenge = async (challengeData) => {
+  try {
+    const docRef = await addDoc(collection(db, "ecoChallenges"), {
+      ...challengeData,
+      createdAt: serverTimestamp(),
+      isActive: true,
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating eco challenge:", error);
+    throw error;
+  }
+};
+
+/**
+ * Pobiera pojedyncze EkoWyzwanie po ID
+ * @param {string} challengeId - ID wyzwania
+ * @returns {Promise<Object|null>} - Dane wyzwania lub null jeśli nie istnieje
+ */
+export const getEcoChallengeById = async (challengeId) => {
+  try {
+    const docRef = doc(db, "ecoChallenges", challengeId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching eco challenge:", error);
+    throw error;
+  }
+};
+
+/**
+ * Aktualizuje istniejące EkoWyzwanie
+ * @param {string} challengeId - ID wyzwania do aktualizacji
+ * @param {Object} updateData - Dane do aktualizacji
+ * @returns {Promise<void>}
+ */
+export const updateEcoChallenge = async (challengeId, updateData) => {
+  try {
+    const docRef = doc(db, "ecoChallenges", challengeId);
+    await updateDoc(docRef, {
+      ...updateData,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error updating eco challenge:", error);
+    throw error;
+  }
+};
+
+/**
+ * Usuwa EkoWyzwanie
+ * @param {string} challengeId - ID wyzwania do usunięcia
+ * @returns {Promise<void>}
+ */
+export const deleteEcoChallenge = async (challengeId) => {
+  try {
+    await deleteDoc(doc(db, "ecoChallenges", challengeId));
+  } catch (error) {
+    console.error("Error deleting eco challenge:", error);
+    throw error;
+  }
+};
+
+/**
+ * Waliduje dane EkoWyzwania
+ * @param {Object} challengeData - Dane do walidacji
+ * @returns {Object} - Obiekt z błędami walidacji lub pusty jeśli brak błędów
+ */
+export const validateEcoChallengeData = (challengeData) => {
+  const errors = {};
+
+  if (!challengeData.name || challengeData.name.trim().length === 0) {
+    errors.name = "Nazwa wyzwania jest wymagana";
+  }
+
+  if (
+    !challengeData.description ||
+    challengeData.description.trim().length === 0
+  ) {
+    errors.description = "Opis wyzwania jest wymagany";
+  }
+
+  if (!challengeData.category || challengeData.category.trim().length === 0) {
+    errors.category = "Kategoria jest wymagana";
+  }
+
+  if (!challengeData.startDate) {
+    errors.startDate = "Data rozpoczęcia jest wymagana";
+  }
+
+  if (!challengeData.endDate) {
+    errors.endDate = "Data zakończenia jest wymagana";
+  }
+
+  if (challengeData.startDate && challengeData.endDate) {
+    const start = new Date(challengeData.startDate);
+    const end = new Date(challengeData.endDate);
+
+    if (start >= end) {
+      errors.endDate =
+        "Data zakończenia musi być późniejsza niż data rozpoczęcia";
+    }
+  }
+
+  if (
+    challengeData.maxDaily &&
+    (isNaN(challengeData.maxDaily) || challengeData.maxDaily < 1)
+  ) {
+    errors.maxDaily = "Limit dzienny musi być liczbą większą od 0";
+  }
+
+  if (
+    challengeData.maxWeekly &&
+    (isNaN(challengeData.maxWeekly) || challengeData.maxWeekly < 1)
+  ) {
+    errors.maxWeekly = "Limit tygodniowy musi być liczbą większą od 0";
+  }
+
+  return errors;
 };

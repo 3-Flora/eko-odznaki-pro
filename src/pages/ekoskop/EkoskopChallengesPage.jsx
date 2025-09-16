@@ -32,10 +32,10 @@ export default function EkoskopChallengesPage() {
     }
   };
 
-  const handleDelete = async (id, title) => {
+  const handleDelete = async (id, name) => {
     if (
       !window.confirm(
-        `Czy na pewno chcesz usunąć wyzwanie "${title}"? Ta operacja nie może być cofnięta.`,
+        `Czy na pewno chcesz usunąć wyzwanie "${name}"? Ta operacja nie może być cofnięta.`,
       )
     ) {
       return;
@@ -53,7 +53,7 @@ export default function EkoskopChallengesPage() {
 
   const filtered = challenges.filter((c) => {
     const matchesSearch =
-      c.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -189,7 +189,7 @@ export default function EkoskopChallengesPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {c.title || c.name || "Bezimienne"}
+                        {c.name || "Bezimienne"}
                       </h3>
                       <span className={`text-sm ${cat.color}`}>
                         {c.category}
@@ -219,7 +219,7 @@ export default function EkoskopChallengesPage() {
                     </Link>
 
                     <button
-                      onClick={() => handleDelete(c.id, c.title || c.name)}
+                      onClick={() => handleDelete(c.id, c.name)}
                       className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
                       title="Usuń wyzwanie"
                     >
@@ -252,10 +252,10 @@ export default function EkoskopChallengesPage() {
 
                   <div className="text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      Bonus punktów:
+                      Limity:
                     </span>
                     <span className="ml-1 font-medium text-gray-900 dark:text-white">
-                      {c.bonusPoints || 0}
+                      {c.maxDaily || 1}/dzień, {c.maxWeekly || 1}/tydzień
                     </span>
                   </div>
 

@@ -39,6 +39,9 @@ import {
   EkoskopBadgesPage,
   CreateBadgePage,
   EditBadgePage,
+  EkoskopChallengesPage,
+  CreateChallengePage,
+  EditChallengePage,
   EkoskopUsersPage,
   CreateTeacherPage,
   TeacherApplicationsPage,
@@ -154,6 +157,15 @@ export default function App() {
                 <Route
                   path="badges/edit/:badgeId"
                   element={<EditBadgePage />}
+                />
+                <Route path="challenges" element={<EkoskopChallengesPage />} />
+                <Route
+                  path="challenges/create"
+                  element={<CreateChallengePage />}
+                />
+                <Route
+                  path="challenges/edit/:id"
+                  element={<EditChallengePage />}
                 />
                 <Route path="users" element={<EkoskopUsersPage />} />
                 <Route

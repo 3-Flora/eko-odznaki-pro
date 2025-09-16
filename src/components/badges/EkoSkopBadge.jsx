@@ -106,9 +106,11 @@ export default function EkoSkopBadge({ badge, handleDeleteBadge }) {
         </div>
 
         <div>
-          <span className="text-gray-600 dark:text-gray-400">Poziomy:</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            Ilość poziomów:
+          </span>
           <span className="ml-1 font-medium text-gray-900 dark:text-white">
-            {maxLevel}
+            {maxLevel}{" "}
             {maxLevel === 1 ? "poziom" : maxLevel < 5 ? "poziomy" : "poziomów"}
           </span>
         </div>

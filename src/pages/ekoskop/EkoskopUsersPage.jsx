@@ -236,7 +236,7 @@ export default function EkoskopUsersPage() {
             <span className="font-bold">
               {users.filter((u) => u.role === "student").length}
             </span>
-            <span class="text-sm"> Uczniów</span>
+            <span className="text-sm"> Uczniów</span>
           </div>
         </div>
 

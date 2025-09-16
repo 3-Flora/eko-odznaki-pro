@@ -16,6 +16,7 @@ import {
   Menu,
   ArrowLeft,
   ArrowRight,
+  Target,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSidebar } from "../../contexts/SidebarContext";
@@ -76,6 +77,11 @@ export const SideNav = () => {
       id: "/ekoskop/badges",
       icon: Award,
       label: "Odznaki",
+    },
+    {
+      id: "/ekoskop/challenges",
+      icon: Target,
+      label: "EkoWyzwania",
     },
   ];
 
