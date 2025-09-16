@@ -26,8 +26,11 @@ const memoryCache = {
 function readLocal(key) {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
+    const result = raw ? JSON.parse(raw) : null;
+    console.log("readLocal:", key, result ? "found" : "not found");
+    return result;
   } catch (e) {
+    console.error("readLocal error:", key, e);
     return null;
   }
 }
@@ -35,8 +38,9 @@ function readLocal(key) {
 function writeLocal(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    console.log("writeLocal:", key, "saved successfully");
   } catch (e) {
-    console.error("writeLocal error:", e);
+    console.error("writeLocal error:", key, e);
   }
 }
 
@@ -180,19 +184,35 @@ export function invalidateCachedSchools() {
 export async function getCachedUserSubmissions(userId) {
   if (!userId) return [];
 
+  console.log("getCachedUserSubmissions: starting for userId", userId);
+
   // memory cache
   const mem = memoryCache.submissions && memoryCache.submissions[userId];
   if (mem && Date.now() - mem.ts < TTL) {
+    console.log(
+      "getCachedUserSubmissions: returning from memory cache",
+      mem.data.length,
+      "submissions",
+    );
     return mem.data;
   }
 
   // localStorage cache
   const local = readLocal(CACHE_KEY_PREFIX + `submissions_${userId}`);
   if (local && Date.now() - local.ts < TTL) {
+    console.log(
+      "getCachedUserSubmissions: returning from localStorage cache",
+      local.data.length,
+      "submissions",
+    );
     memoryCache.submissions = memoryCache.submissions || {};
     memoryCache.submissions[userId] = local;
     return local.data;
   }
+
+  console.log(
+    "getCachedUserSubmissions: no valid cache, fetching from database",
+  );
 
   try {
     // Fetch submissions for the given user
@@ -206,6 +226,12 @@ export async function getCachedUserSubmissions(userId) {
       id: d.id,
       ...d.data(),
     }));
+
+    console.log(
+      "getCachedUserSubmissions: fetched from database",
+      submissions.length,
+      "submissions",
+    );
 
     // Sort newest first
     submissions.sort((a, b) => {
@@ -222,6 +248,12 @@ export async function getCachedUserSubmissions(userId) {
     memoryCache.submissions = memoryCache.submissions || {};
     memoryCache.submissions[userId] = payload;
     writeLocal(CACHE_KEY_PREFIX + `submissions_${userId}`, payload);
+
+    console.log(
+      "getCachedUserSubmissions: saved to cache and returning",
+      submissions.length,
+      "submissions",
+    );
     return submissions;
   } catch (err) {
     console.error("getCachedUserSubmissions error:", err);
@@ -230,11 +262,23 @@ export async function getCachedUserSubmissions(userId) {
 }
 
 export function invalidateCachedUserSubmissions(userId) {
+  console.log(
+    "invalidateCachedUserSubmissions: invalidating cache for userId",
+    userId,
+  );
   try {
     if (memoryCache.submissions && memoryCache.submissions[userId]) {
+      console.log(
+        "invalidateCachedUserSubmissions: removing from memory cache",
+      );
       delete memoryCache.submissions[userId];
     }
-    localStorage.removeItem(CACHE_KEY_PREFIX + `submissions_${userId}`);
+    const cacheKey = CACHE_KEY_PREFIX + `submissions_${userId}`;
+    console.log(
+      "invalidateCachedUserSubmissions: removing from localStorage with key",
+      cacheKey,
+    );
+    localStorage.removeItem(cacheKey);
   } catch (e) {
     console.error("invalidateCachedUserSubmissions error:", e);
   }

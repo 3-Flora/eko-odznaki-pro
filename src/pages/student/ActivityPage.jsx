@@ -21,7 +21,10 @@ import {
   useSubmissionLimits,
   useWeeklyChallengeLimit,
 } from "../../hooks/useSubmissionLimits";
-import { SubmissionLimitsBadge } from "../../components/ui/SubmissionLimitsInfo";
+import {
+  ActivityLimitsOverview,
+  SubmissionLimitsBadge,
+} from "../../components/ui/SubmissionLimitsInfo";
 import PullToRefreshIndicator from "../../components/refresh/PullToRefreshIndicator";
 
 export default function ActivityPage() {
@@ -233,152 +236,139 @@ export default function ActivityPage() {
         onRefresh={handleRefresh}
       />
 
-      <div className="min-h-svh bg-gray-50 dark:bg-gray-900">
-        <PageHeader
-          title="Wybierz EkoDziałanie lub Wyzwanie"
-          emoji="🌍"
-          subtitle="Dotknij działania lub wyzwania, które chcesz zgłosić"
-        />
+      <PageHeader
+        title="Wybierz EkoDziałanie lub Wyzwanie"
+        emoji="🌍"
+        subtitle="Dotknij działania lub wyzwania, które chcesz zgłosić"
+      />
 
-        {/* Przegląd limitów zgłoszeń */}
-        {/* {currentUser && (
-          <ActivityLimitsOverview
-            ecoActions={ecoActions}
-            challenges={challenges}
-            useSubmissionLimitsHook={useSubmissionLimits}
-            currentUser={currentUser}
-          />
-        )} */}
-
-        <div>
-          {/* Challenges Section - wyświetlane na górze gdy są dostępne */}
-          <div className="mb-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                🏆 Dostępne EkoWyzwania
-              </h2>
-            </div>
-            {weeklyLimitData && !weeklyLimitData.canSubmit && (
-              <SubmissionLimitsBadge
-                limitData={{ challengeLimit: weeklyLimitData }}
-                type="challenge"
-              />
-            )}
-
-            {/* Loading state for challenges */}
-            {loading && (
-              <div className="flex items-center justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-green-500" />
-                <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  Ładowanie EkoWyzwań...
-                </span>
-              </div>
-            )}
-
-            {/* Challenges Grid */}
-            {!loading && challenges.length > 0 && (
-              <div className="grid grid-cols-1 gap-4">
-                {challenges.length <= 0 ? (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Brak dostępnych EkoWyzwań
-                  </p>
-                ) : (
-                  challenges.map((challenge) => {
-                    const challengeStatus = getChallengeStatus(challenge.id);
-
-                    return (
-                      <button
-                        key={challenge.id}
-                        onClick={() => handleChallengeSelect(challenge)}
-                        disabled={!challengeStatus.canSubmit}
-                        className={clsx(
-                          "flex items-center rounded-2xl border p-4 shadow-sm transition-all duration-200",
-                          challengeStatus.canSubmit
-                            ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:border-green-700 dark:from-green-900/30 dark:to-emerald-900/30"
-                            : "cursor-not-allowed border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50",
-                        )}
-                      >
-                        <div className="mr-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-green-400 to-green-600 text-2xl shadow-lg">
-                          🏆
-                        </div>
-                        <div className="flex-1 text-left">
-                          <div className="mb-1 flex flex-wrap items-center gap-2">
-                            {challengeStatus.statusText && (
-                              <span
-                                className={clsx(
-                                  "rounded-full px-2 py-1 text-xs font-medium",
-                                  challengeStatus.statusColor,
-                                )}
-                              >
-                                {challengeStatus.statusText}
-                              </span>
-                            )}
-                            <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
-                              {challenge.category}
-                            </span>
-                          </div>
-                          <h3
-                            className={clsx(
-                              "font-semibold",
-                              challengeStatus.canSubmit
-                                ? "text-gray-800 dark:text-white"
-                                : "text-gray-500 dark:text-gray-400",
-                            )}
-                          >
-                            {challenge.name}
-                          </h3>
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* EkoDziałania Section */}
-          <div>
-            <h2 className="mb-4 text-2xl font-bold text-gray-800 dark:text-white">
-              🌱 EkoDziałania
+      <div>
+        {/* Challenges Section - wyświetlane na górze gdy są dostępne */}
+        <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+              🏆 Dostępne EkoWyzwania
             </h2>
-
-            {/* Loading state */}
-            {loading && (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-green-500" />
-                <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  Ładowanie EkoDziałań...
-                </span>
-              </div>
-            )}
-
-            {/* No actions available */}
-            {!loading && ecoActions.length === 0 && (
-              <div className="mt-8 rounded-2xl bg-yellow-50 p-8 text-center dark:bg-yellow-900/20">
-                <div className="mb-4 text-4xl">📝</div>
-                <h3 className="mb-2 text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-                  Brak dostępnych EkoDziałań
-                </h3>
-                <p className="text-yellow-600 dark:text-yellow-400">
-                  W bazie danych nie ma jeszcze żadnych EkoDziałań do
-                  zgłoszenia.
-                </p>
-              </div>
-            )}
-
-            {/* Actions Grid */}
-            {!loading && ecoActions.length > 0 && (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {ecoActions.map((action) => (
-                  <EcoActionCard
-                    key={action.id}
-                    action={action}
-                    onSelect={handleActionSelect}
-                  />
-                ))}
-              </div>
-            )}
           </div>
+          {weeklyLimitData && !weeklyLimitData.canSubmit && (
+            <SubmissionLimitsBadge
+              limitData={{ challengeLimit: weeklyLimitData }}
+              type="challenge"
+            />
+          )}
+
+          {/* Loading state for challenges */}
+          {loading && (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-green-500" />
+              <span className="ml-2 text-gray-600 dark:text-gray-400">
+                Ładowanie EkoWyzwań...
+              </span>
+            </div>
+          )}
+
+          {/* Challenges Grid */}
+          {!loading && challenges.length > 0 && (
+            <div className="grid grid-cols-1 gap-4">
+              {challenges.length <= 0 ? (
+                <p className="text-gray-600 dark:text-gray-400">
+                  Brak dostępnych EkoWyzwań
+                </p>
+              ) : (
+                challenges.map((challenge) => {
+                  const challengeStatus = getChallengeStatus(challenge.id);
+
+                  return (
+                    <button
+                      key={challenge.id}
+                      onClick={() => handleChallengeSelect(challenge)}
+                      disabled={!challengeStatus.canSubmit}
+                      className={clsx(
+                        "flex cursor-pointer items-center rounded-2xl border p-4 shadow-sm transition-all duration-200",
+                        challengeStatus.canSubmit
+                          ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 hover:scale-[1.01] hover:shadow-lg active:scale-[0.98] dark:border-green-700 dark:from-green-900/30 dark:to-emerald-900/30"
+                          : "cursor-not-allowed border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50",
+                      )}
+                    >
+                      <div className="mr-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-green-400 to-green-600 text-2xl shadow-lg">
+                        🏆
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="mb-1 flex flex-wrap items-center gap-2">
+                          {challengeStatus.statusText && (
+                            <span
+                              className={clsx(
+                                "rounded-full px-2 py-1 text-xs font-medium",
+                                challengeStatus.statusColor,
+                              )}
+                            >
+                              {challengeStatus.statusText}
+                            </span>
+                          )}
+                        </div>
+                        <h3
+                          className={clsx(
+                            "font-semibold",
+                            challengeStatus.canSubmit
+                              ? "text-gray-800 dark:text-white"
+                              : "text-gray-500 dark:text-gray-400",
+                          )}
+                        >
+                          {challenge.name}
+                        </h3>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                          {challenge.description}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* EkoDziałania Section */}
+        <div>
+          <h2 className="mb-4 text-2xl font-bold text-gray-800 dark:text-white">
+            🌱 EkoDziałania
+          </h2>
+
+          {/* Loading state */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+              <span className="ml-2 text-gray-600 dark:text-gray-400">
+                Ładowanie EkoDziałań...
+              </span>
+            </div>
+          )}
+
+          {/* No actions available */}
+          {!loading && ecoActions.length === 0 && (
+            <div className="mt-8 rounded-2xl bg-yellow-50 p-8 text-center dark:bg-yellow-900/20">
+              <div className="mb-4 text-4xl">📝</div>
+              <h3 className="mb-2 text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+                Brak dostępnych EkoDziałań
+              </h3>
+              <p className="text-yellow-600 dark:text-yellow-400">
+                W bazie danych nie ma jeszcze żadnych EkoDziałań do zgłoszenia.
+              </p>
+            </div>
+          )}
+
+          {/* Actions Grid */}
+          {!loading && ecoActions.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {ecoActions.map((action) => (
+                <EcoActionCard
+                  key={action.id}
+                  action={action}
+                  onSelect={handleActionSelect}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -400,7 +390,7 @@ const EcoActionCard = memo(function EcoActionCard({ action, onSelect }) {
         onClick={() => (canSubmit ? onSelect(action) : null)}
         disabled={!canSubmit}
         className={clsx(
-          "group relative flex w-full flex-col items-center gap-3 rounded-2xl border p-4 text-center transition-all duration-200",
+          "group relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border p-4 text-center transition-all duration-200",
           canSubmit
             ? "border-gray-200 bg-white shadow-sm hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800"
             : "cursor-not-allowed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50",

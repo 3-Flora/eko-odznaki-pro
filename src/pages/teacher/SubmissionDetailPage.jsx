@@ -20,6 +20,11 @@ import PageHeader from "../../components/ui/PageHeader";
 import Button from "../../components/ui/Button";
 import clsx from "clsx";
 
+/*
+  Strona szczegółów zgłoszenia dla nauczyciela
+  Pozwala na przeglądanie szczegółów zgłoszenia EkoDziałania lub EkoWyzwania
+  oraz zatwierdzanie lub odrzucanie zgłoszenia z opcjonalnym powodem odrzucenia.
+*/
 export default function SubmissionDetailPage() {
   const { submissionId } = useParams();
   const { currentUser } = useAuth();

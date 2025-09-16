@@ -32,6 +32,7 @@ import {
   validateSubmissionLimits,
   validateWeeklyChallengeLimit,
 } from "../services/submissionLimitService";
+import { invalidateCachedUserSubmissions } from "../services/contentCache";
 import { useLimitsRefresh } from "./LimitsRefreshContext";
 
 const AuthContext = createContext(null);
@@ -121,6 +122,12 @@ export const AuthProvider = ({ children }) => {
 
     await addDoc(collection(db, "submissions"), submissionData);
 
+    // Invalidate cache żeby następne zapytania widoki świeże dane
+    invalidateCachedUserSubmissions(currentUser.id);
+
+    // Krótkie opóźnienie żeby cache się zaktualizował przed odświeżeniem limitów
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Wyzwól odświeżenie limitów po zgłoszeniu aktywności
     triggerLimitsRefresh();
   };
@@ -166,6 +173,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     await addDoc(collection(db, "submissions"), submissionData);
+
+    // Invalidate cache żeby następne zapytania widoki świeże dane
+    invalidateCachedUserSubmissions(currentUser.id);
+
+    // Krótkie opóźnienie żeby cache się zaktualizował przed odświeżeniem limitów
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Wyzwól odświeżenie limitów po zgłoszeniu wyzwania
     triggerLimitsRefresh();

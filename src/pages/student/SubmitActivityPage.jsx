@@ -19,6 +19,11 @@ import { useToast } from "../../contexts/ToastContext";
 import useSubmissionLimits from "../../hooks/useSubmissionLimits";
 import SubmissionLimitsInfo from "../../components/ui/SubmissionLimitsInfo";
 
+/*
+  Strona do zgłaszania EkoDziałań i EkoWyzwań przez uczniów
+  Pozwala na dodanie komentarza i zdjęć jako dowodu wykonania
+  Sprawdza limity zgłoszeń przed wysłaniem
+*/
 export default function SubmitActivityPage() {
   const { showError, showSuccess } = useToast();
   const { submitEcoAction, submitChallengeSubmission, currentUser } = useAuth();
@@ -153,7 +158,7 @@ export default function SubmitActivityPage() {
 
       // Upload zdjęć jeśli są dodane
       if (photos.length > 0) {
-        setUploadProgress("Rozpoczynam przesyłanie zdjęć...");
+        setUploadProgress("Przesyłanie zdjęć...");
 
         // Generuj unikalny ID dla submission'u
         const submissionId = generateSubmissionId();
@@ -192,6 +197,7 @@ export default function SubmitActivityPage() {
       }
 
       // Invalidate cached submissions for current user so other pages will refresh
+      // WAŻNE: Robimy to przed navigate(), żeby poprzednia strona miała świeże dane
       try {
         if (currentUser && currentUser.id) {
           invalidateCachedUserSubmissions(currentUser.id);
@@ -260,7 +266,7 @@ export default function SubmitActivityPage() {
             </div>
 
             <div className="rounded-xl">
-              <p className="text-center text-gray-600 dark:text-gray-400">
+              <p className="mb-4 text-center text-gray-600 dark:text-gray-400">
                 {selectedItem.description}
               </p>
             </div>

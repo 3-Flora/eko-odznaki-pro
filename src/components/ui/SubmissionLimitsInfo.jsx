@@ -147,7 +147,6 @@ export default function SubmissionLimitsInfo({
   return (
     <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
       <div className="flex items-start gap-2">
-        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
         <div className="flex-1">
           <div className="font-medium text-green-800 dark:text-green-300">
             Możesz zgłosić tę aktywność
@@ -159,11 +158,6 @@ export default function SubmissionLimitsInfo({
                 <span>
                   Dzisiaj: {limitData.currentDailyCount || 0}/
                   {limitData.maxDaily}
-                  {limitData.remainingDaily !== undefined && (
-                    <span className="ml-1 font-medium">
-                      (pozostało: {limitData.remainingDaily})
-                    </span>
-                  )}
                 </span>
               </div>
             )}
@@ -173,11 +167,6 @@ export default function SubmissionLimitsInfo({
                 <span>
                   W tym tygodniu: {limitData.currentWeeklyCount || 0}/
                   {limitData.maxWeekly}
-                  {limitData.remainingWeekly !== undefined && (
-                    <span className="ml-1 font-medium">
-                      (pozostało: {limitData.remainingWeekly})
-                    </span>
-                  )}
                 </span>
               </div>
             )}
@@ -248,32 +237,22 @@ export function SubmissionLimitsBadge({ limitData, type }) {
       limitData.maxWeekly !== 999
     ) {
       if (limitData.remainingDaily <= limitData.remainingWeekly) {
-        displayText = `${limitData.remainingDaily} dzisiaj (${limitData.currentDailyCount || 0}/${limitData.maxDaily})`;
+        displayText = `Dzisiaj (${limitData.currentDailyCount || 0}/${limitData.maxDaily})`;
       } else {
-        displayText = `${limitData.remainingWeekly} w tygodniu (${limitData.currentWeeklyCount || 0}/${limitData.maxWeekly})`;
+        displayText = `W tygodniu (${limitData.currentWeeklyCount || 0}/${limitData.maxWeekly})`;
       }
     }
     // Tylko limit dzienny
     else if (limitData.maxDaily && limitData.maxDaily !== 999) {
-      displayText = `${limitData.remainingDaily} dzisiaj (${limitData.currentDailyCount || 0}/${limitData.maxDaily})`;
+      displayText = `Dzisiaj (${limitData.currentDailyCount || 0}/${limitData.maxDaily})`;
     }
     // Tylko limit tygodniowy
     else if (limitData.maxWeekly && limitData.maxWeekly !== 999) {
-      displayText = `${limitData.remainingWeekly} w tygodniu (${limitData.currentWeeklyCount || 0}/${limitData.maxWeekly})`;
-    }
-
-    // Zmień kolor jeśli pozostało mało zgłoszeń
-    const minRemaining = Math.min(
-      limitData.remainingDaily || Infinity,
-      limitData.remainingWeekly || Infinity,
-    );
-    if (minRemaining <= 1) {
-      iconColor = "text-orange-600 dark:text-orange-400";
+      displayText = `W tygodniu (${limitData.currentWeeklyCount || 0}/${limitData.maxWeekly})`;
     }
 
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
-        <CheckCircle className={`h-3 w-3 ${iconColor}`} />
         {displayText}
       </span>
     );
@@ -282,12 +261,12 @@ export function SubmissionLimitsBadge({ limitData, type }) {
   // Brak limitów
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-      <CheckCircle className="h-3 w-3" />
       Bez limitów
     </span>
   );
 }
 
+// Nie używane obecnie, ale może się przydać w przyszłości
 /**
  * Komponent wyświetlający szczegółowy przegląd limitów dla wszystkich aktywności
  * @param {Array} ecoActions - Lista EkoDziałań

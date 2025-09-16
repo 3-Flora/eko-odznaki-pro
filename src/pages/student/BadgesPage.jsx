@@ -3,6 +3,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useBadges } from "../../hooks/useBadges";
 import BadgesStats from "../../components/badges/BadgesStats";
 import PageHeader from "../../components/ui/PageHeader";
+import Badge from "../../components/badges/Badge";
+import BadgeModal from "../../components/badges/BadgeModal";
 
 export default function BadgesPage() {
   const { currentUser } = useAuth();

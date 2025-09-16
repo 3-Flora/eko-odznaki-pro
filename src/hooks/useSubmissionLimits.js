@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLimitsRefresh } from "../contexts/LimitsRefreshContext";
 import {
@@ -17,15 +17,27 @@ import {
 export const useSubmissionLimits = (activity, type, enabled = true) => {
   const { currentUser } = useAuth();
   const { refreshTrigger, shouldRefreshLimits } = useLimitsRefresh();
+
+  console.log("useSubmissionLimits: hook initialized", {
+    userId: currentUser?.id,
+    activityId: activity?.id,
+    type,
+    enabled,
+  });
   const [limitData, setLimitData] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState(null);
-  const lastRefreshTriggerRef = useRef(0);
+  const lastRefreshTriggerRef = useRef(-1); // Inicjalizuj na -1, żeby pierwsze sprawdzenie działało
 
   // Funkcja do sprawdzania limitów
-  const checkLimits = async () => {
+  const checkLimits = useCallback(async () => {
     if (!enabled || !currentUser?.id || !activity?.id) {
+      console.log("useSubmissionLimits: skipping check", {
+        enabled,
+        userId: currentUser?.id,
+        activityId: activity?.id,
+      });
       setLoading(false);
       return;
     }
@@ -33,6 +45,12 @@ export const useSubmissionLimits = (activity, type, enabled = true) => {
     try {
       setLoading(true);
       setError(null);
+
+      console.log("useSubmissionLimits: checking limits for", {
+        userId: currentUser.id,
+        activityId: activity.id,
+        type,
+      });
 
       const [limitValidation, submissionStats, challengeValidation] =
         await Promise.all([
@@ -42,6 +60,12 @@ export const useSubmissionLimits = (activity, type, enabled = true) => {
             ? validateWeeklyChallengeLimit(currentUser.id)
             : Promise.resolve(null),
         ]);
+
+      console.log("useSubmissionLimits: results", {
+        limitValidation,
+        submissionStats,
+        challengeValidation,
+      });
 
       setLimitData({
         ...limitValidation,
@@ -55,21 +79,31 @@ export const useSubmissionLimits = (activity, type, enabled = true) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [enabled, currentUser?.id, activity?.id, type, refreshTrigger]);
 
   // Sprawdź limity przy pierwszym ładowaniu
   useEffect(() => {
-    if (enabled && currentUser?.id && activity?.id && !limitData) {
+    console.log("useSubmissionLimits: first load useEffect", {
+      enabled,
+      userId: currentUser?.id,
+      activityId: activity?.id,
+    });
+    if (enabled && currentUser?.id && activity?.id) {
       checkLimits();
     }
-  }, [currentUser?.id, activity?.id, type, enabled]);
+  }, [checkLimits]);
 
   // Sprawdź limity przy wymuszonego odświeżenia
   useEffect(() => {
+    console.log("useSubmissionLimits: refresh useEffect", {
+      refreshTrigger,
+      lastRefreshTrigger: lastRefreshTriggerRef.current,
+      shouldRefresh: shouldRefreshLimits(lastRefreshTriggerRef.current),
+    });
     if (shouldRefreshLimits(lastRefreshTriggerRef.current)) {
       checkLimits();
     }
-  }, [refreshTrigger]);
+  }, [checkLimits, shouldRefreshLimits, refreshTrigger]);
 
   const refresh = async () => {
     await checkLimits();
@@ -98,10 +132,16 @@ export const useWeeklyChallengeLimit = (enabled = true) => {
   const [limitData, setLimitData] = useState(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState(null);
-  const lastRefreshTriggerRef = useRef(0);
+  const lastRefreshTriggerRef = useRef(-1); // Inicjalizuj na -1, żeby pierwsze sprawdzenie działało
+
+  console.log("useWeeklyChallengeLimit: hook initialized", {
+    userId: currentUser?.id,
+    enabled,
+    refreshTrigger,
+  });
 
   // Funkcja do sprawdzania limitów
-  const checkLimit = async () => {
+  const checkLimit = useCallback(async () => {
     if (!enabled || !currentUser?.id) {
       setLoading(false);
       return;
@@ -120,21 +160,30 @@ export const useWeeklyChallengeLimit = (enabled = true) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [enabled, currentUser?.id, refreshTrigger]);
 
   // Sprawdź limity przy pierwszym ładowaniu
   useEffect(() => {
-    if (enabled && currentUser?.id && !limitData) {
+    console.log("useWeeklyChallengeLimit: first load useEffect", {
+      enabled,
+      userId: currentUser?.id,
+    });
+    if (enabled && currentUser?.id) {
       checkLimit();
     }
-  }, [currentUser?.id, enabled]);
+  }, [checkLimit]);
 
   // Sprawdź limity przy wymuszonego odświeżenia
   useEffect(() => {
+    console.log("useWeeklyChallengeLimit: refresh useEffect", {
+      refreshTrigger,
+      lastRefreshTrigger: lastRefreshTriggerRef.current,
+      shouldRefresh: shouldRefreshLimits(lastRefreshTriggerRef.current),
+    });
     if (shouldRefreshLimits(lastRefreshTriggerRef.current)) {
       checkLimit();
     }
-  }, [refreshTrigger]);
+  }, [checkLimit, shouldRefreshLimits, refreshTrigger]);
 
   const refresh = async () => {
     await checkLimit();

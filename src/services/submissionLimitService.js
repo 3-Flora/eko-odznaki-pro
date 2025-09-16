@@ -205,9 +205,17 @@ export const validateSubmissionLimits = async (
     };
   } catch (error) {
     console.error("Error validating submission limits:", error);
-    // W przypadku błędu, pozwól na zgłoszenie (failsafe)
+    console.error("Error details:", { userId, activityId, type, useCache });
+
+    // W przypadku błędu, pozwól na zgłoszenie (failsafe) ale z pełnymi danymi
     return {
       canSubmit: true,
+      currentDailyCount: 0,
+      maxDaily: activityData.maxDaily || 999,
+      currentWeeklyCount: 0,
+      maxWeekly: activityData.maxWeekly || 999,
+      remainingDaily: activityData.maxDaily || 999,
+      remainingWeekly: activityData.maxWeekly || 999,
       error: "Nie udało się sprawdzić limitów",
     };
   }
@@ -407,6 +415,9 @@ export const validateWeeklyChallengeLimit = async (userId, useCache = true) => {
     console.error("Error validating weekly challenge limit:", error);
     return {
       canSubmit: true,
+      currentCount: 0,
+      maxAllowed: 1,
+      remaining: 1,
       error: "Nie udało się sprawdzić limitów EkoWyzwań",
     };
   }
