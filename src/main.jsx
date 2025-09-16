@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./contexts/ThemeContext.jsx";
 import { AuthProvider } from "./contexts/AuthContext";
+import { SidebarProvider } from "./contexts/SidebarContext.jsx";
 import DeviceEnvironmentProvider from "./contexts/DeviceEnvironmentContext";
 import { ToastProvider } from "./contexts/ToastContext.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
@@ -16,13 +17,15 @@ createRoot(document.getElementById("root")).render(
       <DeviceEnvironmentProvider>
         <LimitsRefreshProvider>
           <AuthProvider>
-            <NotificationProvider>
-              <ToastProvider>
-                <RefreshProvider>
-                  <App />
-                </RefreshProvider>
-              </ToastProvider>
-            </NotificationProvider>
+            <SidebarProvider>
+              <NotificationProvider>
+                <ToastProvider>
+                  <RefreshProvider>
+                    <App />
+                  </RefreshProvider>
+                </ToastProvider>
+              </NotificationProvider>
+            </SidebarProvider>
           </AuthProvider>
         </LimitsRefreshProvider>
       </DeviceEnvironmentProvider>

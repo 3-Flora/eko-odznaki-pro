@@ -85,6 +85,7 @@ export default function EkoskopEcoActionsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        emoji="🌿"
         title="Zarządzanie EkoDziałaniami"
         subtitle="Twórz i edytuj szablony EkoDziałań dostępnych dla uczniów"
       />
@@ -158,7 +159,7 @@ export default function EkoskopEcoActionsPage() {
             return (
               <div
                 key={action.id}
-                className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 hover:shadow-md dark:bg-gray-800 dark:ring-gray-700"
+                className="rounded-2xl bg-white p-4 shadow-sm ring-gray-200 hover:shadow-md dark:bg-gray-800 dark:ring-gray-700"
               >
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -227,25 +228,25 @@ export default function EkoskopEcoActionsPage() {
                 </p>
 
                 {/* Limits */}
-                <div className="flex gap-4 text-sm">
+                <div className="flex gap-2 text-sm">
                   {action.maxDaily && (
                     <div className="text-center">
-                      <div className="font-semibold text-orange-600 dark:text-orange-400">
-                        {action.maxDaily}
-                      </div>
-                      <div className="text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold text-orange-600 dark:text-orange-400">
+                        {action.maxDaily}{" "}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-400">
                         dziennie
-                      </div>
+                      </span>
                     </div>
                   )}
                   {action.maxWeekly && (
                     <div className="text-center">
-                      <div className="font-semibold text-blue-600 dark:text-blue-400">
-                        {action.maxWeekly}
-                      </div>
-                      <div className="text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold text-blue-600 dark:text-blue-400">
+                        {action.maxWeekly}{" "}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-400">
                         tygodniowo
-                      </div>
+                      </span>
                     </div>
                   )}
                 </div>

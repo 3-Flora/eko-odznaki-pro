@@ -1,6 +1,7 @@
 import { Navbar } from "./Navbar";
 import { BottomNav } from "./BottomNav";
 import { SideNav } from "./SideNav";
+import { useSidebar } from "../../contexts/SidebarContext";
 import { Outlet, useLocation } from "react-router";
 import { useRef, useEffect } from "react";
 
@@ -21,6 +22,7 @@ function ScrollToTop({ scrollContainerRef }) {
 
 export default function Layout() {
   const scrollRef = useRef(null);
+  const { isCollapsed } = useSidebar();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -30,7 +32,11 @@ export default function Layout() {
       <SideNav />
 
       {/* Main content area */}
-      <div className="lg:pl-64">
+      <div
+        className={`transition-all duration-300 ${
+          isCollapsed ? "lg:pl-16" : "lg:pl-64"
+        }`}
+      >
         <div className="flex h-svh flex-col lg:max-w-none">
           <Navbar />
           <main className="h-full flex-1 overflow-auto" ref={scrollRef}>

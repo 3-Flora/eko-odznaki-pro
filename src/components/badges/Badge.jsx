@@ -1,24 +1,6 @@
 import clsx from "clsx";
-import { useState } from "react";
-import { Lock, X } from "lucide-react";
 
-const getColorClasses = (lvl) => {
-  // Szare tlo gdy lvl 0, Brazawe tlo gdy lvl 1, srebre tlo gdy lvl 2, zlote gdy lvl 3, a diamentowe gdy lvl max
-  switch (lvl) {
-    case 0:
-      return "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 dark:from-gray-700 dark:to-gray-800 dark:text-gray-400";
-    case 1:
-      return "bg-gradient-to-br from-brown-500 to-brown-600 text-white";
-    case 2:
-      return "bg-gradient-to-br from-slate-500 to-slate-600 text-white";
-    case 3:
-      return "bg-gradient-to-br from-yellow-500 to-yellow-600 text-white";
-    case 4:
-      return "bg-gradient-to-br from-blue-500 to-blue-600 text-white";
-    default:
-      return "";
-  }
-};
+import getColorClasses from "../../utils/getColorClasses";
 
 // Kompaktowy komponent odznaki dla gridu (styl Duolingo)
 export default function Badge({
@@ -36,12 +18,15 @@ export default function Badge({
   progressText,
   onClick,
   template,
+  showTitle,
 }) {
   // Dla zdobytych odznak, użyj ikony z aktualnego poziomu
   const currentLevelIcon = currentLevelData?.icon || "🏅";
   // Dla niezdobytych, użyj ikony pierwszego poziomu
   const nextLevelIcon = nextLevelData?.icon || "🏅";
   const icon = isEarned ? currentLevelIcon : nextLevelIcon;
+
+  console.log(badgeImage);
 
   // Znajdź maksymalny poziom dla tej odznaki
   const lvl = currentLevel;
@@ -70,13 +55,17 @@ export default function Badge({
     <button
       onClick={onClick}
       className={clsx(
-        "group relative flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl p-4 text-left transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95",
+        "group relative flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl bg-gray-700 p-4 text-left transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95",
         getColorClasses(lvl),
       )}
     >
       {/* Badge Icon */}
       <div className="flex justify-center">{getBadgeIcon()}</div>
-
+      {showTitle && (
+        <h4 className="mt-2 text-center leading-tight font-bold text-gray-800 dark:text-gray-200">
+          {name}
+        </h4>
+      )}
       {/* Badge Name */}
       {/* <h4 className="text-center text-sm leading-tight font-bold">{name}</h4> */}
 

@@ -18,7 +18,7 @@ export default function Input({
   }
 
   return (
-    <div className="relative">
+    <div className={clsx("relative", className)}>
       {Icon && (
         <Icon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400 dark:text-gray-300" />
       )}
@@ -27,6 +27,7 @@ export default function Input({
         className={clsx(
           "w-full rounded-xl border border-gray-300 py-3 pr-4 transition focus:border-transparent focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white",
           Icon ? "pl-10" : "pl-4",
+          // className,
         )}
         {...props}
       />

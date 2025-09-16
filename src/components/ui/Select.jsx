@@ -41,7 +41,9 @@ export default function Select({ icon: Icon, value, onChange, children }) {
             className={clsx(
               isNull &&
                 "border-b border-gray-200 font-semibold dark:border-gray-700",
-              "cursor-pointer px-4 py-3 text-center text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700",
+              !isNull &&
+                "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700",
+              "px-4 py-3 text-center text-gray-700 dark:text-gray-300",
               value === child.props.value && "bg-gray-100 dark:bg-gray-800",
             )}
           >
@@ -90,7 +92,7 @@ export default function Select({ icon: Icon, value, onChange, children }) {
             {renderOptions(children)}
             <button
               onClick={() => setOpen(false)}
-              className="w-full border-t border-gray-200 py-3 text-center font-semibold text-green-600 dark:border-gray-700"
+              className="w-full cursor-pointer border-t border-gray-200 py-3 text-center font-semibold text-green-600 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700"
             >
               Zamknij
             </button>

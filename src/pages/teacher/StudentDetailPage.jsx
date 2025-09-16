@@ -28,6 +28,8 @@ import { useBadges } from "../../hooks/useBadges";
 import BadgesStats from "../../components/badges/BadgesStats";
 import EcoCategoriesStats from "../../components/badges/EcoCategoriesStats";
 import clsx from "clsx";
+import Badge from "../../components/badges/Badge";
+import BadgeModal from "../../components/badges/BadgeModal";
 
 export default function StudentDetailPage() {
   const { currentUser } = useAuth();
@@ -289,7 +291,7 @@ export default function StudentDetailPage() {
       {/* Zdobyte odznaki ucznia */}
       <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-          Zdobyte odznaki ({badgeStats.earned})
+          Zdobyte odznaki
         </h3>
         {!badgesLoading && earnedBadges.length === 0 && (
           <div className="py-8 text-center">
@@ -321,10 +323,9 @@ export default function StudentDetailPage() {
                 progressText={badge.progressText}
                 nextLevelData={badge.nextLevelData}
                 isEarned={badge.isEarned}
-                badgeImage={
-                  badge.currentLevelData?.image || badge.nextLevelData?.image
-                }
+                badgeImage={badge.badgeImage || "default_badge_image.png"}
                 onClick={() => handleBadgeClick(badge)}
+                showTitle
               />
             );
           })}

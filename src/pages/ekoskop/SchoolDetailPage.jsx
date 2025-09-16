@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import {
   collection,
   getDocs,
@@ -13,6 +13,9 @@ import { useToast } from "../../contexts/ToastContext";
 import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
 import EcoCategoriesStats from "../../components/badges/EcoCategoriesStats";
+import { Copy, Edit, Mail, Phone } from "lucide-react";
+import NavButton from "../../components/ui/NavButton";
+import clsx from "clsx";
 
 export default function SchoolDetailPage() {
   const { schoolId } = useParams();
@@ -22,7 +25,8 @@ export default function SchoolDetailPage() {
   const [teachers, setTeachers] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (schoolId) {
@@ -178,94 +182,105 @@ export default function SchoolDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader title={school.name} subtitle={school.address} />
+    <>
+      <div className="flex flex-col items-center justify-between lg:flex-row">
+        <PageHeader emoji="🏫" title={school.name} subtitle={school.address} />
 
-        <Link
-          to={`/ekoskop/schools/edit/${schoolId}`}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+        <NavButton
+          href={`/ekoskop/schools/edit/${schoolId}`}
+          style="lightBlue"
+          icon={Edit}
+          fullWidth={false}
+          size="sm"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            />
-          </svg>
           Edytuj szkołę
-        </Link>
+        </NavButton>
       </div>
-
       {/* School Info */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="text-center">
+      <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+          Podsumowanie
+        </h3>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="bgp-gray-50 rounded-lg p-4 text-center dark:bg-gray-700">
             <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
               {stats.totalClasses}
             </div>
-            <div className="text-gray-600 dark:text-gray-400">Klas</div>
+            <div className="text-gray-600 dark:text-gray-400">
+              {stats.totalClasses === 1 ? "Klasa" : "Klasy"}
+            </div>
           </div>
 
-          <div className="text-center">
+          <div className="bgp-gray-50 rounded-lg p-4 text-center dark:bg-gray-700">
             <div className="text-3xl font-bold text-green-600 dark:text-green-400">
               {stats.totalStudents}
             </div>
             <div className="text-gray-600 dark:text-gray-400">Uczniów</div>
           </div>
 
-          <div className="text-center">
+          <div className="bgp-gray-50 rounded-lg p-4 text-center dark:bg-gray-700">
             <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
               {teachers.length}
             </div>
             <div className="text-gray-600 dark:text-gray-400">Nauczycieli</div>
           </div>
 
-          <div className="text-center">
+          <div className="rounded-lg bg-gray-50 p-4 text-center sm:col-span-3 dark:bg-gray-700">
             <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
               {stats.totalCounters?.totalActions || 0}
             </div>
             <div className="text-gray-600 dark:text-gray-400">EkoDziałań</div>
           </div>
         </div>
-
-        {school.email && (
-          <div className="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              📧 {school.email}
-            </p>
-            {school.phone && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                📞 {school.phone}
-              </p>
-            )}
-          </div>
-        )}
       </div>
-
       {/* Category Statistics */}
       {stats.totalCounters && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            Statystyki kategorii EkoDziałań
-          </h3>
-          <EcoCategoriesStats
-            userCounters={stats.totalCounters}
-            showGrid={true}
-            title=""
-          />
-        </div>
+        <EcoCategoriesStats
+          title="Statystyki kategorii EkoDziałań"
+          userCounters={stats.totalCounters}
+          showGrid={true}
+        />
       )}
 
+      {/* Contact */}
+      {(school.email || school.phone) && (
+        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+            Kontakt
+          </h3>
+          {school.email && (
+            <span
+              onClick={() => {
+                navigator.clipboard.writeText(school.email);
+                showSuccess("Adres email skopiowany do schowka!");
+              }}
+              className="group mb-4 flex cursor-pointer items-center justify-center rounded-lg bg-gray-50 px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+            >
+              <span className="flex flex-1 gap-2">
+                <Mail className="group-hover:text-gray-300" /> {school.email}
+              </span>
+              <Copy className="group-hover:text-gray-300" />
+            </span>
+          )}
+          {school.phone && (
+            <span
+              onClick={() => {
+                navigator.clipboard.writeText(school.phone);
+                showSuccess("Numer telefonu skopiowany do schowka!");
+              }}
+              className="group flex cursor-pointer items-center justify-center rounded-lg bg-gray-50 px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+            >
+              <span className="flex flex-1 gap-2">
+                <Phone className="group-hover:text-gray-300" /> {school.phone}
+              </span>
+              <Copy className="group-hover:text-gray-300" />
+            </span>
+          )}
+        </div>
+      )}
       {/* Class Rankings */}
       {stats.classStats && stats.classStats.length > 0 && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
             Ranking klas
           </h3>
@@ -303,7 +318,7 @@ export default function SchoolDetailPage() {
                   <div className="text-lg font-bold text-green-600 dark:text-green-400">
                     {classData.totalActions}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     EkoDziałań
                   </div>
                 </div>
@@ -312,10 +327,9 @@ export default function SchoolDetailPage() {
           </div>
         </div>
       )}
-
       {/* Top Students */}
       {stats.topStudents && stats.topStudents.length > 0 && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
             Najaktywniejszi uczniowie
           </h3>
@@ -323,7 +337,8 @@ export default function SchoolDetailPage() {
             {stats.topStudents.slice(0, 5).map((student, index) => (
               <div
                 key={student.id}
-                className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-700"
+                className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+                onClick={() => navigate(`/teacher/student/${student.id}`)}
               >
                 <div className="flex items-center gap-4">
                   <div
@@ -353,7 +368,7 @@ export default function SchoolDetailPage() {
                   <div className="text-lg font-bold text-green-600 dark:text-green-400">
                     {student.totalActions}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     EkoDziałań
                   </div>
                 </div>
@@ -362,6 +377,6 @@ export default function SchoolDetailPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

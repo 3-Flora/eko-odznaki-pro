@@ -102,7 +102,9 @@ export default function App() {
               {/* Routes for teachers */}
               <Route
                 path="teacher"
-                element={<ProtectedRoute allowedRoles={["teacher"]} />}
+                element={
+                  <ProtectedRoute allowedRoles={["teacher", "ekoskop"]} />
+                }
               >
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="statistics" element={<TeacherStatisticsPage />} />

@@ -14,7 +14,8 @@ import Loading from "../../components/routing/Loading";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
-import { Trash2 } from "lucide-react";
+import { Notebook, Plus, Trash2 } from "lucide-react";
+import NavButton from "../../components/ui/NavButton";
 
 export default function EkoskopUsersPage() {
   const [users, setUsers] = useState([]);
@@ -165,25 +166,30 @@ export default function EkoskopUsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        emoji="📲"
         title="Zarządzanie użytkownikami"
         subtitle="Przeglądaj i zarządzaj wszystkimi użytkownikami w systemie"
       />
 
       {/* Search and Filters */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4">
-          <Input
-            type="text"
-            placeholder="Szukaj użytkowników..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 lg:flex-row">
+          <div className="flex-1">
+            <Input
+              type="text"
+              placeholder="Szukaj użytkowników..."
+              value={searchTerm}
+              // className="flex-1"
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
           <Select
             value={filterRole}
             onChange={setFilterRole}
             className="rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           >
+            <option value="">Wybierz role</option>
             <option value="all">Wszystkie role</option>
             <option value="student">Uczniowie</option>
             <option value="teacher">Nauczyciele</option>
@@ -195,6 +201,7 @@ export default function EkoskopUsersPage() {
             onChange={setFilterSchool}
             className="rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           >
+            <option value="">Wybierz szkołę</option>
             <option value="all">Wszystkie szkoły</option>
             {schools.map((school) => (
               <option key={school.id} value={school.id}>
@@ -205,82 +212,58 @@ export default function EkoskopUsersPage() {
         </div>
 
         <div className="flex gap-2">
-          <Link
-            to="/ekoskop/users/teacher-applications"
-            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          <NavButton
+            href="/ekoskop/users/teacher-applications"
+            style="lightBlue"
+            icon={Notebook}
           >
-            <svg
-              className="mr-2 h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
             Wnioski nauczycieli
-          </Link>
-          <Link
-            to="/ekoskop/users/create-teacher"
-            className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+          </NavButton>
+          <NavButton
+            href="/ekoskop/users/create-teacher"
+            style="success"
+            icon={Plus}
           >
-            <svg
-              className="mr-2 h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
             Utwórz konto nauczyciela
-          </Link>
+          </NavButton>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {users.filter((u) => u.role === "student").length}
-          </div>
-          <div className="text-sm text-blue-600 dark:text-blue-400">
-            Uczniów
-          </div>
-        </div>
-
-        <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-            {users.filter((u) => u.role === "teacher").length}
-          </div>
-          <div className="text-sm text-green-600 dark:text-green-400">
-            Nauczycieli
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg bg-blue-50 p-2 dark:bg-blue-900/20">
+          <div className="text-blue-600 dark:text-blue-400">
+            <span className="font-bold">
+              {users.filter((u) => u.role === "student").length}
+            </span>
+            <span class="text-sm"> Uczniów</span>
           </div>
         </div>
 
-        <div className="rounded-lg bg-purple-50 p-4 dark:bg-purple-900/20">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {users.filter((u) => u.role === "ekoskop").length}
-          </div>
-          <div className="text-sm text-purple-600 dark:text-purple-400">
-            Ekoskop
+        <div className="rounded-lg bg-green-50 p-2 dark:bg-green-900/20">
+          <div className="text-green-600 dark:text-green-400">
+            <span className="font-bold">
+              {users.filter((u) => u.role === "teacher").length}
+            </span>
+            <span class="text-sm"> Nauczycieli</span>
           </div>
         </div>
 
-        <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
-          <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-            {users.filter((u) => !u.isVerified).length}
+        <div className="rounded-lg bg-purple-50 p-2 dark:bg-purple-900/20">
+          <div className="text-purple-600 dark:text-purple-400">
+            <span className="font-bold">
+              {users.filter((u) => u.role === "ekoskop").length}
+            </span>
+            <span class="text-sm"> Ekoskop</span>
           </div>
-          <div className="text-sm text-red-600 dark:text-red-400">
-            Niezweryfikowanych
+        </div>
+
+        <div className="rounded-lg bg-red-50 p-2 dark:bg-red-900/20">
+          <div className="text-red-600 dark:text-red-400">
+            <span className="font-bold">
+              {users.filter((u) => !u.isVerified).length}
+            </span>
+            <span className="text-sm"> Niezweryfikowanych</span>
           </div>
         </div>
       </div>

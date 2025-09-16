@@ -1,3 +1,9 @@
+import clsx from "clsx";
+import getColorClasses from "../../utils/getColorClasses";
+import { useState } from "react";
+import { Lock, X } from "lucide-react";
+import Button from "../ui/Button";
+
 export default function BadgeModal(props) {
   // Accept either an object `badge` or individual props (backwards-compatible)
   const { badge, isOpen, onClose } = props;
@@ -116,12 +122,9 @@ export default function BadgeModal(props) {
           )}
 
           {/* Przycisk zamknięcia */}
-          <button
-            onClick={onClose}
-            className="w-full rounded-2xl bg-blue-500 py-3 font-medium text-white transition-colors hover:bg-blue-600"
-          >
+          <Button onClick={onClose} style="lightBlue">
             Zamknij
-          </button>
+          </Button>
         </div>
       </div>
     </div>

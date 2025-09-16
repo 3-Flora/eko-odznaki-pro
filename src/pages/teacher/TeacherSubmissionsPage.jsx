@@ -136,17 +136,20 @@ export default function TeacherSubmissionsPage() {
         }
 
         // Pobierz wszystkie zgłoszenia z tej klasy (zarówno EkoDziałania jak i EkoWyzwania)
-        let allSubmissionsQuery = query(
-          collection(db, "submissions"),
-          where("classId", "==", currentUser.classId),
-          limit(100),
-        );
+        let allSubmissionsQuery;
 
         // Jeśli filtrujemy po konkretnym uczniu
         if (filterByStudent) {
           allSubmissionsQuery = query(
             collection(db, "submissions"),
+            where("classId", "==", currentUser.classId),
             where("studentId", "==", filterByStudent),
+            limit(100),
+          );
+        } else {
+          allSubmissionsQuery = query(
+            collection(db, "submissions"),
+            where("classId", "==", currentUser.classId),
             limit(100),
           );
         }

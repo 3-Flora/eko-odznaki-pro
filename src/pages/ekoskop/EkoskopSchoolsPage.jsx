@@ -113,7 +113,7 @@ export default function EkoskopSchoolsPage() {
 
         {/* Search and Actions */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex-1 lg:max-w-md">
+          <div className="flex-1">
             <Input
               type="text"
               placeholder="Szukaj szkół..."
@@ -192,7 +192,7 @@ function SchoolCard({ school }) {
               {school.name}
             </h3>
             {school.address && (
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mt-1 text-gray-600 dark:text-gray-400">
                 📍 {school.address}
               </p>
             )}
@@ -202,7 +202,7 @@ function SchoolCard({ school }) {
                 <span className="font-semibold text-blue-600 dark:text-blue-400">
                   {school.classCount}
                 </span>
-                Klas <GraduationCap />
+                {school.classCount === 1 ? " Klasa" : " Klas"} <GraduationCap />
               </div>
               <div className="flex items-center gap-1 text-center">
                 <span className="font-semibold text-green-600 dark:text-green-400">
@@ -213,12 +213,6 @@ function SchoolCard({ school }) {
             </div>
           </div>
         </div>
-
-        {school.email && (
-          <p className="mt-1 text-gray-600 dark:text-gray-400">
-            📧 {school.email}
-          </p>
-        )}
       </div>
 
       <div className="mt-2 flex gap-2 border-t border-gray-200 pt-2 text-sm dark:border-gray-700">

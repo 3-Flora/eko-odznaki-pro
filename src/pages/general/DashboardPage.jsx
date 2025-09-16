@@ -132,7 +132,7 @@ export default function DashboardPage() {
         {isEkoskop && (
           <div className="space-y-6">
             {/* System Overview */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
               <DashboardCard
                 title="Szkoła"
                 subtitle="Zarządzaj szkołami"
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               />
               <DashboardCard
                 title="Treści"
-                subtitle="EkoDziałania & EkoOdznaki"
+                subtitle="EkoDziałania"
                 emoji="🌱"
                 className="from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 href="ekoskop/badges"

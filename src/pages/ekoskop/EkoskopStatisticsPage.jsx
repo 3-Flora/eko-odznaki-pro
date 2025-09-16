@@ -141,6 +141,7 @@ export default function EkoskopStatisticsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        emoji="📊"
         title="Statystyki globalne"
         subtitle="Przegląd aktywności wszystkich szkół w systemie"
       />
@@ -190,7 +191,7 @@ export default function EkoskopStatisticsPage() {
 
       {/* Activity Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 dark:text-gray-400">EkoDziałania</p>
@@ -202,7 +203,7 @@ export default function EkoskopStatisticsPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 dark:text-gray-400">EkoWyzwania</p>
@@ -214,7 +215,7 @@ export default function EkoskopStatisticsPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 dark:text-gray-400">Zgłoszenia</p>
@@ -228,7 +229,7 @@ export default function EkoskopStatisticsPage() {
       </div>
 
       {/* Category Statistics */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Statystyki kategorii (wszystkie szkoły)
         </h3>
@@ -240,7 +241,7 @@ export default function EkoskopStatisticsPage() {
       </div>
 
       {/* School Rankings */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Ranking szkół
         </h3>
