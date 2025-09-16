@@ -209,9 +209,9 @@ users/{userId}/
         - recyclingActions: 2,  // <-- Klucz do odznak za recykling
         - educationActions: 1,  // <-- Klucz do odznak za edukację
         - savingActions: 2      // <-- Klucz do odznak za oszczędzanie
-        - transportActions: 0
-        - energyActions: 0
-        - foodActions: 0
+        - transportActions: 0   // <-- Klucz do odznak za transport
+        - energyActions: 0      // <-- Klucz do odznak za energię
+        - foodActions: 0        // <-- Klucz do odznak za jedzenie
     // Mozemy dodać więcej
     - totalActiveDays: 1
   }
