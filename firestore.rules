@@ -67,6 +67,29 @@ service cloud.firestore {
              data.status in ['approved', 'rejected', 'pending'];
     }
 
+    // 🆕 WALIDACJA AKTUALIZACJI LICZNIKÓW I ODZNAK
+    // Sprawdza czy aktualizacja liczników jest prawidłowa (userCounterService.js)
+    function isValidCounterUpdate() {
+      let data = request.resource.data;
+      let oldData = resource.data;
+      
+      // Lista dozwolonych pól w counters
+      let allowedCounterFields = ['totalActions', 'totalChallenges', 'recyclingActions', 
+                                  'educationActions', 'savingActions', 'transportActions', 
+                                  'energyActions', 'foodActions', 'totalActiveDays'];
+      
+      // Sprawdź czy modyfikowane są tylko dozwolone pola
+      return (
+        // Jeśli counters są modyfikowane, sprawdź dozwolone pola
+        (!('counters' in data.diff(oldData).affectedKeys()) || 
+         data.counters.diff(oldData.counters).affectedKeys().hasOnly(allowedCounterFields)) &&
+        
+        // earnedBadges może być modyfikowane (dodawanie nowych odznak)
+        (!('earnedBadges' in data.diff(oldData).affectedKeys()) || 
+         data.earnedBadges is map)
+      );
+    }
+
     // ===== REGUŁY BEZPIECZEŃSTWA =====
 
     // KOLEKCJA: users
@@ -84,6 +107,18 @@ service cloud.firestore {
                        isUserInClass(userId, get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId) &&
                        // Nauczyciel może tylko zmieniać isVerified
                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isVerified']);
+
+      // 🆕 AUTOMATYCZNA AKTUALIZACJA LICZNIKÓW I ODZNAK
+      // Nauczyciel może aktualizować liczniki i odznaki ucznia z jego klasy 
+      // (automatyczne po zatwierdzeniu zgłoszeń - userCounterService.js)
+      allow update: if isAuthenticated() && 
+                       getUserRole(request.auth.uid) == 'teacher' &&
+                       isUserInClass(userId, get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId) &&
+                       // Można tylko aktualizować pola związane z licznikami i odznakami
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasAny(['counters', 'earnedBadges']) &&
+                       // Sprawdź czy modyfikowane są tylko dozwolone pola counters
+                       isValidCounterUpdate();
     }
 
     // KOLEKCJA: schools
@@ -147,7 +182,9 @@ service cloud.firestore {
                      getUserRole(request.auth.uid) == 'teacher' &&
                      resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId;
 
+      // 🆕 AUTOMATYCZNA AKTUALIZACJA STATUSU ZGŁOSZENIA
       // Tylko nauczyciel może zmieniać status zgłoszeń uczniów ze swojej klasy
+      // Po zatwierdzeniu następuje automatyczna aktualizacja liczników (SubmissionDetailPage.jsx -> userCounterService.js)
       allow update: if isAuthenticated() && 
                        getUserRole(request.auth.uid) == 'teacher' &&
                        resource.data.classId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.classId &&

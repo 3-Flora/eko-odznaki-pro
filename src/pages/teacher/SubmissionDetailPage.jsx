@@ -2,10 +2,15 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useNavigate, useParams } from "react-router";
+import { useGlobalRefresh } from "../../contexts/RefreshContext";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { getEcoActions } from "../../services/ecoActionService";
 import { getEcoChallenges } from "../../services/ecoChallengeService";
+import {
+  updateUserCountersOnApproval,
+  revertUserCountersOnRejection,
+} from "../../services/userCounterService";
 import {
   CheckCircle,
   XCircle,
@@ -30,6 +35,7 @@ export default function SubmissionDetailPage() {
   const { currentUser } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
+  const { triggerGlobalRefresh, triggerSpecificRefresh } = useGlobalRefresh();
 
   const [submission, setSubmission] = useState(null);
   const [ecoAction, setEcoAction] = useState(null);
@@ -119,12 +125,36 @@ export default function SubmissionDetailPage() {
 
     try {
       const submissionRef = doc(db, "submissions", submissionId);
+
+      // 🆕 AKTUALIZACJA STATUSU ZGŁOSZENIA NA ODRZUCONE
+      // Najpierw zaktualizuj status zgłoszenia
       await updateDoc(submissionRef, {
         status: "rejected",
         reviewedAt: new Date(),
         reviewedBy: currentUser.id,
         rejectionReason: rejectionReason,
       });
+
+      // 🆕 COFNIĘCIE LICZNIKÓW JEŚLI ZGŁOSZENIE BYŁO WCZEŚNIEJ ZATWIERDZONE
+      // Jeśli zgłoszenie było wcześniej zatwierdzone, cofnij liczniki
+      if (submission?.status === "approved" && submission?.studentId) {
+        try {
+          const activityData =
+            submission.type === "eco_action" ? ecoAction : challenge;
+
+          if (activityData) {
+            await revertUserCountersOnRejection(
+              submission.studentId,
+              activityData,
+              submission.type,
+            );
+            console.log("Liczniki użytkownika zostały cofnięte po odrzuceniu");
+          }
+        } catch (counterError) {
+          console.error("Błąd podczas cofania liczników:", counterError);
+          showError("Zgłoszenie odrzucone, ale wystąpił błąd z licznikami");
+        }
+      }
 
       // Aktualizuj lokalny stan
       setSubmission((prev) => ({
@@ -141,6 +171,26 @@ export default function SubmissionDetailPage() {
       // Resetuj modal
       setShowRejectModal(false);
       setRejectionReason("");
+
+      // 🆕 ODŚWIEŻENIE CACHE PO AKTUALIZACJI STATUSU
+      // Odśwież cache strony submissions po pomyślnej aktualizacji
+      try {
+        await triggerSpecificRefresh("teacher-submissions");
+        console.log(
+          "Cache strony submissions został odświeżony po odrzuceniu zgłoszenia",
+        );
+      } catch (refreshError) {
+        console.error("Błąd podczas odświeżania cache:", refreshError);
+        // Jeśli nie uda się odświeżyć specyficznie, spróbuj globalnie
+        try {
+          await triggerGlobalRefresh();
+        } catch (globalRefreshError) {
+          console.error(
+            "Błąd podczas globalnego odświeżania cache:",
+            globalRefreshError,
+          );
+        }
+      }
     } catch (error) {
       console.error("Error rejecting submission:", error);
       showError("Błąd podczas odrzucania zgłoszenia");
@@ -160,11 +210,77 @@ export default function SubmissionDetailPage() {
 
     try {
       const submissionRef = doc(db, "submissions", submissionId);
+
+      // Najpierw zaktualizuj status zgłoszenia
       await updateDoc(submissionRef, {
         status: status,
         reviewedAt: new Date(),
         reviewedBy: currentUser.id,
       });
+
+      // Jeśli zgłoszenie zostało zatwierdzone, zaktualizuj liczniki użytkownika
+      if (status === "approved" && submission?.studentId) {
+        try {
+          // 🆕 AUTOMATYCZNA AKTUALIZACJA LICZNIKÓW PO ZATWIERDZENIU ZGŁOSZENIA
+          // Znajdź odpowiednie dane aktywności (EkoDziałanie lub EkoWyzwanie)
+          const activityData =
+            submission.type === "eco_action" ? ecoAction : challenge;
+
+          if (activityData) {
+            // 🆕 WYWOŁANIE SERWISU AKTUALIZACJI LICZNIKÓW (userCounterService.js)
+            const result = await updateUserCountersOnApproval(
+              submission.studentId,
+              activityData,
+              submission.type,
+              submission.classId, // ID klasy dla feed aktywności
+              submission.studentName, // Nazwa użytkownika dla feed aktywności
+            );
+            console.log("Liczniki użytkownika zostały zaktualizowane");
+
+            // Jeśli użytkownik zdobył nowe odznaki, pokaż informację
+            if (result.newBadges && result.newBadges.length > 0) {
+              const badgeNames = result.newBadges
+                .map((badge) => `${badge.name} (poziom ${badge.level})`)
+                .join(", ");
+              showSuccess(
+                `Zgłoszenie zatwierdzone! 🎉 ${submission.studentName} zdobył nowe odznaki: ${badgeNames}`,
+              );
+            }
+          } else {
+            console.warn(
+              "Nie znaleziono danych aktywności dla aktualizacji liczników",
+            );
+          }
+        } catch (counterError) {
+          console.error("Błąd podczas aktualizacji liczników:", counterError);
+          // Nie przerywamy procesu - zgłoszenie zostało zatwierdzone, ale liczniki nie zostały zaktualizowane
+          showError("Zgłoszenie zatwierdzone, ale wystąpił błąd z licznikami");
+        }
+      }
+
+      // Jeśli zgłoszenie zostało odrzucone po poprzednim zatwierdzeniu, cofnij liczniki
+      if (
+        status === "rejected" &&
+        submission?.status === "approved" &&
+        submission?.studentId
+      ) {
+        try {
+          const activityData =
+            submission.type === "eco_action" ? ecoAction : challenge;
+
+          if (activityData) {
+            await revertUserCountersOnRejection(
+              submission.studentId,
+              activityData,
+              submission.type,
+            );
+            console.log("Liczniki użytkownika zostały cofnięte");
+          }
+        } catch (counterError) {
+          console.error("Błąd podczas cofania liczników:", counterError);
+          showError("Zgłoszenie odrzucone, ale wystąpił błąd z licznikami");
+        }
+      }
 
       // Aktualizuj lokalny stan
       setSubmission((prev) => ({
@@ -178,6 +294,26 @@ export default function SubmissionDetailPage() {
           ? `${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało zatwierdzone`
           : `${submission.type === "eco_action" ? "EkoDziałanie" : "EkoWyzwanie"} zostało odrzucone`,
       );
+
+      // 🆕 ODŚWIEŻENIE CACHE PO AKTUALIZACJI STATUSU
+      // Odśwież cache strony submissions po pomyślnej aktualizacji
+      try {
+        await triggerSpecificRefresh("teacher-submissions");
+        console.log(
+          "Cache strony submissions został odświeżony po aktualizacji zgłoszenia",
+        );
+      } catch (refreshError) {
+        console.error("Błąd podczas odświeżania cache:", refreshError);
+        // Jeśli nie uda się odświeżyć specyficznie, spróbuj globalnie
+        try {
+          await triggerGlobalRefresh();
+        } catch (globalRefreshError) {
+          console.error(
+            "Błąd podczas globalnego odświeżania cache:",
+            globalRefreshError,
+          );
+        }
+      }
     } catch (error) {
       console.error("Error updating submission:", error);
       showError("Błąd podczas aktualizacji zgłoszenia");

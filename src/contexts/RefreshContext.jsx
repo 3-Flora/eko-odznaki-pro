@@ -54,13 +54,38 @@ export function RefreshProvider({ children }) {
     }
   }, [refreshTriggers, isRefreshing]);
 
+  // 🆕 FUNKCJA SPECYFICZNEGO ODŚWIEŻANIA - używana po aktualizacji statusu zgłoszeń
+  // Odświeżanie konkretnej strony/komponentu po ID (np. "teacher-submissions")
+  const triggerSpecificRefresh = useCallback(
+    async (id) => {
+      const refreshFn = refreshTriggers.get(id);
+      if (refreshFn) {
+        try {
+          console.log(`🔄 Triggering specific refresh for: ${id}`);
+          await refreshFn();
+        } catch (error) {
+          console.error(`Error refreshing ${id}:`, error);
+        }
+      } else {
+        console.warn(`No refresh function registered for ID: ${id}`);
+      }
+    },
+    [refreshTriggers],
+  );
+
   const value = React.useMemo(
     () => ({
       isRefreshing,
       registerRefreshTrigger,
       triggerGlobalRefresh,
+      triggerSpecificRefresh,
     }),
-    [isRefreshing, registerRefreshTrigger, triggerGlobalRefresh],
+    [
+      isRefreshing,
+      registerRefreshTrigger,
+      triggerGlobalRefresh,
+      triggerSpecificRefresh,
+    ],
   );
 
   return (
