@@ -32,7 +32,7 @@ export const Navbar = () => {
     "/ekoskop/schools",
     "/ekoskop/users",
     "/ekoskop/statistics",
-    "/ekoskop/articles",
+    // "/ekoskop/articles",
     "/ekoskop/eco-actions",
     "/ekoskop/badges",
   ]);

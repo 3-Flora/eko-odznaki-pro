@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Target,
+  LeafyGreenIcon,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSidebar } from "../../contexts/SidebarContext";
@@ -63,20 +64,20 @@ export const SideNav = () => {
       icon: BarChart3,
       label: "Statystyki",
     },
-    {
-      id: "/ekoskop/articles",
-      icon: FileText,
-      label: "Artykuły",
-    },
-    {
-      id: "/ekoskop/eco-actions",
-      icon: Plus,
-      label: "EkoDziałania",
-    },
+    // {
+    //   id: "/ekoskop/articles",
+    //   icon: FileText,
+    //   label: "Artykuły",
+    // },
     {
       id: "/ekoskop/badges",
       icon: Award,
       label: "Odznaki",
+    },
+    {
+      id: "/ekoskop/eco-actions",
+      icon: LeafyGreenIcon,
+      label: "EkoDziałania",
     },
     {
       id: "/ekoskop/challenges",

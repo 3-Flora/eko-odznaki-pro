@@ -2,9 +2,14 @@ import clsx from "clsx";
 
 export default function PageHeader({ emoji, title, subtitle, className }) {
   return (
-    <div className={clsx("relative mt-2 mb-4", className)}>
+    <div className={"relative mt-2 mb-4"}>
       {/* Header Content */}
-      <div className="text-center lg:flex lg:items-center lg:gap-6 lg:text-left">
+      <div
+        className={clsx(
+          "text-center lg:flex lg:items-center lg:gap-6 lg:text-left",
+          className,
+        )}
+      >
         {emoji && (
           <div className="mb-4 text-6xl lg:mb-0 lg:text-8xl">{emoji}</div>
         )}

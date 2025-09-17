@@ -6,6 +6,10 @@ import { useToast } from "../../contexts/ToastContext";
 import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
 import { ECO_CATEGORIES } from "../../constants/ecoCategories";
+import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import NavButton from "../../components/ui/NavButton";
+import { Plus } from "lucide-react";
 
 export default function EkoskopChallengesPage() {
   const [challenges, setChallenges] = useState([]);
@@ -108,53 +112,37 @@ export default function EkoskopChallengesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Zarządzanie wyzwaniami"
-        subtitle="Twórz i edytuj EkoWyzwania dostępne dla klas"
+        title="EkoWyzwania"
+        subtitle="Zarządzaj wyzwaniami ekologicznymi w aplikacji"
       />
 
+      {/* Search and Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-4">
-          <input
+        <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
+          <Input
             type="text"
             placeholder="Szukaj wyzwań..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
+            className="max-w-md"
           />
-
-          <select
+          <Select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
+            className="max-w-xs"
           >
-            <option value="all">Wszystkie kategorie</option>
-            {ECO_CATEGORIES.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.name}
+            <option value="">Wszystkie kategorie</option>
+            {Object.keys(ECO_CATEGORIES).map((category) => (
+              <option key={category} value={category}>
+                {ECO_CATEGORIES[category].name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
-
-        <Link
-          to="/ekoskop/challenges/create"
-          className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
-        >
-          <svg
-            className="mr-2 h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
+        <NavButton to="/ekoskop/challenges/create" variant="primary">
+          <Plus className="h-4 w-4" />
           Nowe wyzwanie
-        </Link>
+        </NavButton>
       </div>
 
       {filtered.length === 0 ? (
@@ -172,7 +160,7 @@ export default function EkoskopChallengesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c) => {
             const cat = getCategoryInfo(c.category);
             return (

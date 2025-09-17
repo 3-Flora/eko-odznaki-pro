@@ -7,7 +7,10 @@ import PageHeader from "../../components/ui/PageHeader";
 import Loading from "../../components/routing/Loading";
 import { ECO_CATEGORIES } from "../../constants/ecoCategories";
 import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import NavButton from "../../components/ui/NavButton";
 import EkoSkopBadge from "../../components/badges/EkoSkopBadge";
+import { Plus } from "lucide-react";
 
 export default function EkoskopBadgesPage() {
   const [badges, setBadges] = useState([]);
@@ -78,20 +81,19 @@ export default function EkoskopBadgesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        emoji="🏆"
         title="Zarządzanie odznakami"
         subtitle="Twórz i edytuj odznaki przyznawane uczniom za EkoDziałania"
+        emoji="🏆"
       />
 
-      {/* Search and Filters */}
+      {/* Search and Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-4">
-          <input
+          <Input
             type="text"
             placeholder="Szukaj odznak..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-green-400"
           />
 
           <Select
@@ -108,25 +110,12 @@ export default function EkoskopBadgesPage() {
           </Select>
         </div>
 
-        <Link
-          to="/ekoskop/badges/create"
-          className="flex h-full items-center rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
-        >
-          <svg
-            className="mr-2 h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Nowa odznaka
-        </Link>
+        <div className="flex gap-4">
+          <NavButton href="/ekoskop/badges/create" className="w-full sm:w-auto">
+            <Plus />
+            Nowa odznaka
+          </NavButton>
+        </div>
       </div>
 
       {/* Badges Grid */}
@@ -135,7 +124,7 @@ export default function EkoskopBadgesPage() {
           <div className="mb-4 text-4xl">🏆</div>
           <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             {searchTerm || filterCategory !== "all"
-              ? "Brak wyników"
+              ? "Brak wyników wyszukiwania"
               : "Brak odznak"}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -145,7 +134,7 @@ export default function EkoskopBadgesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filteredBadges.map((badge) => {
             return (
               <EkoSkopBadge
